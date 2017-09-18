@@ -1,9 +1,12 @@
-Download the [latest release](https://github.com/SchlossLab/new_project/releases/latest) to the directory and decompress
+## Effects of Short Chain Fatty Acid Production on the Microbiota and Colorectal Cancer
 
+The abstract will be updated once analysis is completed. The general overall analysis workflow is as follows:
 
-## TITLE OF YOUR PAPER GOES HERE
+* Analyze differences in SCFA between those with and without colorectal cancer (CRC)
+* Assess which bacterial communities are associated with SCFA reduction
+* Determine if any of these communities are higher in those with CRC
 
-YOUR PAPER'S ABSTRACT GOES HERE
+Overall goal is to develop a potential framework by which the microbiota can affect CRC disease course through SCFAs
 
 
 
