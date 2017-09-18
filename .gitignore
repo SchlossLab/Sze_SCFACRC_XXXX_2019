@@ -6,6 +6,9 @@
 
 data/*/*
 !data/process/*
+!data/raw/metadata/
+!data/raw/Raw_hplc_files
+!data/raw/scfa_plate_layouts
 !README.md
 
 *.qsub*
