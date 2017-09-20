@@ -113,9 +113,6 @@ run_conversion <- function(group_length, std_areas,
   
 }
 
-### Not working need to figure out why
-
-
 
 # Function to create correction factor for the samples
 get_correction_factor <- function(g, samplesList){
@@ -141,10 +138,22 @@ get_corr_conc <- function(list_number, conv_sampleData,
   value2 <- paste("std", list_number + 1, sep = "")
   tempData <- conv_sampleData[[list_number]]
   
-  tempConc <- tempData[, value1] + 
-    correctionFactors[[list_number]]*(tempData[, value2] - tempData[, value1])
+  if(length(conv_sampleData) != as.numeric(gsub("std", "", value1))){
+    
+    tempConc <- tempData[, value1] + 
+      correctionFactors[[list_number]]*(tempData[, value2] - tempData[, value1])
+    
+    finalTable <- tempData %>% select(location, Sample.Name) %>% 
+      mutate(conc_mM = tempConc)
+    
+  } else {
+    
+    finalTable <- NULL
+  }
   
-  return(tempConc)
+ 
+  
+  return(finalTable)
   
 }
 
@@ -196,12 +205,25 @@ converted_samples <- sapply(c(1:length(sample_location)),
                                             std_list_length = length(sample_location), 
                                             stds = F), simplify = F)
 
+corrected_conc <- sapply(c(1:length(sample_location)), 
+                         function(x) 
+                           get_corr_conc(x, converted_samples, correction_factor_list), 
+                         simplify = F) %>% bind_rows()
+
+
+
+
+
 
 
 
 
 # TO DO LIST
-### Create correction based on location run
-### Correct concentration based on location of sample relative to three different standards used
-    ### e.g. use std 1 and 2 if samples between them and std 2 and 3 if samples between them (mM)
 ### Convert to mmol/kg based on weight measured and total volume originally suspended in
+
+
+
+
+
+
+
