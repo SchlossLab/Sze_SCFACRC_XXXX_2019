@@ -74,25 +74,75 @@ get_corr_coefficients <- function(i, areas, stds_amount){
 
 
 # Function to convert the standards based on provided area
-run_conversion <- function(i, stds_coeff, std_areas){
+run_conversion <- function(group_length, std_areas, 
+                           stds_coeff = coeff_list, std_list_length = NULL, stds = T){
   
-  tempConc <- (std_areas[[i]] - filter(stds_coeff, variables == "Intercept")[, i]) / 
-    filter(stds_coeff, variables == "m")[, i]
+  if(stds == T){
+    
+    tempConc <- (std_areas[[group_length]] - 
+                   filter(stds_coeff, variables == "Intercept")[, group_length]) / 
+      filter(stds_coeff, variables == "m")[, group_length]
+    
+  } else {
+    
+    x = 1
+    tempList <-  NULL
+    
+    while (x - std_list_length <= 0){
+
+      tempList[[x]] <- (std_areas[[group_length]]$Area - 
+                          filter(stds_coeff, variables == "Intercept")[, x]) / 
+        filter(stds_coeff, variables == "m")[, x]
+      
+      x = x + 1
+      
+      
+
+    }
+    
+    tempConc <- as.data.frame.list(tempList)
+    colnames(tempConc) <- paste("std", c(1:std_list_length), sep = "")
+    
+    tempConc <- cbind(std_areas[[group_length]], tempConc)
+    
+  }
+  
+  
   
   return(tempConc)
   
 }
 
-
+### Not working need to figure out why
 
 
 
 # Function to create correction factor for the samples
-get_correction_factor <- function(){
+get_correction_factor <- function(g, samplesList){
+  
+  tempVector <- c(1:length(rownames(samplesList[[g]])))
+  
+  tempData <- samplesList[[g]]
+  first_cf <- 1/(max(tempData$location) - min(tempData$location))
+  
+  tempVector <- tempVector * first_cf
   
   
+  return(tempVector)
 }
 
+# corrected_concentration = std1 + correction_factor*(std2-std1)
+
+# Function to get the correction concentrations
+get_corr_conc <- function(group_length, sample_locations, conv_sampleData, 
+                          correctionFactors, conv_stdsData){
+  
+  i1 <- group_length
+  i2 <- i1 + 1
+  
+  tempConc <- conv_sampleData[[1]]
+  
+}
 
 
 
@@ -124,8 +174,8 @@ coeff_list <- sapply(names(area_list),
   as.data.frame() %>% mutate(variables = c("Intercept", "m"))
 
 
-converted_stds <- sapply(names(area_list), 
-                         function(x) run_conversion(x, coeff_list, area_list))
+converted_stds <- sapply(c(1:length(area_list)), 
+                         function(x) run_conversion(x, area_list))
 
 
 sample_list <- sapply(names(sample_location), 
@@ -133,14 +183,18 @@ sample_list <- sapply(names(sample_location),
                         suppressWarnings(
                           get_samples(x, sample_location, dataTable)), simplify = F)
 
+correction_factor_list <- sapply(names(sample_location), 
+                                 function(x) get_correction_factor(x, sample_list))
+
+converted_samples <- sapply(c(1:length(sample_location)), 
+                           function(x) 
+                             run_conversion(x, sample_list, 
+                                            std_list_length = length(sample_location), 
+                                            stds = F), simplify = F)
 
 
 
-
-
-
-
-
+run_conversion(1, sample_list, std_list_length = 3, stds = F)
 
 
 
