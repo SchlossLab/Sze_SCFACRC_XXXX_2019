@@ -131,16 +131,20 @@ get_correction_factor <- function(g, samplesList){
   return(tempVector)
 }
 
-# corrected_concentration = std1 + correction_factor*(std2-std1)
+# corrected_concentration = std1_value + correction_factor*(std2-std1)
 
 # Function to get the correction concentrations
-get_corr_conc <- function(group_length, sample_locations, conv_sampleData, 
-                          correctionFactors, conv_stdsData){
+get_corr_conc <- function(list_number, conv_sampleData, 
+                          correctionFactors){
   
-  i1 <- group_length
-  i2 <- i1 + 1
+  value1 <- paste("std", list_number, sep = "")
+  value2 <- paste("std", list_number + 1, sep = "")
+  tempData <- conv_sampleData[[list_number]]
   
-  tempConc <- conv_sampleData[[1]]
+  tempConc <- tempData[, value1] + 
+    correctionFactors[[list_number]]*(tempData[, value2] - tempData[, value1])
+  
+  return(tempConc)
   
 }
 
@@ -191,15 +195,6 @@ converted_samples <- sapply(c(1:length(sample_location)),
                              run_conversion(x, sample_list, 
                                             std_list_length = length(sample_location), 
                                             stds = F), simplify = F)
-
-
-
-run_conversion(1, sample_list, std_list_length = 3, stds = F)
-
-
-
-
-
 
 
 
