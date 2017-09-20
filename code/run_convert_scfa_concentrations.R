@@ -54,6 +54,16 @@ get_corr_coefficients <- function(i, areas, stds_amount){
 }
 
 
+# Function to convert the standards based on provided area
+run_conversion <- function(i, stds_coeff, std_areas){
+  
+  tempConc <- (std_areas[[i]] - filter(stds_coeff, variables == "intercept")[, i]) / 
+    filter(stds_coeff, variables == "m")[, i]
+  
+  return(tempConc)
+  
+}
+
 
 ##############################################################################################
 ############### Run the actual programs to get the data ######################################
