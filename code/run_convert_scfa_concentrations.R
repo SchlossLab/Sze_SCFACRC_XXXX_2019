@@ -10,33 +10,82 @@ source('code/functions.R')
 loadLibs(c("dplyr", "tidyr", "ggplot2"))
 
 
-
-dataTable <- read.csv("exploratory/scratch/reference_for_calcs/test_data.csv", header = T, stringsAsFactors = F)
-
-g1_stds <- c(20, 10, 5, 2.5, 1.0, 0.5, 0.25, 0.1)
-
-stds1_location <- c(2:9)
-stds2_location <- c(43:49)
-stds3_location <- c(79:85)
+dataTable <- read.csv("exploratory/scratch/reference_for_calcs/test_data.csv", 
+                      header = T, stringsAsFactors = F)
 
 
-std_areas <- dataTable %>% filter(grepl("STD", Sample.ID) == TRUE & grepl("biorad", Sample.ID) != TRUE) %>% 
+stds_location <- list(std1 = c(2:9), std2 = c(43:49), 
+                      std3 = c(79:85))
+
+
+
+##############################################################################################
+############### List of functions to get things to run nice ##################################
+##############################################################################################
+
+# Function to generate the areas needed for the respective correlation analysis
+get_areas <- function(i, all_stds_data, locationList){
+  
+  temp_areas <- all_stds_data %>% slice(match(locationList[[i]], location)) %>% 
+    select(Area) %>% mutate(Area = as.numeric(Area))
+  
+  return(temp_areas)
+}
+
+
+# Function to get the standard values used
+get_standards <- function(i, all_stds_data, locationList){
+  
+  temp_stands <- all_stds_data %>% 
+    slice(match(locationList[[i]], location)) %>% 
+    select(conc)
+  
+  return(temp_stands)
+}
+
+
+# Function to generate the needed coefficients for std transformation
+get_corr_coefficients <- function(i, areas, stds_amount){
+  
+  tempCoeff <- lm(areas[[i]]$Area ~ stds_amount[[i]]$conc)$coefficients
+  
+  return(tempCoeff)
+  
+}
+
+
+
+##############################################################################################
+############### Run the actual programs to get the data ######################################
+##############################################################################################
+
+std_areas <- dataTable %>% 
+  filter(grepl("STD", Sample.ID) == TRUE & grepl("biorad", Sample.ID) != TRUE) %>% 
   separate(Data.Filename, c("temp1", "temp2"), sep = "_") %>% 
-  rename(location = temp2) %>% mutate(location = as.numeric(gsub("\\.lcd", "", location)))
+  rename(location = temp2) %>% 
+  separate(Sample.Name, c("conc", "unit"), sep = " ") %>% 
+  mutate(location = as.numeric(gsub("\\.lcd", "", location)), 
+         conc = as.numeric(conc))
 
-temp_areas <- std_areas %>% slice(match(stds1_location, location)) %>% select(Area) %>% 
-  mutate(Area = as.numeric(Area))
 
 
-test1 <- lm(temp_areas$Area ~ g1_stds)
+area_list <- sapply(names(stds_location), 
+               function(x) get_areas(x, std_areas, stds_location), simplify = F)
 
-std1_corr_factors <- test1$coefficients
+stand_list <- sapply(names(stds_location), 
+                     function(x) get_standards(x, std_areas, stds_location), 
+                     simplify = F)
+
+coeff_list <- sapply(names(area_list), 
+                     function(x) get_corr_coefficients(x, area_list, stand_list)) %>% 
+  as.data.frame() %>% mutate(variables = c("Intercept", "m"))
+
+
+
 
 
 
 # TO DO LIST
-### Create three different linear regressions
-    ### One for each standard (x = concentration, y = Area)
 ### Convert each standard based on unique model obtained
 ### Create correction based on location run
 ### Correct concentration based on location of sample relative to three different standards used
