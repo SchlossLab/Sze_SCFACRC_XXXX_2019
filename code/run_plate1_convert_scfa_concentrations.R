@@ -380,14 +380,3 @@ sapply(scfas,
 
 
 
-
-
-# TO DO LIST
-### Convert to mmol/kg based on weight measured and total volume originally suspended in
-
-
-
-
-
-
-
