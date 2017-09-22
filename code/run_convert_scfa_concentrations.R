@@ -10,10 +10,13 @@ source('code/functions.R')
 loadLibs(c("dplyr", "tidyr", "ggplot2"))
 
 # Set up the locations of the standards
-stds_location <- list(std1 = c(1:9), std2 = c(66:74))
+stds_positions <- list(std1 = c(1:9), std2 = c(66:74))
 
 # Set up the locastions of the samples
-sample_location <- list(g1 = c(11:65))
+sample_positions <- list(g1 = c(11:65))
+
+# Set up the scfas of interest
+scfas <- c("acetate", "butyrate", "isobutyrate", "propionate")
 
 
 ##############################################################################################
@@ -27,7 +30,7 @@ get_scfa_data <- function(scfa_name, uniq_name, ending,
   if(!is.null(scfa_name)){
     
     tempData <- read.delim(
-      paste(path_to_file, "/", scfa_name, "/", uniq_name, "_", ending, sep = ""), 
+      paste(path_to_file, scfa_name, "/", uniq_name, "_", ending, sep = ""), 
       skip = 2, header = T, stringsAsFactors = F, row.names = 1) %>% 
       select(Data.Filename, Sample.ID, Sample.Name, Ret..Time, 
              Area, Peak.Start, Peak.End, Conc.) %>% 
@@ -165,7 +168,7 @@ get_corr_coefficients <- function(i, areas, stds_amount){
 
 # Function to convert the standards based on provided area
 run_conversion <- function(group_length, std_areas, 
-                           stds_coeff = coeff_list, std_list_length = NULL, stds = T){
+                           stds_coeff, std_list_length = NULL, stds = T){
   # group_length represents the group number of interest
   # std_areas represents the dataList with the areas of interest
   # std_coeff is defaulted to coeff_list since it is always the same
@@ -244,7 +247,6 @@ get_corr_conc <- function(list_number, conv_sampleData,
     # merge the corrected concentrations with location and sample name
     finalTable <- tempData %>% mutate(conc_mM = tempConc)
     
-    print("HEllo")
   } else {
     # sets table to NULL if standards are at the end
     finalTable <- NULL
@@ -254,6 +256,67 @@ get_corr_conc <- function(list_number, conv_sampleData,
   
 }
 
+# Function to generate final mmol/kg values
+# 1000uL  = 1mL = 0.1L
+# g needs to be multiplied by 1000 
+# mmol/kg = (corr_conc * 0.1) / (g * 1000)
+
+
+
+
+
+# Control function to make the finalized corrected concentration data
+get_final_concentrations <- function(scfa_of_interest, rawdataList, metadata, 
+                                     stds_location, sample_location){
+  
+  tempData <- rawdataList[[scfa_of_interest]]
+  ptest <- perform_peak_check(tempData)
+  
+  comb_test <- combine_data(ptest, metadata, "Sample.ID")
+  std_areas <- make_standard_table(ptest)
+  
+  
+  # Generate the standard areas
+  area_list <- sapply(names(stds_location), 
+                      function(x) get_areas(x, std_areas, stds_location), simplify = F)
+  # Generate the standard concentrations
+  stand_list <- sapply(names(stds_location), 
+                       function(x) get_standards(x, std_areas, stds_location), 
+                       simplify = F)
+  # Generate the coefficients for each standard grouping
+  coeff_list <- sapply(names(area_list), 
+                       function(x) get_corr_coefficients(x, area_list, stand_list)) %>% 
+    as.data.frame() %>% mutate(variables = c("Intercept", "m"))
+  
+  # generate the converted standards values based on generated coefficients
+  converted_stds <- sapply(c(1:length(area_list)), 
+                           function(x) run_conversion(x, area_list, coeff_list))
+  
+  # generate sample groupings based on location on run
+  sample_list <- sapply(names(sample_location), 
+                        function(x) 
+                          suppressWarnings(
+                            get_samples(x, sample_location, comb_test)), simplify = F)
+  # generate correction factors based on location on run
+  correction_factor_list <- sapply(names(sample_location), 
+                                   function(x) get_correction_factor(x, sample_list), simplify = F)
+  # get the converted sample values based on location of standards run and location on run
+  converted_samples <- sapply(c(1:length(sample_location)), 
+                              function(x) 
+                                run_conversion(x, sample_list, coeff_list, 
+                                               std_list_length = length(stds_location), 
+                                               stds = F), simplify = F)
+  # get the final corrected concentrations
+  corrected_conc <- sapply(c(1:length(sample_location)), 
+                           function(x) 
+                             get_corr_conc(x, converted_samples, correction_factor_list), 
+                           simplify = F) %>% bind_rows()
+  
+  return(corrected_conc)
+}
+
+
+
 
 
 ##############################################################################################
@@ -261,50 +324,19 @@ get_corr_conc <- function(list_number, conv_sampleData,
 ##############################################################################################
 
 
-test <- get_scfa_data("acetate", "plate1", "scfa_crc_acetate.txt")
-ptest <- perform_peak_check(test)
+test <- sapply(scfas, 
+               function(x) 
+                 get_scfa_data(x, "plate1_scfa_crc", paste(x, ".txt", sep = "")), 
+                               simplify = F)
+  
 meta_test <- get_scfa_data(NULL, "scfa_plate_metadata.csv", NULL, "data/raw/metadata/")
-comb_test <- combine_data(ptest, meta_test, "Sample.ID")
-std_areas <- make_standard_table(ptest)
 
 
-# Generate the standard areas
-area_list <- sapply(names(stds_location), 
-               function(x) get_areas(x, std_areas, stds_location), simplify = F)
-# Generate the standard concentrations
-stand_list <- sapply(names(stds_location), 
-                     function(x) get_standards(x, std_areas, stds_location), 
-                     simplify = F)
-# Generate the coefficients for each standard grouping
-coeff_list <- sapply(names(area_list), 
-                     function(x) get_corr_coefficients(x, area_list, stand_list)) %>% 
-  as.data.frame() %>% mutate(variables = c("Intercept", "m"))
-
-# generate the converted standards values based on generated coefficients
-converted_stds <- sapply(c(1:length(area_list)), 
-                         function(x) run_conversion(x, area_list))
-
-# generate sample groupings based on location on run
-sample_list <- sapply(names(sample_location), 
-                      function(x) 
-                        suppressWarnings(
-                          get_samples(x, sample_location, comb_test)), simplify = F)
-# generate correction factors based on location on run
-correction_factor_list <- sapply(names(sample_location), 
-                                 function(x) get_correction_factor(x, sample_list), simplify = F)
-# get the converted sample values based on location of standards run and location on run
-converted_samples <- sapply(c(1:length(sample_location)), 
-                           function(x) 
-                             run_conversion(x, sample_list, 
-                                            std_list_length = length(stds_location), 
-                                            stds = F), simplify = F)
-# get the final corrected concentrations
-corrected_conc <- sapply(c(1:length(sample_location)), 
-                         function(x) 
-                           get_corr_conc(x, converted_samples, correction_factor_list), 
-                         simplify = F)
-
-
+final_test <- sapply(scfas, 
+                     function(x) 
+                       get_final_concentrations(x, test, meta_test, 
+                                                stds_positions, sample_positions), simplify = F)
+  
 
 
 
