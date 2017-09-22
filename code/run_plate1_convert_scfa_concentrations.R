@@ -19,7 +19,7 @@ sample_positions <- list(g1 = c(11:65))
 scfas <- c("acetate", "butyrate", "isobutyrate", "propionate")
 
 # Set up the plate name
-plate <- "plate1_scfa_crc"
+plate <- "plate2_scfa_crc"
 
 # Set up mapping file nam
 map_name <- "scfa_plate_metadata.csv"
