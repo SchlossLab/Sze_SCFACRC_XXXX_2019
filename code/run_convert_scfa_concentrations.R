@@ -9,22 +9,96 @@ source('code/functions.R')
 # Load needed libraries
 loadLibs(c("dplyr", "tidyr", "ggplot2"))
 
-# Load in data file
-dataTable <- read.csv("exploratory/scratch/reference_for_calcs/test_data.csv", 
-                      header = T, stringsAsFactors = F)
-
 # Set up the locations of the standards
-stds_location <- list(std1 = c(2:9), std2 = c(43:49), 
-                      std3 = c(79:85))
+stds_location <- list(std1 = c(1:9), std2 = c(66:74))
 
 # Set up the locastions of the samples
-sample_location <- list(g1 = c(11:41), g2 = c(50:77), 
-                        g3 = c(86:109))
+sample_location <- list(g1 = c(11:65))
 
 
 ##############################################################################################
 ############### List of functions to get things to run nice ##################################
 ##############################################################################################
+
+# Function to read in data tables for scfa or mapping file
+get_scfa_data <- function(scfa_name, uniq_name, ending, 
+                          path_to_file = "data/raw/Raw_hplc_files/"){
+  
+  if(!is.null(scfa_name)){
+    
+    tempData <- read.delim(
+      paste(path_to_file, "/", scfa_name, "/", uniq_name, "_", ending, sep = ""), 
+      skip = 2, header = T, stringsAsFactors = F, row.names = 1) %>% 
+      select(Data.Filename, Sample.ID, Sample.Name, Ret..Time, 
+             Area, Peak.Start, Peak.End, Conc.) %>% 
+      filter(Area != "-----") %>% 
+      mutate(
+        Ret..Time = as.numeric(Ret..Time), 
+        Area = as.numeric(Area), 
+        Peak.Start = as.numeric(Peak.Start), 
+        Peak.End = as.numeric(Peak.End), 
+        Conc. = as.numeric(Conc.))
+  } else{
+    
+    tempData <- read.csv(paste(path_to_file, "/", uniq_name, sep = ""), 
+                         header = T, stringsAsFactors = F)
+  }
+  
+ 
+  
+  
+  
+  
+  return(tempData)
+  
+  
+}
+
+
+# Function to remove outliers from the samples. 
+# Must be contained in min peak start and max peak end. 
+# Allow for 5% variation on either end)
+perform_peak_check <- function(dataTable){
+  
+  tempStds <- dataTable %>% filter(grepl("mM", Sample.Name) == TRUE)
+  
+  min_start <- min(tempStds$Peak.Start)*0.95
+  max_end <- max(tempStds$Peak.End)*1.05
+  
+  tempData <- dataTable %>% filter(Peak.Start >= min_start, Peak.End <= max_end)
+  
+  return(tempData)
+  
+}
+
+# Function to join plate mapping with actual samples
+combine_data <- function(peak_check_data, metadata, combine_by){
+  
+  tempData <- peak_check_data %>% 
+    inner_join(metadata, by = combine_by) %>% 
+    select(-Sample.Name)
+  
+  return(tempData)
+  
+}
+
+
+# Function to make a standards only table
+make_standard_table <- function(peak_check_data){
+  
+  # Make a standard only table
+  tempData <- peak_check_data %>% 
+    filter(grepl("mM", Sample.Name) == TRUE) %>% 
+    separate(Data.Filename, c("temp1", "temp2"), sep = "_") %>% 
+    rename(location = temp2) %>% 
+    separate(Sample.Name, c("conc", "unit"), sep = " ") %>% 
+    mutate(location = as.numeric(gsub("\\.lcd", "", location)), 
+           conc = as.numeric(conc))
+  
+  return(tempData)
+}
+
+
 
 # Function to generate the areas needed for the respective correlation analysis
 get_areas <- function(i, all_stds_data, locationList){
@@ -67,13 +141,11 @@ get_samples <- function(g, locationList, all_data){
     separate(location, c("location", "extra"), sep = "\\.") %>% 
     mutate(location = as.numeric(location), 
            Area = as.numeric(Area)) %>% 
-    slice(match(locationList[[g]], location)) %>% 
-    select(location, Sample.Name, Area)
+    slice(match(locationList[[g]], location))
   # prints the data table to the global working environment
   return(tempData)
   
 }
-
 
 
 # Function to generate the needed coefficients for std transformation
@@ -165,14 +237,14 @@ get_corr_conc <- function(list_number, conv_sampleData,
   value2 <- paste("std", list_number + 1, sep = "") # second measures
   tempData <- conv_sampleData[[list_number]] # data table of interest
   # checks to see if the standards are at the end of the run or not
-  if(length(conv_sampleData) != as.numeric(gsub("std", "", value1))){
+  if(as.numeric(gsub("std", "", value1)) <= length(conv_sampleData)){
     # Generate the corrected concentrations
     tempConc <- tempData[, value1] + 
       correctionFactors[[list_number]]*(tempData[, value2] - tempData[, value1])
     # merge the corrected concentrations with location and sample name
-    finalTable <- tempData %>% select(location, Sample.Name) %>% 
-      mutate(conc_mM = tempConc)
+    finalTable <- tempData %>% mutate(conc_mM = tempConc)
     
+    print("HEllo")
   } else {
     # sets table to NULL if standards are at the end
     finalTable <- NULL
@@ -188,14 +260,13 @@ get_corr_conc <- function(list_number, conv_sampleData,
 ############### Run the actual programs to get the data ######################################
 ##############################################################################################
 
-# Make a standard only table
-std_areas <- dataTable %>% 
-  filter(grepl("STD", Sample.ID) == TRUE & grepl("biorad", Sample.ID) != TRUE) %>% 
-  separate(Data.Filename, c("temp1", "temp2"), sep = "_") %>% 
-  rename(location = temp2) %>% 
-  separate(Sample.Name, c("conc", "unit"), sep = " ") %>% 
-  mutate(location = as.numeric(gsub("\\.lcd", "", location)), 
-         conc = as.numeric(conc))
+
+test <- get_scfa_data("acetate", "plate1", "scfa_crc_acetate.txt")
+ptest <- perform_peak_check(test)
+meta_test <- get_scfa_data(NULL, "scfa_plate_metadata.csv", NULL, "data/raw/metadata/")
+comb_test <- combine_data(ptest, meta_test, "Sample.ID")
+std_areas <- make_standard_table(ptest)
+
 
 # Generate the standard areas
 area_list <- sapply(names(stds_location), 
@@ -217,21 +288,21 @@ converted_stds <- sapply(c(1:length(area_list)),
 sample_list <- sapply(names(sample_location), 
                       function(x) 
                         suppressWarnings(
-                          get_samples(x, sample_location, dataTable)), simplify = F)
+                          get_samples(x, sample_location, comb_test)), simplify = F)
 # generate correction factors based on location on run
 correction_factor_list <- sapply(names(sample_location), 
-                                 function(x) get_correction_factor(x, sample_list))
+                                 function(x) get_correction_factor(x, sample_list), simplify = F)
 # get the converted sample values based on location of standards run and location on run
 converted_samples <- sapply(c(1:length(sample_location)), 
                            function(x) 
                              run_conversion(x, sample_list, 
-                                            std_list_length = length(sample_location), 
+                                            std_list_length = length(stds_location), 
                                             stds = F), simplify = F)
 # get the final corrected concentrations
 corrected_conc <- sapply(c(1:length(sample_location)), 
                          function(x) 
                            get_corr_conc(x, converted_samples, correction_factor_list), 
-                         simplify = F) %>% bind_rows()
+                         simplify = F)
 
 
 
