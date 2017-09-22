@@ -257,10 +257,17 @@ get_corr_conc <- function(list_number, conv_sampleData,
 }
 
 # Function to generate final mmol/kg values
-# 1000uL  = 1mL = 0.1L
+# 1000uL  = 1mL = 0.001L
 # g needs to be multiplied by 1000 
 # mmol/kg = (corr_conc * 0.1) / (g * 1000)
-
+get_mmol_kg <- function(corrected_data){
+  
+  tempData <- corrected_data %>% 
+    mutate(mmol_kg = (conc_mM * (susp_volume_uL / 1E6)) / (stool_weight_g / 1000))
+  
+  return(tempData)
+  
+}
 
 
 
@@ -312,7 +319,9 @@ get_final_concentrations <- function(scfa_of_interest, rawdataList, metadata,
                              get_corr_conc(x, converted_samples, correction_factor_list), 
                            simplify = F) %>% bind_rows()
   
-  return(corrected_conc)
+  finalData <- get_mmol_kg(corrected_conc)
+  
+  return(finalData)
 }
 
 
