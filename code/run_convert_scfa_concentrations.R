@@ -18,14 +18,29 @@ sample_positions <- list(g1 = c(11:65))
 # Set up the scfas of interest
 scfas <- c("acetate", "butyrate", "isobutyrate", "propionate")
 
+# Set up the plate name
+plate <- "plate1_scfa_crc"
+
+# Set up mapping file nam
+map_name <- "scfa_plate_metadata.csv"
+
+# Set up raw text file path
+raw_path <- "data/raw/Raw_hplc_files/"
+
+# Set up plate mapping path
+platemap_path <- "data/raw/metadata/"
+
+# Set up final data name differentiator
+final_name <- "transformed"
+
+
 
 ##############################################################################################
 ############### List of functions to get things to run nice ##################################
 ##############################################################################################
 
 # Function to read in data tables for scfa or mapping file
-get_scfa_data <- function(scfa_name, uniq_name, ending, 
-                          path_to_file = "data/raw/Raw_hplc_files/"){
+get_scfa_data <- function(scfa_name, uniq_name, ending, path_to_file){
   
   if(!is.null(scfa_name)){
     
@@ -325,6 +340,16 @@ get_final_concentrations <- function(scfa_of_interest, rawdataList, metadata,
 }
 
 
+# Create a function that will write out all the data
+write_the_data <- function(scfa_of_interest, dataList, 
+                           raw_path, plate, final_name){
+  
+  write.csv(dataList[[scfa_of_interest]], 
+            paste(raw_path, scfa_of_interest, "/", final_name, "_", 
+                  plate, "_", scfa_of_interest, ".csv", sep = ""), row.names = F)
+  
+}
+
 
 
 
@@ -335,10 +360,10 @@ get_final_concentrations <- function(scfa_of_interest, rawdataList, metadata,
 
 test <- sapply(scfas, 
                function(x) 
-                 get_scfa_data(x, "plate1_scfa_crc", paste(x, ".txt", sep = "")), 
+                 get_scfa_data(x, plate, paste(x, ".txt", sep = ""), raw_path), 
                                simplify = F)
   
-meta_test <- get_scfa_data(NULL, "scfa_plate_metadata.csv", NULL, "data/raw/metadata/")
+meta_test <- get_scfa_data(NULL, map_name, NULL, platemap_path)
 
 
 final_test <- sapply(scfas, 
@@ -346,7 +371,11 @@ final_test <- sapply(scfas,
                        get_final_concentrations(x, test, meta_test, 
                                                 stds_positions, sample_positions), simplify = F)
   
-
+sapply(scfas, 
+       function(x) write_the_data(x, final_test, 
+                                  raw_path = raw_path, 
+                                  plate = plate, 
+                                  final_name = final_name))
 
 
 
