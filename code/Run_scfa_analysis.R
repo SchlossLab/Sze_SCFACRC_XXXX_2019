@@ -13,6 +13,9 @@ loadLibs(c("dplyr", "tidyr", "ggplot2"))
 #setup variables that will be used
 scfas <- c("acetate", "butyrate", "isobutyrate", "propionate")
 
+# Samples that had to little volume to actually be measured
+not_measured <- c("3367653", "2041650", "2043650", "3027650")
+
 
 ##############################################################################################
 ############### List of functions to get things to run nice ##################################
@@ -29,7 +32,7 @@ upload_scfa_data <- function(scfa_name, path_to_file, ending){
 }
 
 # Function to merge the respective scfa data with the needed metadata for visualization
-merge_data <- function(scfa_name, meta_data, dataList){
+merge_data <- function(scfa_name, meta_data, dataList, not_enough){
   
   tempData <- dataList[[scfa_name]]
   
@@ -44,7 +47,19 @@ merge_data <- function(scfa_name, meta_data, dataList){
     inner_join(tempData, by = "study_id") %>% 
     distinct(study_id, .keep_all = TRUE)
   
-  return(temp_combined_data)
+  # get sample IDs that were measured but had no signal
+  test <- meta_data %>% 
+    select(study_id, Dx_Bin, dx) %>% 
+    mutate(study_id = as.character(study_id)) %>% 
+    filter(!(study_id %in% temp_combined_data$study_id) & 
+             !(study_id %in% not_enough)) %>% 
+    mutate(mmol_kg = rep(0, length(study_id)))
+  
+  final_temp_combined <- temp_combined_data %>% 
+    bind_rows(test)
+  
+  
+  return(final_temp_combined)
   
 }
 
@@ -100,7 +115,7 @@ scfa_data <- sapply(scfas,
                     simplify = F)
 
 combined_data <- sapply(scfas, 
-                        function(x) merge_data(x, metaI, scfa_data), simplify = F)
+                        function(x) merge_data(x, metaI, scfa_data, not_measured), simplify = F)
 
 graphs <- sapply(scfas, 
                  function(x) create_graphs(x, combined_data), simplify = F)
