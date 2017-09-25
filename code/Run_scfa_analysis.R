@@ -126,6 +126,19 @@ save_gg_plots <- function(scfa_name, graphLists, path_to_save, ending){
   
 }
 
+# Function to save ANOVA results
+save_anova_comparisons <- function(scfa_name, dataList, 
+                                   path_to_save, ending){
+  
+  tempData <- dataList[[scfa_name]] %>% 
+    rename(pvalue = `Pr(>F)`)
+  
+  write.csv(tempData, 
+            paste(path_to_save, scfa_name, ending, sep = ""), 
+            row.names = F)
+  
+}
+
 
 
 ##############################################################################################
@@ -157,7 +170,11 @@ lapply(scfas,
                        "exploratory/notebook/exploratory_graphs/", 
                        "_general_distributions.pdf"))
 
-
+lapply(scfas, 
+       function(x) 
+         save_anova_comparisons(x, test, 
+                                "data/process/tables/", 
+                                "_anova_crc_groups.csv"))
 
 
 
