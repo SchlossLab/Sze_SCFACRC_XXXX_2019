@@ -8,7 +8,7 @@
 source('code/functions.R')
 
 # Load needed libraries
-loadLibs(c("dplyr", "tidyr", "ggplot2"))
+loadLibs(c("dplyr", "tidyr", "ggplot2", "gridExtra"))
 
 #setup variables that will be used
 scfas <- c("acetate", "butyrate", "isobutyrate", "propionate")
@@ -40,10 +40,7 @@ merge_data <- function(scfa_name, meta_data, dataList, not_enough){
   
   temp_combined_data <- meta_data %>% 
     select(study_id, Dx_Bin, dx) %>% 
-    mutate(Dx_Bin = ifelse(Dx_Bin == "High Risk Normal", invisible("Normal"), 
-                           ifelse(Dx_Bin == "adv Adenoma", 
-                                  invisible("adv_Adenoma"), invisible(Dx_Bin))), 
-           study_id = as.character(study_id)) %>% 
+    mutate(study_id = as.character(study_id)) %>% 
     inner_join(tempData, by = "study_id") %>% 
     distinct(study_id, .keep_all = TRUE)
   
@@ -56,7 +53,10 @@ merge_data <- function(scfa_name, meta_data, dataList, not_enough){
     mutate(mmol_kg = rep(0, length(study_id)))
   
   final_temp_combined <- temp_combined_data %>% 
-    bind_rows(test)
+    bind_rows(test) %>% 
+    mutate(Dx_Bin = ifelse(Dx_Bin == "High Risk Normal", invisible("Normal"), 
+                           ifelse(Dx_Bin == "adv Adenoma", 
+                                  invisible("adv_Adenoma"), invisible(Dx_Bin))))
   
   
   return(final_temp_combined)
@@ -78,7 +78,22 @@ create_graphs <- function(scfa_name, dataList){
                  colour = "black", geom = "crossbar", size = 0.5, width = 0.5)  + 
     xlab("") + ylab("mmol per Kg") + theme_bw()
   
-  return(tempPlot)
+  
+  tempPlot2 <- tempData %>% 
+    mutate(
+      Dx_Bin = factor(Dx_Bin, 
+                      levels = c("Normal", "Adenoma", "adv_Adenoma", "Cancer"), 
+                      labels = c("Control", "Adenoma", "Advanced\nAdenoma", "Carcinoma"))) %>% 
+    ggplot(aes(mmol_kg, group = Dx_Bin, fill = Dx_Bin)) + 
+    geom_density(alpha = 0.3, show.legend = F) + 
+    xlab("mmol per Kg") + ylab("Density") + theme_bw() + 
+    scale_x_continuous(expand = c(0, 0)) + scale_y_continuous(expand = c(0, 0)) + 
+    ggtitle(paste(scfa_name))
+  
+  
+  tempFinalGraph <- grid.arrange(tempPlot2, tempPlot, nrow = 2)
+  
+  return(tempFinalGraph)
   
 }
 
@@ -99,6 +114,19 @@ get_anova_comparisons <- function(scfa_name, dataList,
   return(test_data)
   
 }
+
+
+# Function to save plots as pdfs to be viewed as needed
+save_gg_plots <- function(scfa_name, graphLists, path_to_save, ending){
+  
+  ggsave(paste(path_to_save, scfa_name, ending), graphLists[[scfa_name]], 
+         device = "pdf", width = 8, height = 6)
+  
+  print(paste("completed saving graph for ", scfa_name, sep = ""))
+  
+}
+
+
 
 ##############################################################################################
 ############### Run the actual programs to get the data ######################################
@@ -123,7 +151,11 @@ graphs <- sapply(scfas,
 test <- sapply(scfas, 
                function(x) get_anova_comparisons(x, combined_data), simplify = F)
 
-
+lapply(scfas, 
+       function(x) 
+         save_gg_plots(x, graphs, 
+                       "exploratory/notebook/exploratory_graphs/", 
+                       "_general_distributions.pdf"))
 
 
 
