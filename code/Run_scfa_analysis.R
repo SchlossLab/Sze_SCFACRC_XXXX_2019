@@ -81,13 +81,6 @@ get_anova_comparisons <- function(scfa_name, dataList,
   test_data <- summary(aov(lm(
     as.formula(paste(set_variable, "~", set_groups)), data = tempData)))[[1]]
   
-  #[[set_groups]] %>% 
-    
-    
-    #as.data.frame() %>% 
-    #mutate(comparison = rownames(.), measure = set_variable)
-  
-  # Returns the results of the test for each comparison
   return(test_data)
   
 }

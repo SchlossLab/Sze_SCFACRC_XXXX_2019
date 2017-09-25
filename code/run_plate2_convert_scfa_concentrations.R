@@ -49,8 +49,8 @@ get_scfa_data <- function(scfa_name, uniq_name, ending, path_to_file){
       skip = 2, header = T, stringsAsFactors = F, row.names = 1) %>% 
       select(Data.Filename, Sample.ID, Sample.Name, Ret..Time, 
              Area, Peak.Start, Peak.End, Conc.) %>% 
-      filter(Area != "-----") %>% 
       mutate(
+        Area = ifelse(Area == "-----", invisible(0), invisible(Area)), 
         Ret..Time = as.numeric(Ret..Time), 
         Area = as.numeric(Area), 
         Peak.Start = as.numeric(Peak.Start), 
