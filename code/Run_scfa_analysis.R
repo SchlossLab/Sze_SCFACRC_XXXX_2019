@@ -78,10 +78,14 @@ get_anova_comparisons <- function(scfa_name, dataList,
   tempData <- dataList[[scfa_name]]
   
   # this runs an ANOVA with Tukey post hoc test and makes a readable table 
-  test_data <- TukeyHSD(aov(lm(
-    as.formula(paste(set_variable, "~", set_groups)), data = tempData)))[[set_groups]] %>% 
-    as.data.frame() %>% 
-    mutate(comparison = rownames(.), measure = set_variable)
+  test_data <- summary(aov(lm(
+    as.formula(paste(set_variable, "~", set_groups)), data = tempData)))[[1]]
+  
+  #[[set_groups]] %>% 
+    
+    
+    #as.data.frame() %>% 
+    #mutate(comparison = rownames(.), measure = set_variable)
   
   # Returns the results of the test for each comparison
   return(test_data)
