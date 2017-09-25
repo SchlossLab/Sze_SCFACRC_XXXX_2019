@@ -19,7 +19,7 @@ sample_positions <- list(g1 = c(11:65))
 scfas <- c("acetate", "butyrate", "isobutyrate", "propionate")
 
 # Set up the plate name
-plate <- "plate2_scfa_crc"
+plate <- "plate1_scfa_crc"
 
 # Set up mapping file nam
 map_name <- "scfa_plate_metadata.csv"
@@ -49,8 +49,8 @@ get_scfa_data <- function(scfa_name, uniq_name, ending, path_to_file){
       skip = 2, header = T, stringsAsFactors = F, row.names = 1) %>% 
       select(Data.Filename, Sample.ID, Sample.Name, Ret..Time, 
              Area, Peak.Start, Peak.End, Conc.) %>% 
-      filter(Area != "-----") %>% 
       mutate(
+        Area = ifelse(Area == "-----", invisible(0), invisible(Area)), 
         Ret..Time = as.numeric(Ret..Time), 
         Area = as.numeric(Area), 
         Peak.Start = as.numeric(Peak.Start), 
