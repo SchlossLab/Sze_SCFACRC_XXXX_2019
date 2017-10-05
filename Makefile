@@ -72,8 +72,7 @@ $(PROC)/unmatched.fasta : code/mothur.batch\
 					data/references/trainset14_032015.pds.fasta\
 					data/references/trainset14_032015.pds.tax\
 					data/process/stability.files
-	bash code/mothur.batch;\
-	rm data/process/*.map
+	bash code/mothur.batch
 
 
 # Run initial mothur 16S OTU Clustering
