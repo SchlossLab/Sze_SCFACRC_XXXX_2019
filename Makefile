@@ -90,7 +90,7 @@ $(PROC)/final.thetayc.0.03.lt.ave.dist\
 $(PROC)/final.thetayc.0.03.lt.dist\
 $(PROC)/final.thetayc.0.03.lt.std.dist\
 $(PROC)/final.shared : code/mothurCluster.batch\
-					$(PROC)/unmatched.file $(PROC)/unmatched.count_table\
+					$(PROC)/unmatched.file $(PROC)/unmatched.dist\
 					$(PROC)/unmatched.taxonomy $(PROC)/unmatched.fasta
 	bash code/mothurCluster.batch
 
