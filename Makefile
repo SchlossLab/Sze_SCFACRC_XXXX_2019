@@ -63,7 +63,7 @@ $(REFS)/trainset14_032015.% :
 #
 ################################################################################
 
-
+# Run initial mothur 16S sequence processing
 $(PROC)/followup.files\
 $(PROC)/unmatched.taxonomy\
 $(PROC)/unmatched.count_table\
@@ -75,6 +75,24 @@ $(PROC)/unmatched.fasta : code/mothur.batch\
 	bash code/mothur.batch;\
 	rm data/process/*.map
 
+
+# Run initial mothur 16S OTU Clustering
+$(PROC)/final.0.03.subsample.shared\
+$(PROC)/final.groups.ave-std.summary\
+$(PROC)/final.groups.summary\
+$(PROC)/final.rep.count_table\
+$(PROC)/final.rep.seqs\
+$(PROC)/final.sharedsobs.0.03.lt.ave.dist\
+$(PROC)/final.sharedsobs.0.03.lt.dist\
+$(PROC)/final.sharedsobs.0.03.lt.std.dist\
+$(PROC)/final.taxonomy\
+$(PROC)/final.thetayc.0.03.lt.ave.dist\
+$(PROC)/final.thetayc.0.03.lt.dist\
+$(PROC)/final.thetayc.0.03.lt.std.dist\
+(PROC)/final.shared : code/mothurCluster.batch\
+					$(PROC)/unmatched.file $(PROC)/unmatched.count_table\
+					$(PROC)/unmatched.taxonomy $(PROC)/unmatched.fasta
+	bash code/mothurCluster.batch
 
 
 # here we go from the good sequences and generate a shared file and a
