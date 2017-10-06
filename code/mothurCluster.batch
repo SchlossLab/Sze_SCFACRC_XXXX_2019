@@ -1,9 +1,11 @@
 #!bash
 
-#Load needed R
+#Load needed modules
+module load gcc/4.9.3
 
 #Set local variables
-mothurRv=/nfs/turbo/schloss-lab/bin/mothur_src/mothur
+#mothurRv=/nfs/turbo/schloss-lab/bin/mothur_src/mothur
+mothurRv=/nfs/turbo/schloss-lab/msze/axiom_home_stuff/bin/mothurV1.39.3/mothur/mothur
 DOWNDIR=data/raw
 WORKDIR=data/process
 REF=data/references
@@ -34,7 +36,6 @@ $mothurRv "#sub.sample(shared=$WORKDIR/final.shared, label=0.03);
 
 
 # Remove raw files to free up space
-#rm $WORKDIR/unmatched.* $WORKDIR/stability.* $WORKDIR/*.fastq $WORKDIR/*.temp
-#rm $WORKDIR/*.rabund
-#mv $WORKDIR/followup.files $WORKDIR/stability.files
-#rm data/process/*.map
+rm $WORKDIR/unmatched.* $WORKDIR/stability.* $WORKDIR/*.fastq $WORKDIR/*.temp
+rm $WORKDIR/*.rabund
+mv $WORKDIR/followup.files $WORKDIR/stability.files
