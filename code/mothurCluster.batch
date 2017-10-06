@@ -22,7 +22,7 @@ $mothurRv "#cluster.split(file=$WORKDIR/unmatched.file, method=opti, metric=mcc,
 	# be worth trouble shooting for such a small number missing only
 
 # Rename data files
-mv $WORKDIR/unmatched.an.unique_list.0.03.pick.shared $WORKDIR/final.shared
+mv $WORKDIR/unmatched.opti_mcc.unique_list.0.03.pick.shared $WORKDIR/final.shared
 mv $WORKDIR/*.cons.taxonomy $WORKDIR/final.taxonomy
 mv $WORKDIR/*0.03.rep.fasta $WORKDIR/final.rep.seqs
 mv $WORKDIR/*.0.03.rep.count_table $WORKDIR/final.rep.count_table
@@ -37,3 +37,4 @@ $mothurRv "#sub.sample(shared=$WORKDIR/final.shared, label=0.03);
 #rm $WORKDIR/unmatched.* $WORKDIR/stability.* $WORKDIR/*.fastq $WORKDIR/*.temp
 #rm $WORKDIR/*.rabund
 #mv $WORKDIR/followup.files $WORKDIR/stability.files
+#rm data/process/*.map
