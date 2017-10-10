@@ -65,7 +65,8 @@ $(REFS)/gg_13_5_99.gg.tax :
 	wget -N http://www.mothur.org/w/images/9/9d/Gg_13_5_99.taxonomy.tgz
 	tar xvzf Gg_13_5_99.taxonomy.tgz
 	mv gg_13_5_99* $(REFS)/
-	rm Gg_13_5_99.taxonomy.tgz
+	rm -r Gg_13_5_99.taxonomy.tgz ._gg_13_5_99.pds.tax ._pds.notes __MACOSX/ pds.notes
+
 
 ################################################################################
 #
