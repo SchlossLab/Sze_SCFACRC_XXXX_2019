@@ -54,6 +54,19 @@ $(REFS)/trainset14_032015.% :
 	rmdir trainset14_032015.pds
 	rm Trainset14_032015.pds.tgz
 
+# Grab greengenes reference files for picrust
+
+$(REFS)/gg_13_5_99.gg.tax : 
+	wget -N http://www.mothur.org/w/images/b/be/GG_13_5_otuMapTable.zip
+	unzip GG_13_5_otuMapTable.zip
+	mv GG_13_5_otuMapTable/*.txt $(REFS)/
+	rmdir GG_13_5_otuMapTable
+	rm GG_13_5_otuMapTable.zip
+	wget -N http://www.mothur.org/w/images/9/9d/Gg_13_5_99.taxonomy.tgz
+	tar xvzf Gg_13_5_99.taxonomy.tgz
+	mv gg_13_5_99* $(REFS)/
+	rm Gg_13_5_99.taxonomy.tgz
+
 ################################################################################
 #
 # Part 2: Run data through mothur
@@ -92,6 +105,12 @@ $(PROC)/final.shared : code/mothurCluster.batch\
 					$(PROC)/unmatched.file $(PROC)/unmatched.dist\
 					$(PROC)/unmatched.taxonomy $(PROC)/unmatched.fasta
 	bash code/mothurCluster.batch
+
+
+# Create a biom file
+
+# make.biom(shared=data/process/final.shared, label=0.03, 
+# reftaxonomy=data/references/99_otu_map.txt, constaxonomy=data/process/final.taxonomy
 
 
 # here we go from the good sequences and generate a shared file and a
