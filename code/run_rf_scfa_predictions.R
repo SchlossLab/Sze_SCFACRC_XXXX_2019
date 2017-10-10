@@ -32,42 +32,36 @@ upload_scfa_data <- function(scfa_name, path_to_file, ending){
   return(tempData)
 }
 
+# Function to remove specific data from sets of interest
+pare_down_data <- function(ids_to_remove, scfa_list, otu_data, meta_data){
+  
+  # Remove data from tables first
+  temp_otuData <- otu_data %>% filter(!(Group %in% ids_to_remove))
+  temp_meta_data <- meta_data %>% filter(!(Group %in% ids_to_remove))
+  
+  # Remove data from lists
+  tempList <- lapply(scfa_list, 
+                     function(x) filter(x, !(Group %in% ids_to_remove)) %>% 
+                                          inner_join(temp_meta_data, by = "Group") %>% 
+                                          inner_join(temp_otuData, by = "Group")) 
 
-# Function to merge the respective scfa data with the needed metadata for visualization
-merge_data <- function(scfa_name, meta_data, dataList, not_enough){
-  # scfa_name is a variable that stores the scfa of interest e.g. "acetate"
-  # meta_data contains the needed meta data on disease groups, etc.
-  # dataList is a list with all the scfa data tables of interests
-  # not_enough is a vector with the samples that could not be run on the HPLC
+  return(tempList)
+}
+
+# Function to generate the high low groupings for each respective SCFA
+get_high_low <- function(all_data_list, scfa_median_list, scfas){
   
-  # Create a temp data table variable
-  tempData <- dataList[[scfa_name]]
+  tempList <- sapply(scfas, 
+         function(x) all_data_list[[x]] %>% 
+           mutate(high_low = ifelse(mmol_kg <= scfa_median_list[[x]], 
+                                    invisible("low"), invisible("high"))) %>% 
+           select(Group, mmol_kg, high_low, Dx_Bin, dx, fit_result, everything()), 
+         simplify = F)
   
-  # Modify and merge the data together for samples that matched
-  temp_combined_data <- meta_data %>% 
-    select(study_id, Dx_Bin, dx) %>% 
-    mutate(study_id = as.character(study_id)) %>% 
-    inner_join(tempData, by = "study_id") %>% 
-    distinct(study_id, .keep_all = TRUE)
-  
-  # get sample IDs that were measured but had no signal
-  # and remove those that were never run on HPLC
-  test <- meta_data %>% 
-    select(study_id, Dx_Bin, dx) %>% 
-    mutate(study_id = as.character(study_id)) %>% 
-    filter(!(study_id %in% temp_combined_data$study_id) & 
-             !(study_id %in% not_enough)) %>% 
-    mutate(mmol_kg = rep(0, length(study_id)))
-  # create a final combined table with appropriate label names
-  final_temp_combined <- temp_combined_data %>% 
-    bind_rows(test) %>% 
-    mutate(Dx_Bin = ifelse(Dx_Bin == "High Risk Normal", invisible("Normal"), 
-                           ifelse(Dx_Bin == "adv Adenoma", 
-                                  invisible("adv_Adenoma"), invisible(Dx_Bin))))
-  # Send the final data table to the global work environment
-  return(final_temp_combined)
+  return(tempList)
   
 }
+
 
 
 ##############################################################################################
@@ -75,13 +69,36 @@ merge_data <- function(scfa_name, meta_data, dataList, not_enough){
 ##############################################################################################
 
 # Load in needed metadata and rename sample column
-meta_data <- read_tsv("data/process/picrust_metadata")
+picrust_meta <- read_tsv("data/process/picrust_metadata") %>% 
+  mutate(Group = as.character(Group))
+
+# Load in more specific follow up data
+metaF <- read_csv("data/raw/metadata/good_metaf_final.csv")
+
+# Load in shared data
+shared <- read_tsv("data/process/final.0.03.subsample.shared") %>% 
+  mutate(Group = as.character(Group)) %>% 
+  select(-label, -numOtus)
+
+# Generate IDs that are initial and follow up
+initial_IDs <- as.character(metaF$initial)
+follow_IDs <- as.character(metaF$followUp)
+
 # read in all the respective scfa data tables
 scfa_data <- sapply(scfas, 
                     function(x) upload_scfa_data(x, "data/process/tables/", "_final_data.csv"), 
                     simplify = F)
 
-# combine all the necessary data together into a single file
-combined_data <- sapply(scfas, 
-                        function(x) merge_data(x, meta_data = meta_data, 
-                                               scfa_data, not_measured), simplify = F)
+# Combine all data into a single list of lists and remove follow samples
+all_data <- pare_down_data(c(initial_IDs, follow_IDs), scfa_data, shared, picrust_meta)
+
+# Get medians for each scfa measured
+scfa_medians <- lapply(all_data, function(x) median(x$mmol_kg))
+
+# get final data tables to be used in the RF analysis
+final_data <- get_high_low(all_data, scfa_medians, scfas)
+
+
+
+
+
