@@ -147,16 +147,31 @@ make_rf_model <- function(i, run_marker, train_data_name,
 }
 
 # Create a function to run the prediction on the test data
-run_prediction <- function(i, model_data, train_data_name, control_type, dataList){
+run_prediction <- function(i, model_data, train_data_name, control_type, 
+                           var_of_int, dataList){
   
   tempData <- dataList[[i]][[train_data_name]]
+  tempModel <- model_data[[i]]
   
   
-  tempPredictions <- predict(model_data, tempData, type = control_type)
+  
+  tempPredictions <- predict(tempModel, tempData, type = control_type)
+  
+  tempPredictions <- cbind(tempPredictions, actual = tempData[, var_of_int])
+  
   
   return(tempPredictions)
 }
 
+
+# Generate ROC curves for the test data
+get_test_roc <- function(i, train_data_name, var_of_int, 
+                         pred_list, dataList){
+  
+  pred_roc[[paste("run_", i, sep = "")]] <- 
+    roc(test_data_list[[paste("run_", i, sep="")]]$lesion ~ 
+          factor(run_predictions[[paste("run_", i, sep = "")]], ordered = TRUE))
+}
 
 
 
@@ -198,19 +213,30 @@ final_data <- get_high_low(all_data, scfa_medians, scfas)
 final_sp_data <- sapply(scfas, 
                         function(x) split_dataframe(x, final_data), simplify = F)
 # Generate an 80/20 data split
-rf_data <- sapply(scfas, 
-               function(x) eighty_twenty_split(x, "rf_groups", final_sp_data), simplify = F)
+rf_data <- sapply(scfas, function(x) eighty_twenty_split(x, "rf_groups", final_sp_data), simplify = F)
 
-class_test <- make_rf_model("acetate", 1, "training_data", "high_low", "rf", "ROC", rf_data)
+class_test <- sapply(scfas, function(x) 
+                       make_rf_model(x, 1, "training_data", "high_low", "rf", "ROC", rf_data), 
+                     simplify = F)
 
-class_pred <- run_prediction("acetate", class_test, "test_data", "prob", rf_data)
+class_pred <- sapply(scfas, function(x) 
+                       run_prediction(x, class_test, "test_data", "prob", "high_low", rf_data), 
+                     simplify = F)
 
 
 # Generate an 80/20 data split for regression
 reg_rf_data <- sapply(scfas, 
                   function(x) eighty_twenty_split(x, "rf_regression", final_sp_data), simplify = F)
 
-regression_test <- make_rf_model("acetate", 1, "training_data", 
-                                 "mmol_kg", "rf", "Rsquared", reg_rf_data)
+regression_test <- sapply(scfas, 
+                          function(x) make_rf_model(x, 1, "training_data", 
+                                 "mmol_kg", "rf", "Rsquared", reg_rf_data), simplify = F)
 
-class_pred <- run_prediction("acetate", regression_test, "test_data", "raw", reg_rf_data)
+reg_pred <- sapply(scfas, function(x) 
+                     run_prediction(x, regression_test, "test_data", "raw", "mmol_kg", reg_rf_data), 
+                   simplify = F)
+
+
+
+
+
