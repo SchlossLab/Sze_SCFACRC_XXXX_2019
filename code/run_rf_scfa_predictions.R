@@ -7,7 +7,7 @@
 source('code/functions.R')
 
 # Load needed libraries
-loadLibs(c("tidyverse"))
+loadLibs(c("tidyverse", "caret"))
 
 #setup variables that will be used
 scfas <- c("acetate", "butyrate", "isobutyrate", "propionate")
@@ -37,13 +37,18 @@ pare_down_data <- function(ids_to_remove, scfa_list, otu_data, meta_data){
   
   # Remove data from tables first
   temp_otuData <- otu_data %>% filter(!(Group %in% ids_to_remove))
+  
+  nzv <- nearZeroVar(temp_otuData)
+  
+  nzv_rm_tempOTU <- temp_otuData[, -nzv]
+  
   temp_meta_data <- meta_data %>% filter(!(Group %in% ids_to_remove))
   
   # Remove data from lists
   tempList <- lapply(scfa_list, 
                      function(x) filter(x, !(Group %in% ids_to_remove)) %>% 
                                           inner_join(temp_meta_data, by = "Group") %>% 
-                                          inner_join(temp_otuData, by = "Group")) 
+                                          inner_join(nzv_rm_tempOTU, by = "Group")) 
 
   return(tempList)
 }
@@ -61,6 +66,97 @@ get_high_low <- function(all_data_list, scfa_median_list, scfas){
   return(tempList)
   
 }
+
+# Function to create relevent RF data frames
+split_dataframe <- function(i, dataList){
+  
+  tempData <- dataList[[i]]
+  
+  temp_regression <- tempData %>% select(mmol_kg, contains("Otu"))
+  
+  temp_high_low <- tempData %>% select(high_low, contains("Otu"))
+  
+  finalList <- list(rf_regression = temp_regression, 
+                    rf_groups = temp_high_low)
+  return(finalList)
+}
+
+
+# Function to make an initial 80/20 split within the data
+eighty_twenty_split <- function(i, data_of_int, dataList){
+  
+  tempData <- dataList[[i]][[data_of_int]]
+  
+  totalLength <- length(rownames(tempData))
+  
+  tempTrain <- tempData %>% sample_frac(0.8, replace = FALSE)
+  
+  tempTest <- tempData %>% filter(!(rownames(.) %in% rownames(tempTrain)))
+  
+  finalList <- list(
+    training_data = tempTrain, 
+    test_data = tempTest)
+  
+  
+  return(finalList)
+  
+}
+
+
+# Function that will run and create the needed models
+make_rf_model <- function(i, run_marker, train_data_name, 
+                          cat_column, method_to_use, 
+                          metric_to_use, dataList){
+  # i is the scfa of interest
+  # run_marker is the model iteration that has currently completed
+  # train_data_name is a vector for the data set to be used
+  # dataList is the data table to be used for model training
+  # cat_column is the grouping column to be used
+  # method_to_use are "rf" for classification and "rf" for regression rf
+  # metric_to_use are "ROC" for classification and "Rsquared" for regression rf
+  
+  tempData <- dataList[[i]][[train_data_name]]
+  
+  #Create Overall specifications for model tuning
+  # number controls fold of cross validation
+  # Repeats control the number of times to run it
+  fitControl <- trainControl(## 10-fold CV
+    method = "cv",
+    number = 10,
+    p = 0.8, 
+    classProbs = TRUE, 
+    summaryFunction = twoClassSummary, 
+    savePredictions = "final")
+
+  
+  #Train the model
+  training_model <- 
+    train(formula(paste(cat_column, " ~ .", sep = "")), data = tempData, 
+          method = method_to_use, 
+          ntree = 500, 
+          trControl = fitControl,
+          metric = metric_to_use, 
+          verbose = FALSE)
+  
+  #Print out tracking message
+  print(paste("Completed ", run_marker, " RF model for ", 
+              i, " ", cat_column,  " using cv", sep = ""))
+  
+  # Return the model object
+  return(training_model)
+}
+
+# Create a function to run the prediction on the test data
+run_prediction <- function(i, model_data, train_data_name, control_type, dataList){
+  
+  tempData <- dataList[[i]][[train_data_name]]
+  
+  
+  tempPredictions <- predict(model_data, tempData, type = control_type)
+  
+  return(tempPredictions)
+}
+
 
 
 
@@ -98,7 +194,23 @@ scfa_medians <- lapply(all_data, function(x) median(x$mmol_kg))
 # get final data tables to be used in the RF analysis
 final_data <- get_high_low(all_data, scfa_medians, scfas)
 
+#split the data for the downstream nzv that needs to occur
+final_sp_data <- sapply(scfas, 
+                        function(x) split_dataframe(x, final_data), simplify = F)
+# Generate an 80/20 data split
+rf_data <- sapply(scfas, 
+               function(x) eighty_twenty_split(x, "rf_groups", final_sp_data), simplify = F)
+
+class_test <- make_rf_model("acetate", 1, "training_data", "high_low", "rf", "ROC", rf_data)
+
+class_pred <- run_prediction("acetate", class_test, "test_data", "prob", rf_data)
 
 
+# Generate an 80/20 data split for regression
+reg_rf_data <- sapply(scfas, 
+                  function(x) eighty_twenty_split(x, "rf_regression", final_sp_data), simplify = F)
 
+regression_test <- make_rf_model("acetate", 1, "training_data", 
+                                 "mmol_kg", "rf", "Rsquared", reg_rf_data)
 
+class_pred <- run_prediction("acetate", regression_test, "test_data", "raw", reg_rf_data)
