@@ -7,7 +7,7 @@
 source('code/functions.R')
 
 # Load needed libraries
-loadLibs(c("tidyverse", "caret"))
+loadLibs(c("tidyverse", "caret", "pROC"))
 
 #setup variables that will be used
 scfas <- c("acetate", "butyrate", "isobutyrate", "propionate")
@@ -165,14 +165,57 @@ run_prediction <- function(i, model_data, train_data_name, control_type,
 
 
 # Generate ROC curves for the test data
-get_test_roc <- function(i, train_data_name, var_of_int, 
-                         pred_list, dataList){
+get_test_roc <- function(i, var_of_int, pred_name, pred_list, classif = T){
   
-  pred_roc[[paste("run_", i, sep = "")]] <- 
-    roc(test_data_list[[paste("run_", i, sep="")]]$lesion ~ 
-          factor(run_predictions[[paste("run_", i, sep = "")]], ordered = TRUE))
+  if(classif == T){
+    
+    actual_values <- factor(pred_list[[i]][, var_of_int])
+    pred_values <- factor(pred_list[[i]][, pred_name], ordered = TRUE)
+    
+  } else{
+    
+    actual_values <- pred_list[[i]][, var_of_int]
+    pred_values <- pred_list[[i]][, pred_name]
+  }
+  
+  tempPred_ROC <- roc(actual_values ~ pred_values)
+  
+  return(tempPred_ROC)
 }
 
+
+# Function to aggregate test data
+add_model_summary_data <- function(i, model_list, test_data, data_Table, classif = T){
+  
+  tempTrainResults <- model_list[[i]]$results
+  
+  if(classif == T){
+    
+    tempROC_test <- test_data[[i]]
+    
+    tempdata <- tempTrainResults %>% 
+      filter(ROC == max(ROC)) %>% 
+      rename(train_AUC = ROC) %>% 
+      mutate(test_AUC = tempROC_test$auc[1]) %>% 
+      select(mtry, train_AUC, test_AUC, everything())
+    
+    data_Table[[i]] <- data_Table[[i]] %>% bind_rows(tempdata)
+    
+  } else{
+    
+    temp_test <- summary(lm(test_data[[i]]$mmol_kg ~ test_data[[i]]$tempPredictions))
+
+    tempdata <- tempTrainResults %>% 
+      filter(Rsquared == max(Rsquared)) %>% 
+      rename(train_r2 = Rsquared) %>% 
+      mutate(test_r2 = temp_test$adj.r.squared) %>% 
+      select(mtry, train_r2, test_r2, everything())
+    
+    data_Table[[i]] <- data_Table[[i]] %>% bind_rows(tempdata)
+  }
+  
+  return(data_Table[[i]])
+}
 
 
 ##############################################################################################
@@ -212,6 +255,17 @@ final_data <- get_high_low(all_data, scfa_medians, scfas)
 #split the data for the downstream nzv that needs to occur
 final_sp_data <- sapply(scfas, 
                         function(x) split_dataframe(x, final_data), simplify = F)
+
+# Set up initial store for summary data
+class_summary_model_data <- list(acetate = data_frame(), butyrate = data_frame(), 
+                           isobutyrate = data_frame(), propionate = data_frame())
+
+reg_summary_model_data <- list(acetate = data_frame(), butyrate = data_frame(), 
+                                 isobutyrate = data_frame(), propionate = data_frame())
+
+
+
+
 # Generate an 80/20 data split
 rf_data <- sapply(scfas, function(x) eighty_twenty_split(x, "rf_groups", final_sp_data), simplify = F)
 
@@ -220,8 +274,16 @@ class_test <- sapply(scfas, function(x)
                      simplify = F)
 
 class_pred <- sapply(scfas, function(x) 
-                       run_prediction(x, class_test, "test_data", "prob", "high_low", rf_data), 
+                       run_prediction(x, class_test, "test_data", "raw", "high_low", rf_data), 
                      simplify = F)
+
+ROC_data <- sapply(scfas, function(x) 
+  get_test_roc(x, "high_low", "tempPredictions", class_pred, classif = T), simplify = F)
+
+summary_model_data <- sapply(scfas, function(x) 
+  add_model_summary_data(x, class_test, ROC_data, summary_model_data, classif = T), simplify = F)
+
+
 
 
 # Generate an 80/20 data split for regression
@@ -236,7 +298,7 @@ reg_pred <- sapply(scfas, function(x)
                      run_prediction(x, regression_test, "test_data", "raw", "mmol_kg", reg_rf_data), 
                    simplify = F)
 
-
-
+reg_summary_model_data <- sapply(scfas, function(x) 
+  add_model_summary_data(x, regression_test, reg_pred, summary_model_data, classif = F), simplify = F)
 
 
