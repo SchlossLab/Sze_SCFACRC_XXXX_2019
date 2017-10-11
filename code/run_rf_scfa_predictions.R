@@ -263,42 +263,54 @@ class_summary_model_data <- list(acetate = data_frame(), butyrate = data_frame()
 reg_summary_model_data <- list(acetate = data_frame(), butyrate = data_frame(), 
                                  isobutyrate = data_frame(), propionate = data_frame())
 
+# Run a 100 different splits for each SCFA on classification
+for(j in 1:100){
+  
+  # Generate an 80/20 data split
+  rf_data <- sapply(scfas, function(x) eighty_twenty_split(x, "rf_groups", final_sp_data), simplify = F)
+  
+  class_test <- sapply(scfas, function(x) 
+    make_rf_model(x, j, "training_data", "high_low", "rf", "ROC", rf_data), 
+    simplify = F)
+  
+  class_pred <- sapply(scfas, function(x) 
+    run_prediction(x, class_test, "test_data", "raw", "high_low", rf_data), 
+    simplify = F)
+  
+  ROC_data <- sapply(scfas, function(x) 
+    get_test_roc(x, "high_low", "tempPredictions", class_pred, classif = T), simplify = F)
+  
+  class_summary_model_data <- sapply(scfas, function(x) 
+    add_model_summary_data(x, class_test, ROC_data, class_summary_model_data, classif = T), simplify = F)
+}
+
+sapply(scfas, function(x) 
+  write_csv(class_summary_model_data[[x]], 
+            paste("data/process/tables/", x, "_classificaion_RF_summary.csv", sep = "")))
+
+# Run a 100 different splits for each SCFA on regression
+for(j in 1:100){
+  
+  # Generate an 80/20 data split for regression
+  reg_rf_data <- sapply(scfas, 
+                        function(x) eighty_twenty_split(x, "rf_regression", final_sp_data), simplify = F)
+  
+  regression_test <- sapply(scfas, 
+                            function(x) make_rf_model(x, 1, "training_data", 
+                                                      "mmol_kg", "rf", "Rsquared", reg_rf_data), simplify = F)
+  
+  reg_pred <- sapply(scfas, function(x) 
+    run_prediction(x, regression_test, "test_data", "raw", "mmol_kg", reg_rf_data), 
+    simplify = F)
+  
+  reg_summary_model_data <- sapply(scfas, function(x) 
+    add_model_summary_data(x, regression_test, reg_pred, summary_model_data, classif = F), simplify = F)
+}
+
+sapply(scfas, function(x) 
+  write_csv(reg_summary_model_data[[x]], 
+            paste("data/process/tables/", x, "_regression_RF_summary.csv", sep = "")))
 
 
-
-# Generate an 80/20 data split
-rf_data <- sapply(scfas, function(x) eighty_twenty_split(x, "rf_groups", final_sp_data), simplify = F)
-
-class_test <- sapply(scfas, function(x) 
-                       make_rf_model(x, 1, "training_data", "high_low", "rf", "ROC", rf_data), 
-                     simplify = F)
-
-class_pred <- sapply(scfas, function(x) 
-                       run_prediction(x, class_test, "test_data", "raw", "high_low", rf_data), 
-                     simplify = F)
-
-ROC_data <- sapply(scfas, function(x) 
-  get_test_roc(x, "high_low", "tempPredictions", class_pred, classif = T), simplify = F)
-
-summary_model_data <- sapply(scfas, function(x) 
-  add_model_summary_data(x, class_test, ROC_data, summary_model_data, classif = T), simplify = F)
-
-
-
-
-# Generate an 80/20 data split for regression
-reg_rf_data <- sapply(scfas, 
-                  function(x) eighty_twenty_split(x, "rf_regression", final_sp_data), simplify = F)
-
-regression_test <- sapply(scfas, 
-                          function(x) make_rf_model(x, 1, "training_data", 
-                                 "mmol_kg", "rf", "Rsquared", reg_rf_data), simplify = F)
-
-reg_pred <- sapply(scfas, function(x) 
-                     run_prediction(x, regression_test, "test_data", "raw", "mmol_kg", reg_rf_data), 
-                   simplify = F)
-
-reg_summary_model_data <- sapply(scfas, function(x) 
-  add_model_summary_data(x, regression_test, reg_pred, summary_model_data, classif = F), simplify = F)
 
 
