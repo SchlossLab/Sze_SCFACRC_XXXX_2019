@@ -7,7 +7,7 @@
 source('code/functions.R')
 
 # Load needed libraries
-loadLibs(c("tidyverse", "caret", "pROC", "ranger", "randomForest"))
+loadLibs(c("tidyverse", "caret", "pROC", "randomForest"))
 
 #setup variables that will be used
 scfas <- c("acetate", "butyrate", "isobutyrate", "propionate")
