@@ -7,7 +7,7 @@
 source('code/functions.R')
 
 # Load needed libraries
-loadLibs(c("tidyverse", "caret", "pROC"))
+loadLibs(c("tidyverse", "caret", "pROC", "ranger"))
 
 #setup variables that will be used
 scfas <- c("acetate", "butyrate", "isobutyrate", "propionate")
@@ -120,14 +120,24 @@ make_rf_model <- function(i, run_marker, train_data_name,
   #Create Overall specifications for model tuning
   # number controls fold of cross validation
   # Repeats control the number of times to run it
-  fitControl <- trainControl(## 10-fold CV
-    method = "cv",
-    number = 10,
-    p = 0.8, 
-    classProbs = TRUE, 
-    summaryFunction = twoClassSummary, 
-    savePredictions = "final")
-
+  if(metric_to_use == "ROC"){
+    
+    fitControl <- trainControl(## 10-fold CV
+      method = "cv",
+      number = 10,
+      p = 0.8, 
+      classProbs = TRUE, 
+      summaryFunction = twoClassSummary, 
+      savePredictions = "final")
+  } else{
+    
+    fitControl <- trainControl(## 10-fold CV
+      method = "cv",
+      number = 10,
+      p = 0.8, 
+      savePredictions = "final")
+  }
+  
   
   #Train the model
   training_model <- 
@@ -296,7 +306,7 @@ for(j in 1:100){
                         function(x) eighty_twenty_split(x, "rf_regression", final_sp_data), simplify = F)
   
   regression_test <- sapply(scfas, 
-                            function(x) make_rf_model(x, 1, "training_data", 
+                            function(x) make_rf_model(x, j, "training_data", 
                                                       "mmol_kg", "rf", "Rsquared", reg_rf_data), simplify = F)
   
   reg_pred <- sapply(scfas, function(x) 
@@ -304,7 +314,7 @@ for(j in 1:100){
     simplify = F)
   
   reg_summary_model_data <- sapply(scfas, function(x) 
-    add_model_summary_data(x, regression_test, reg_pred, summary_model_data, classif = F), simplify = F)
+    add_model_summary_data(x, regression_test, reg_pred, reg_summary_model_data, classif = F), simplify = F)
 }
 
 sapply(scfas, function(x) 
