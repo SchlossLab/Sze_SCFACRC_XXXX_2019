@@ -7,7 +7,7 @@
 source('code/functions.R')
 
 # Load needed libraries
-loadLibs(c("tidyverse", "caret", "pROC", "ranger"))
+loadLibs(c("tidyverse", "caret", "pROC", "ranger", "randomForest"))
 
 #setup variables that will be used
 scfas <- c("acetate", "butyrate", "isobutyrate", "propionate")
@@ -145,7 +145,8 @@ make_rf_model <- function(i, run_marker, train_data_name,
           method = method_to_use, 
           ntree = 500, 
           trControl = fitControl,
-          metric = metric_to_use, 
+          metric = metric_to_use,
+          importance = TRUE, 
           verbose = FALSE)
   
   #Print out tracking message
@@ -227,6 +228,31 @@ add_model_summary_data <- function(i, model_list, test_data, data_Table, classif
   return(data_Table[[i]])
 }
 
+#Function to store the importance information for each run
+grab_importance <- function(i, run_number, type_of_model, modelList, dataHolder){
+  
+  tempModel <- modelList[[i]]
+  
+  if(type_of_model == "classification"){
+    
+    test <- as.data.frame.list(varImp(tempModel, scale = FALSE)) %>% 
+      mutate(otu = rownames(.), Overall = importance.high, 
+             run = run_number) %>% 
+      select(-model, -calledFrom, -importance.high, -importance.low) %>% 
+      select(Overall, otu, run)
+  } else{
+    
+    test <- as.data.frame.list(varImp(tempModel, scale = FALSE)) %>% 
+      mutate(otu = rownames(.), run = run_number) %>% 
+      select(-model, -calledFrom)
+  }
+  
+  dataHolder[[i]] <- dataHolder[[i]] %>% bind_rows(test)
+  
+ return(dataHolder[[i]])
+}
+
+
 
 ##############################################################################################
 ############### Run the actual programs to get the data ######################################
@@ -273,6 +299,13 @@ class_summary_model_data <- list(acetate = data_frame(), butyrate = data_frame()
 reg_summary_model_data <- list(acetate = data_frame(), butyrate = data_frame(), 
                                  isobutyrate = data_frame(), propionate = data_frame())
 
+class_important_vars <- list(acetate = data_frame(), butyrate = data_frame(), 
+                            isobutyrate = data_frame(), propionate = data_frame())
+
+reg_important_vars <- list(acetate = data_frame(), butyrate = data_frame(), 
+                             isobutyrate = data_frame(), propionate = data_frame())
+
+
 # Run a 100 different splits for each SCFA on classification
 for(j in 1:100){
   
@@ -292,11 +325,18 @@ for(j in 1:100){
   
   class_summary_model_data <- sapply(scfas, function(x) 
     add_model_summary_data(x, class_test, ROC_data, class_summary_model_data, classif = T), simplify = F)
+  
+  class_important_vars <- sapply(scfas, function(x) 
+    grab_importance(x, j, "classification", class_test, class_important_vars), simplify = F)
 }
 
 sapply(scfas, function(x) 
   write_csv(class_summary_model_data[[x]], 
-            paste("data/process/tables/", x, "_classificaion_RF_summary.csv", sep = "")))
+            paste("data/process/tables/", x, "_classification_RF_summary.csv", sep = "")))
+
+sapply(scfas, function(x) 
+  write_csv(class_important_vars[[x]], 
+            paste("data/process/tables/", x, "imp_otus_classification_RF_summary.csv", sep = "")))
 
 # Run a 100 different splits for each SCFA on regression
 for(j in 1:100){
@@ -315,12 +355,17 @@ for(j in 1:100){
   
   reg_summary_model_data <- sapply(scfas, function(x) 
     add_model_summary_data(x, regression_test, reg_pred, reg_summary_model_data, classif = F), simplify = F)
+  
+  reg_important_vars <- sapply(scfas, function(x) 
+    grab_importance(x, j, "regression", class_test, class_important_vars), simplify = F)
 }
 
 sapply(scfas, function(x) 
   write_csv(reg_summary_model_data[[x]], 
             paste("data/process/tables/", x, "_regression_RF_summary.csv", sep = "")))
 
-
+sapply(scfas, function(x) 
+  write_csv(reg_important_vars[[x]], 
+            paste("data/process/tables/", x, "imp_otus_regression_RF_summary.csv", sep = "")))
 
 
