@@ -82,19 +82,8 @@ $(REFS)/gg_13_5_99.align :
 #
 ################################################################################
 
-# Run initial mothur 16S sequence processing
-$(PROC)/followup.files\
-$(PROC)/unmatched.taxonomy\
-$(PROC)/unmatched.count_table\
-$(PROC)/unmatched.fasta : code/mothur.batch\
-					data/references/silva.v4.align\
-					data/references/trainset14_032015.pds.fasta\
-					data/references/trainset14_032015.pds.tax\
-					data/process/stability.files
-	bash code/mothur.batch
 
-
-# Run initial mothur 16S OTU Clustering
+# Run initial mothur 16S Sequecning and OTU Clustering
 $(PROC)/final.0.03.subsample.shared\
 $(PROC)/final.groups.ave-std.summary\
 $(PROC)/final.groups.summary\
@@ -107,17 +96,46 @@ $(PROC)/final.taxonomy\
 $(PROC)/final.thetayc.0.03.lt.ave.dist\
 $(PROC)/final.thetayc.0.03.lt.dist\
 $(PROC)/final.thetayc.0.03.lt.std.dist\
-$(PROC)/final.shared : code/mothurCluster.batch\
+$(PROC)/final.shared : code/mothurCluster.batch code/mothur.batch\
 					$(PROC)/unmatched.file $(PROC)/unmatched.dist\
-					$(PROC)/unmatched.taxonomy $(PROC)/unmatched.fasta
+					$(PROC)/unmatched.taxonomy $(PROC)/unmatched.fasta\
+					data/references/silva.v4.align\
+					data/references/trainset14_032015.pds.fasta\
+					data/references/trainset14_032015.pds.tax\
+					data/process/stability.files
+	bash code/mothur.batch
 	bash code/mothurCluster.batch
 
 
-# Create a biom file
+# Run the greengenes formated file mothur 16S Sequecning and OTU Clustering
+$(PROC)/gg_final.0.03.biom\
+$(PROC)/gg_final.0.03.subsample.shared\
+$(PROC)/gg_final.groups.ave-std.summary\
+$(PROC)/gg_final.groups.summary\
+$(PROC)/gg_final.rep.count_table\
+$(PROC)/gg_final.rep.seqs\
+$(PROC)/gg_final.sharedsobs.0.03.lt.ave.dist\
+$(PROC)/gg_final.sharedsobs.0.03.lt.dist\
+$(PROC)/gg_final.sharedsobs.0.03.lt.std.dist\
+$(PROC)/gg_final.taxonomy\
+$(PROC)/gg_final.thetayc.0.03.lt.ave.dist\
+$(PROC)/gg_final.thetayc.0.03.lt.dist\
+$(PROC)/gg_final.thetayc.0.03.lt.std.dist\
+$(PROC)/gg_final.shared : code/gg_mothurCluster.batch code/gg_mothur.batch\
+					code/align_metadata_picrust.R\
+					$(PROC)/unmatched.file $(PROC)/unmatched.dist\
+					$(PROC)/unmatched.taxonomy $(PROC)/unmatched.fasta\
+					data/references/silva.v4.align\
+					data/references/trainset14_032015.pds.fasta\
+					data/references/trainset14_032015.pds.tax\
+					data/process/stability.files
+	bash code/gg_mothur.batch
+	R -e "source('code/align_metadata_picrust.R')"
+	bash code/gg_mothurCluster.batch
 
-# make.biom(shared=data/process/final.shared, label=0.03, 
-# reftaxonomy=data/references/99_otu_map.txt, constaxonomy=data/process/final.taxonomy, 
-# metadata=data/process/picrust_metadata)
+
+
+# Create a biom file
 
 
 # here we go from the good sequences and generate a shared file and a
