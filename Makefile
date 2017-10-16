@@ -56,7 +56,7 @@ $(REFS)/trainset14_032015.% :
 
 # Grab greengenes reference files for picrust
 
-$(REFS)/gg_13_5_99.gg.tax : 
+$(REFS)/gg_13_5_99.align : 
 	wget -N http://www.mothur.org/w/images/b/be/GG_13_5_otuMapTable.zip
 	unzip GG_13_5_otuMapTable.zip
 	mv GG_13_5_otuMapTable/*.txt $(REFS)/
@@ -66,6 +66,11 @@ $(REFS)/gg_13_5_99.gg.tax :
 	tar xvzf Gg_13_5_99.taxonomy.tgz
 	mv gg_13_5_99* $(REFS)/
 	rm -r Gg_13_5_99.taxonomy.tgz ._gg_13_5_99.pds.tax ._pds.notes __MACOSX/ pds.notes
+	wget -N http://www.mothur.org/w/images/c/cd/Gg_13_5_99.refalign.tgz
+	tar xvzf Gg_13_5_99.refalign.tgz
+	mv gg_13_5_99.align $(REFS)/
+	rm pds.notes Gg_13_5_99.refalign.tgz
+
 
 
 ################################################################################
