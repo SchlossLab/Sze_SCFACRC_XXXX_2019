@@ -116,7 +116,8 @@ $(PROC)/final.shared : code/mothurCluster.batch\
 # Create a biom file
 
 # make.biom(shared=data/process/final.shared, label=0.03, 
-# reftaxonomy=data/references/99_otu_map.txt, constaxonomy=data/process/final.taxonomy
+# reftaxonomy=data/references/99_otu_map.txt, constaxonomy=data/process/final.taxonomy, 
+# metadata=data/process/picrust_metadata)
 
 
 # here we go from the good sequences and generate a shared file and a

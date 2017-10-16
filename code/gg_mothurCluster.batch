@@ -32,7 +32,8 @@ mv $WORKDIR/*.0.03.rep.count_table $WORKDIR/gg_final.rep.count_table
 # Run diversity analysis on new aligned data set
 $mothurRv "#sub.sample(shared=$WORKDIR/gg_final.shared, label=0.03);
 	dist.shared(shared=$WORKDIR/gg_final.shared, calc=sharedsobs-thetayc, label=0.03, subsample=T, iters=100);
-	summary.single(shared=$WORKDIR/gg_final.shared, calc=nseqs-sobs-shannon-shannoneven, subsample=T)"
+	summary.single(shared=$WORKDIR/gg_final.shared, calc=nseqs-sobs-shannon-shannoneven, subsample=T);
+	make.biom(shared=$WORKDIR/gg_final.shared, label=0.03, reftaxonomy=$REF/99_otu_map.txt, constaxonomy=$WORKDIR/gg_final.taxonomy, metadata=$WORKDIR/picrust_metadata)"
 
 
 # Remove raw files to free up space
