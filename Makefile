@@ -109,6 +109,7 @@ $(PROC)/final.shared : code/mothurCluster.batch code/mothur.batch\
 
 # Run the greengenes formated file mothur 16S Sequecning and OTU Clustering
 $(PROC)/gg_final.0.03.biom\
+$(PROC)/gg_final.0.03.biom_shared\
 $(PROC)/gg_final.0.03.subsample.shared\
 $(PROC)/gg_final.groups.ave-std.summary\
 $(PROC)/gg_final.groups.summary\
