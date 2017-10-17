@@ -135,7 +135,12 @@ $(PROC)/gg_final.shared : code/gg_mothurCluster.batch code/gg_mothur.batch\
 	bash code/gg_mothurCluster.batch
 
 
-# here we go from the good sequences and generate a shared file and a
+# Run the picrust prediction algorithm on the gg generated file
+$(PROC)/nsti.txt\
+$(PROC)/gg_corr_OTU_table.biom\
+$(PROC)/gg_corr_normalized_otus.biom\
+$(PROC)/predicted_metagenomes.txt : code/run_picrust.sh
+	bash code/run_picrust.sh
 
 
 
