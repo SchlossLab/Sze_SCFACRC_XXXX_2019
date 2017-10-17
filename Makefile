@@ -135,13 +135,6 @@ $(PROC)/gg_final.shared : code/gg_mothurCluster.batch code/gg_mothur.batch\
 	bash code/gg_mothurCluster.batch
 
 
-# create a useable biom formated table for picrust
-# help from https://github.com/rprops/PICRUSt_from_mothur
-
-#biom convert --table-type="OTU table" -i data/process/gg_final.0.03.biom -o your_OTU_table.txt --to-tsv --header-key taxonomy
-#biom convert -i your_OTU_table.txt -o your_OTU_table.biom --table-type="OTU table" --to-json --process-obs-metadata taxonomy
-
-
 # here we go from the good sequences and generate a shared file and a
 
 
