@@ -6,7 +6,7 @@
 source('code/functions.R')
 
 # Load needed libraries
-loadLibs(c("tidyverse", "biomformat", "caret", "randomForest"))
+loadLibs(c("tidyverse", "biomformat", "caret", "randomForest", "pROC"))
 
 # Load in needed metadata and rename sample column
 picrust_meta <- read_tsv("data/process/picrust_metadata") %>% 
@@ -130,27 +130,74 @@ make_rf_model <- function(i, run_marker, train_data_name,
 
 
 #Function to store the importance information for each run
-grab_importance <- function(i, run_number, type_of_model, modelList, dataHolder){
+grab_importance <- function(i, run_number, modelList, dataHolder){
   
   tempModel <- modelList[[i]]
   
-  if(type_of_model == "classification"){
+  if (i ==  "adenoma"){
     
     test <- as.data.frame.list(varImp(tempModel, scale = FALSE)) %>% 
-      mutate(otu = rownames(.), Overall = importance.high, 
-             run = run_number) %>% 
-      select(-model, -calledFrom, -importance.high, -importance.low) %>% 
-      select(Overall, otu, run)
+      mutate(kegg_id = rownames(.), Overall = importance.adenoma, 
+             run = run_number)
   } else{
     
     test <- as.data.frame.list(varImp(tempModel, scale = FALSE)) %>% 
-      mutate(otu = rownames(.), run = run_number) %>% 
-      select(-model, -calledFrom)
+      mutate(kegg_id = rownames(.), Overall = importance.cancer, 
+             run = run_number)
   }
   
-  dataHolder[[i]] <- dataHolder[[i]] %>% bind_rows(test)
+  dataHolder[[i]] <- dataHolder[[i]] %>% bind_rows((test %>% select(Overall, kegg_id, run)))
   
+
   return(dataHolder[[i]])
+}
+
+# Create a function to run the prediction on the test data
+run_prediction <- function(i, model_data, train_data_name, control_type, 
+                           var_of_int, dataList){
+  
+  tempData <- dataList[[i]][[train_data_name]]
+  tempModel <- model_data[[i]]
+  
+  
+  
+  tempPredictions <- predict(tempModel, tempData, type = control_type)
+  
+  tempPredictions <- cbind(tempPredictions, actual = tempData[, var_of_int])
+  
+  
+  return(tempPredictions)
+}
+
+
+# Generate ROC curves for the test data
+get_test_roc <- function(i, var_of_int, pred_name, pred_list){
+  
+  actual_values <- pred_list[[i]][, var_of_int]
+  pred_values <- factor(pred_list[[i]][, pred_name], ordered = TRUE)
+  
+  tempPred_ROC <- roc(actual_values ~ pred_values)
+  
+  return(tempPred_ROC)
+}
+
+
+# Function to aggregate test data
+add_model_summary_data <- function(i, model_list, test_data, data_Table){
+  
+  tempTrainResults <- model_list[[i]]$results
+  
+  tempROC_test <- test_data[[i]]
+  
+  tempdata <- tempTrainResults %>% 
+    filter(ROC == max(ROC)) %>% 
+    rename(train_AUC = ROC) %>% 
+    mutate(test_AUC = tempROC_test$auc[1]) %>% 
+    select(mtry, train_AUC, test_AUC, everything())
+  
+  data_Table[[i]] <- data_Table[[i]] %>% bind_rows(tempdata)
+  
+  return(data_Table[[i]])
 }
 
 
@@ -161,6 +208,8 @@ grab_importance <- function(i, run_number, type_of_model, modelList, dataHolder)
 # Set up initial store for summary data
 model_important_vars <- list(adenoma = data_frame(), cancer = data_frame())
 
+model_summary_data <- list(adenoma = data_frame(), cancer = data_frame())
+
 # Set up model type variables
 models <- c("adenoma", "cancer")
 # Create RF data tables to be used
@@ -170,13 +219,49 @@ rf_data <- sapply(models,
 # Correctly assign names
 names(rf_data) <- c("cancer", "adenoma")
 
+# run through a 100 different 80/20 splits for modeling
+for(j in 1:100){
+  
+  # Create test and train data for both conditions
+  final_rf_data <- sapply(models, 
+                          function(x) eighty_twenty_split(x, rf_data), simplify = F)
+  
+  # Create the two models
+  rf_models <- sapply(models, 
+                      function(x) make_rf_model(x, j, "training_data", "disease", "rf", "ROC", final_rf_data),
+                      simplify = F)
+  
+  # grab the importance variables MDA
+  model_important_vars <- sapply(models, 
+                                 function(x) 
+                                   grab_importance(x, j, rf_models, model_important_vars), simplify = F)
+  
+  # Run the prediction
+  rf_test_data <- sapply(models, 
+                         function(x) 
+                           run_prediction(x, rf_models, "test_data", "raw", "disease", final_rf_data), 
+                         simplify = F)
+  
+  # Generate the ROC curves
+  test_roc <- sapply(models, 
+                     function(x) get_test_roc(x, "disease", "tempPredictions", rf_test_data), simplify = F)
+  
+  # Generate the summary data
+  model_summary_data <- sapply(models, function(x) 
+    add_model_summary_data(x, rf_models, test_roc, model_summary_data), 
+    simplify = F)
+  
+}
 
-# Create test and train data for both conditions
-final_rf_data <- sapply(models, 
-                        function(x) eighty_twenty_split(x, rf_data), simplify = F)
+# Write out the necessary data files
+sapply(models, function(x) 
+  write_csv(class_summary_model_data[[x]], 
+            paste("data/process/tables/", x, "_classification_RF_summary.csv", sep = "")))
 
-# Create the two models
-rf_models <- sapply(models, 
-       function(x) make_rf_model(x, 1, "training_data", "disease", "rf", "ROC", final_rf_data),
-       simplify = F)
+sapply(models, function(x) 
+  write_csv(class_important_vars[[x]], 
+            paste("data/process/tables/", x, "imp_otus_classification_RF_summary.csv", sep = "")))
+
+# Write out the relevant Kegg ID key
+write_csv(kegg_table, "data/process/tables/kegg_id_key.csv")
 
