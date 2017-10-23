@@ -255,12 +255,12 @@ for(j in 1:100){
 
 # Write out the necessary data files
 sapply(models, function(x) 
-  write_csv(class_summary_model_data[[x]], 
+  write_csv(model_summary_data[[x]], 
             paste("data/process/tables/", x, "_classification_RF_summary.csv", sep = "")))
 
 sapply(models, function(x) 
-  write_csv(class_important_vars[[x]], 
-            paste("data/process/tables/", x, "imp_otus_classification_RF_summary.csv", sep = "")))
+  write_csv(model_important_vars[[x]], 
+            paste("data/process/tables/", x, "_imp_otus_classification_RF_summary.csv", sep = "")))
 
 # Write out the relevant Kegg ID key
 write_csv(kegg_table, "data/process/tables/kegg_id_key.csv")
