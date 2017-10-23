@@ -87,15 +87,17 @@ eighty_twenty_split <- function(i, data_of_int, dataList){
   
   tempData <- dataList[[i]][[data_of_int]]
   
-  totalLength <- length(rownames(tempData))
+  sampling_vector <- c(1:length(rownames(tempData)))
   
-  tempTrain <- tempData %>% sample_frac(0.8, replace = FALSE)
+  trainValues <- sample(sampling_vector, round(length(sampling_vector)*0.8))
   
-  tempTest <- tempData %>% filter(!(rownames(.) %in% rownames(tempTrain)))
+  #tempTrain <- tempData %>% sample_frac(0.8, replace = FALSE)
+  
+  #tempTest <- tempData %>% filter(!(rownames(tempTrain) %in% rownames(.)))
   
   finalList <- list(
-    training_data = tempTrain, 
-    test_data = tempTest)
+    training_data = tempData[trainValues, ], 
+    test_data = tempData[-trainValues, ])
   
   
   return(finalList)
@@ -307,36 +309,36 @@ reg_important_vars <- list(acetate = data_frame(), butyrate = data_frame(),
 
 
 # Run a 100 different splits for each SCFA on classification
-#for(j in 1:100){
+for(j in 1:100){
   
   # Generate an 80/20 data split
-#  rf_data <- sapply(scfas, function(x) eighty_twenty_split(x, "rf_groups", final_sp_data), simplify = F)
+  rf_data <- sapply(scfas, function(x) eighty_twenty_split(x, "rf_groups", final_sp_data), simplify = F)
   
-#  class_test <- sapply(scfas, function(x) 
-#    make_rf_model(x, j, "training_data", "high_low", "rf", "ROC", rf_data), 
-#    simplify = F)
+  class_test <- sapply(scfas, function(x) 
+    make_rf_model(x, j, "training_data", "high_low", "rf", "ROC", rf_data), 
+    simplify = F)
   
-#  class_pred <- sapply(scfas, function(x) 
-#    run_prediction(x, class_test, "test_data", "raw", "high_low", rf_data), 
-#    simplify = F)
+  class_pred <- sapply(scfas, function(x) 
+    run_prediction(x, class_test, "test_data", "raw", "high_low", rf_data), 
+    simplify = F)
   
-#  ROC_data <- sapply(scfas, function(x) 
-#    get_test_roc(x, "high_low", "tempPredictions", class_pred, classif = T), simplify = F)
+  ROC_data <- sapply(scfas, function(x) 
+    get_test_roc(x, "high_low", "tempPredictions", class_pred, classif = T), simplify = F)
   
-#  class_summary_model_data <- sapply(scfas, function(x) 
-#    add_model_summary_data(x, class_test, ROC_data, class_summary_model_data, classif = T), simplify = F)
+  class_summary_model_data <- sapply(scfas, function(x) 
+    add_model_summary_data(x, class_test, ROC_data, class_summary_model_data, classif = T), simplify = F)
   
-#  class_important_vars <- sapply(scfas, function(x) 
-#    grab_importance(x, j, "classification", class_test, class_important_vars), simplify = F)
-#}
+  class_important_vars <- sapply(scfas, function(x) 
+    grab_importance(x, j, "classification", class_test, class_important_vars), simplify = F)
+}
 
-#sapply(scfas, function(x) 
-#  write_csv(class_summary_model_data[[x]], 
-#            paste("data/process/tables/", x, "_classification_RF_summary.csv", sep = "")))
+sapply(scfas, function(x) 
+  write_csv(class_summary_model_data[[x]], 
+            paste("data/process/tables/", x, "_classification_RF_summary.csv", sep = "")))
 
-#sapply(scfas, function(x) 
-#  write_csv(class_important_vars[[x]], 
-#            paste("data/process/tables/", x, "imp_otus_classification_RF_summary.csv", sep = "")))
+sapply(scfas, function(x) 
+  write_csv(class_important_vars[[x]], 
+            paste("data/process/tables/", x, "imp_otus_classification_RF_summary.csv", sep = "")))
 
 # Run a 100 different splits for each SCFA on regression
 for(j in 1:100){
