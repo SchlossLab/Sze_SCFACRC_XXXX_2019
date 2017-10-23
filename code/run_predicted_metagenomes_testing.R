@@ -57,19 +57,21 @@ eighty_twenty_split <- function(i, dataList){
   
   tempData <- dataList[[i]]
   
-  totalLength <- length(rownames(tempData))
+  sampling_vector <- c(1:length(rownames(tempData)))
   
-  tempTrain <- tempData %>% sample_frac(0.8, replace = FALSE)
+  trainValues <- sample(sampling_vector, round(length(sampling_vector)*0.8))
   
-  tempTest <- tempData %>% filter(!(rownames(.) %in% rownames(tempTrain)))
+  #tempTrain <- tempData %>% sample_frac(0.8, replace = FALSE)
+  
+  #tempTest <- tempData %>% filter(!(rownames(tempTrain) %in% rownames(.)))
   
   finalList <- list(
-    training_data = tempTrain, 
-    test_data = tempTest)
+    training_data = tempData[trainValues, ], 
+    test_data = tempData[-trainValues, ])
   
   
   return(finalList)
-  
+
 }
 
 
@@ -158,8 +160,6 @@ run_prediction <- function(i, model_data, train_data_name, control_type,
   
   tempData <- dataList[[i]][[train_data_name]]
   tempModel <- model_data[[i]]
-  
-  
   
   tempPredictions <- predict(tempModel, tempData, type = control_type)
   
