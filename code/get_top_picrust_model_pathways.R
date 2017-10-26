@@ -9,8 +9,7 @@ source('code/functions.R')
 loadLibs(c("tidyverse"))
 
 # Load in needed kegg pathway data
-kegg_pathway <- read_csv("data/process/tables/kegg_id_key.csv")
-
+kegg_pathway <- read_csv("data/process/tables/kegg_id_key.csv") 
 # Load in model information
 adn_model_imp <- read_csv("data/process/tables/adenoma_imp_otus_classification_RF_summary.csv")
 crc_model_imp <- read_csv("data/process/tables/cancer_imp_otus_classification_RF_summary.csv")
@@ -48,8 +47,6 @@ top_model_pathways <- function(dataTable, mapFile, topNumber){
 
 
 
-
-
 ##############################################################################################
 ############### Run the actual programs to get the data ######################################
 ##############################################################################################
@@ -60,4 +57,8 @@ summary_imp_lists <- sapply(c("adn_model_imp", "crc_model_imp"),
   
 top_ten_pathways <- sapply(c("adn_model_imp", "crc_model_imp"), 
                function(x) top_model_pathways(summary_imp_lists[[x]], kegg_pathway, 10), simplify = F)
-  
+
+
+
+
+
