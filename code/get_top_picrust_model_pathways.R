@@ -23,7 +23,9 @@ crc_model_imp <- read_csv("data/process/tables/cancer_imp_otus_classification_RF
 # Function to summarize all the Keggs by median and quantiles and order highest to lowest
 group_stats <- function(dataTable){
   
-  tempData <- dataTable %>% 
+  tempData <- get(dataTable)
+  
+  tempData <- tempData %>% 
     group_by(kegg_id) %>% 
     summarise(median_MDA = median(Overall), 
               quantile_25 = quantile(Overall, probs = 0.25), 
@@ -34,13 +36,28 @@ group_stats <- function(dataTable){
 }
 
 
+# Function to ID the top X pathways
+top_model_pathways <- function(dataTable, mapFile, topNumber){
+  
+  tempData <- dataTable %>% 
+    slice(1:topNumber) %>% 
+    left_join(mapFile, by = "kegg_id")
+  
+  return(tempData)
+}
+
+
+
 
 
 ##############################################################################################
 ############### Run the actual programs to get the data ######################################
 ##############################################################################################
 
-test <- group_stats(adn_model_imp)
-
-
-
+# Get the summary imp data
+summary_imp_lists <- sapply(c("adn_model_imp", "crc_model_imp"), 
+                            function(x) group_stats(x), simplify = F)
+  
+top_ten_pathways <- sapply(c("adn_model_imp", "crc_model_imp"), 
+               function(x) top_model_pathways(summary_imp_lists[[x]], kegg_pathway, 10), simplify = F)
+  
