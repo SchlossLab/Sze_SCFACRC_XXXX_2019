@@ -154,17 +154,10 @@ grab_importance <- function(i, run_number, modelList, dataHolder){
   
   tempModel <- modelList[[i]]
   
-  if (i ==  "adenoma"){
+  test <- as.data.frame.list(varImp(tempModel, scale = FALSE)) %>% 
+    mutate(kegg_id = rownames(.), Overall = importance.high, 
+           run = run_number)  
     
-    test <- as.data.frame.list(varImp(tempModel, scale = FALSE)) %>% 
-      mutate(kegg_id = rownames(.), Overall = importance.adenoma, 
-             run = run_number)
-  } else{
-    
-    test <- as.data.frame.list(varImp(tempModel, scale = FALSE)) %>% 
-      mutate(kegg_id = rownames(.), Overall = importance.cancer, 
-             run = run_number)
-  }
   
   dataHolder[[i]] <- dataHolder[[i]] %>% bind_rows((test %>% select(Overall, kegg_id, run)))
   
@@ -264,7 +257,7 @@ for(j in 1:100){
                       simplify = F)
   
   # grab the importance variables MDA
-  model_important_vars <- sapply(scfas, 
+  class_important_vars <- sapply(scfas, 
                                  function(x) 
                                    grab_importance(x, j, rf_models, class_important_vars), simplify = F)
   
