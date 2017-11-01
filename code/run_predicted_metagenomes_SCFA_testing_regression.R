@@ -1,4 +1,4 @@
-### Investigate how well the picrust predicted metagenomes predict SCFA levels
+### Investigate how well the picrust predicted metagenomes predict SCFA levels (regression)
 ### compare most differentially expressed genes by disease
 ### Marc Sze
 
@@ -154,17 +154,8 @@ grab_importance <- function(i, run_number, modelList, dataHolder){
   
   tempModel <- modelList[[i]]
   
-  if (i ==  "adenoma"){
-    
-    test <- as.data.frame.list(varImp(tempModel, scale = FALSE)) %>% 
-      mutate(kegg_id = rownames(.), Overall = importance.adenoma, 
-             run = run_number)
-  } else{
-    
-    test <- as.data.frame.list(varImp(tempModel, scale = FALSE)) %>% 
-      mutate(kegg_id = rownames(.), Overall = importance.cancer, 
-             run = run_number)
-  }
+  test <- as.data.frame.list(varImp(tempModel, scale = FALSE)) %>% 
+    mutate(kegg_id = rownames(.), run = run_number)
   
   dataHolder[[i]] <- dataHolder[[i]] %>% bind_rows((test %>% select(Overall, kegg_id, run)))
   
@@ -205,13 +196,13 @@ add_model_summary_data <- function(i, model_list, test_data, data_Table){
   
   tempTrainResults <- model_list[[i]]$results
   
-  tempROC_test <- test_data[[i]]
+  temp_test <- summary(lm(test_data[[i]]$mmol_kg ~ test_data[[i]]$tempPredictions))
   
   tempdata <- tempTrainResults %>% 
-    filter(ROC == max(ROC)) %>% 
-    rename(train_AUC = ROC) %>% 
-    mutate(test_AUC = tempROC_test$auc[1]) %>% 
-    select(mtry, train_AUC, test_AUC, everything())
+    filter(Rsquared == max(Rsquared)) %>% 
+    rename(train_r2 = Rsquared) %>% 
+    mutate(test_r2 = temp_test$adj.r.squared) %>% 
+    select(mtry, train_r2, test_r2, everything())
   
   data_Table[[i]] <- data_Table[[i]] %>% bind_rows(tempdata)
   
@@ -224,12 +215,6 @@ add_model_summary_data <- function(i, model_list, test_data, data_Table){
 ##############################################################################################
 
 # Set up initial store for summary data
-class_important_vars <- list(acetate = data_frame(), butyrate = data_frame(), 
-                             isobutyrate = data_frame(), propionate = data_frame())
-
-class_summary_data <- list(acetate = data_frame(), butyrate = data_frame(), 
-                           isobutyrate = data_frame(), propionate = data_frame())
-
 regress_important_vars <- list(acetate = data_frame(), butyrate = data_frame(), 
                                isobutyrate = data_frame(), propionate = data_frame())
 
@@ -250,47 +235,33 @@ combined_data_amount <- sapply(scfas,
                   function(x) make_rf_data(x, nzv_full_pi_data, all_scfa_data, 
                                            c(metaF$initial, metaF$followUp), "mmol_kg"), simplify = F)
 
-
-# run through a 100 different 80/20 splits for modeling
+# Run a 100 different splits for each SCFA on regression
 for(j in 1:100){
   
-  # Create test and train data for both conditions
-  final_rf_data <- sapply(scfas, 
-                          function(x) eighty_twenty_split(x, combined_data_hl), simplify = F)
+  # Generate an 80/20 data split for regression
+  reg_rf_data <- sapply(scfas, 
+                        function(x) eighty_twenty_split(x, combined_data_amount), simplify = F)
   
-  # Create the two models
-  rf_models <- sapply(scfas, 
-                      function(x) make_rf_model(x, j, "training_data", "disease", "rf", "ROC", final_rf_data),
-                      simplify = F)
+  regression_test <- sapply(scfas, 
+                            function(x) make_rf_model(x, j, "training_data", 
+                                                      "mmol_kg", "rf", "Rsquared", reg_rf_data), simplify = F)
   
-  # grab the importance variables MDA
-  model_important_vars <- sapply(scfas, 
-                                 function(x) 
-                                   grab_importance(x, j, rf_models, class_important_vars), simplify = F)
-  
-  # Run the prediction
-  rf_test_data <- sapply(scfas, 
-                         function(x) 
-                           run_prediction(x, rf_models, "test_data", "raw", "disease", final_rf_data), 
-                         simplify = F)
-  
-  # Generate the ROC curves
-  test_roc <- sapply(scfas, 
-                     function(x) get_test_roc(x, "disease", "tempPredictions", rf_test_data), simplify = F)
-  
-  # Generate the summary data
-  class_summary_data <- sapply(scfas, function(x) 
-    add_model_summary_data(x, rf_models, test_roc, class_summary_data), 
+  reg_pred <- sapply(scfas, function(x) 
+    run_prediction(x, regression_test, "test_data", "raw", "mmol_kg", reg_rf_data), 
     simplify = F)
   
+  regress_summary_data <- sapply(scfas, function(x) 
+    add_model_summary_data(x, regression_test, reg_pred, regress_summary_data), simplify = F)
+  
+  regress_important_vars <- sapply(scfas, function(x) 
+    grab_importance(x, j, regression_test, regress_important_vars), simplify = F)
 }
 
-# Write out the necessary data files
 sapply(scfas, function(x) 
-  write_csv(class_summary_data[[x]], 
-            paste("data/process/tables/", x, "_classification_RF_summary.csv", sep = "")))
+  write_csv(reg_summary_model_data[[x]], 
+            paste("data/process/tables/", x, "_regression_RF_summary.csv", sep = "")))
 
 sapply(scfas, function(x) 
-  write_csv(class_important_vars[[x]], 
-            paste("data/process/tables/", x, "_imp_otus_classification_RF_summary.csv", sep = "")))
+  write_csv(reg_important_vars[[x]], 
+            paste("data/process/tables/", x, "imp_otus_regression_RF_summary.csv", sep = "")))
 
