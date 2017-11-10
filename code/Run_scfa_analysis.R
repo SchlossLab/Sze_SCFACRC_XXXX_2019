@@ -87,6 +87,7 @@ create_graphs <- function(scfa_name, dataList){
     geom_jitter(aes(color = Dx_Bin), width = 0.3, show.legend = F) + 
     stat_summary(fun.y = median, fun.ymin = median, fun.ymax = median, 
                  colour = "black", geom = "crossbar", size = 0.5, width = 0.5)  + 
+    scale_color_manual(values = c('#228B22', '#FFD700', '#DC143C', '#808069')) + 
     xlab("") + ylab("mmol per Kg") + theme_bw()
   
   # Graph the overall distributions of the values by group
@@ -99,7 +100,9 @@ create_graphs <- function(scfa_name, dataList){
     geom_density(alpha = 0.3, show.legend = F) + 
     xlab("mmol per Kg") + ylab("Density") + theme_bw() + 
     scale_x_continuous(expand = c(0, 0)) + scale_y_continuous(expand = c(0, 0)) + 
+    scale_fill_manual(values = c('#228B22', '#FFD700', '#DC143C', '#808069')) + 
     ggtitle(paste(scfa_name))
+  
   
   # Combine the two graphs into a single figure
   tempFinalGraph <- grid.arrange(tempPlot2, tempPlot, nrow = 2)
