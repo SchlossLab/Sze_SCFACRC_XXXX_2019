@@ -140,7 +140,7 @@ save_gg_plots <- function(scfa_name, graphLists, path_to_save, ending){
   # ending is the unique file name ending
   
   # The command that initializes the save
-  ggsave(paste(path_to_save, scfa_name, ending), graphLists[[scfa_name]], 
+  ggsave(paste(path_to_save, scfa_name, ending, sep = ""), graphLists[[scfa_name]], 
          device = "pdf", width = 8, height = 6)
   # Prints out that the file was saved
   print(paste("completed saving graph for ", scfa_name, sep = ""))
