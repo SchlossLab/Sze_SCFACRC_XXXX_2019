@@ -262,6 +262,6 @@ sapply(scfas, function(x)
             paste("data/process/tables/", x, "_regression_RF_summary.csv", sep = "")))
 
 sapply(scfas, function(x) 
-  write_csv(reg_important_vars[[x]], 
+  write_csv(regress_important_vars[[x]], 
             paste("data/process/tables/", x, "imp_otus_regression_RF_summary.csv", sep = "")))
 
