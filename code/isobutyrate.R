@@ -222,7 +222,7 @@ regress_summary_data <- list(acetate = data_frame(), butyrate = data_frame(),
                              isobutyrate = data_frame(), propionate = data_frame())
 
 # Set up model type variables
-scfas <- c("acetate")
+scfas <- c("isobutyrate")
 
 # Get scfas medians
 scfa_median_vector <- sapply(scfas, function(x) median(scfa_data[[x]]$mmol_kg))
