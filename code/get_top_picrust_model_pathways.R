@@ -86,7 +86,22 @@ pull_respective_kegg_data <- function(ID_of_int){
   return(tempEntry)
 }
 
-
+# Function to assign SCFA grouping to data table
+get_scfa_grouping <- function(ortholog, dataTable, ortholog_pathways_list, column_of_int){
+  
+  ortholog_pathways <- ortholog_pathways_list[[ortholog]]
+  tempData <- as.data.frame(dataTable)
+  
+  tempList <- sapply(ortholog_pathways, 
+                     function(x) 
+                       ifelse(grepl(x, tempData[, "kegg_orthologs"]) == T, 
+                       invisible(1), invisible(0)), simplify = F) %>% bind_rows() %>% 
+    mutate(total_occurances = rowSums(.))
+  
+  tempVector <- ifelse(tempList$total_occurances >= 1, invisible(1), invisible(0))
+  
+  return(tempVector)
+}
 
 
 
@@ -98,36 +113,59 @@ pull_respective_kegg_data <- function(ID_of_int){
 models_used <- c("adn_model_imp", "crc_model_imp")
 
 # Group kegg orthologs that feed into specific scfa pathway of interest
-propionate_pathway <- c("ko00640")
-butyrate_pathway <- c("ko00650")
-acetate_pathway <- c("ko00010", "ko00430", "ko00440", "ko00620", "ko00640", "ko00660", 
-                     "ko00680", "ko00720", "ko00908", "ko00920", "")
-isobutyrate_pathway <- c("ko00280")
+pathways_of_interest <- list(
+  propionate_pathway = c("ko00640"), 
+  butyrate_pathway = c("ko00650"), 
+  acetate_pathway = c("ko00010", "ko00430", "ko00440", "ko00620", "ko00640", "ko00660", 
+                       "ko00680", "ko00720", "ko00908", "ko00920"), 
+  isobutyrate_pathway = c("ko00280"))
+
+
 
 # Get the summary imp data
 summary_imp_lists <- sapply(models_used, 
                             function(x) group_stats(x), simplify = F)
 
-# Get top 25 most predictive genes according to picrust for adenoma
+# Generate the kegg id information for adenoma
 adn_imp_w_gene_data <- get_gene_ids(summary_imp_lists[["adn_model_imp"]], "kegg_id")
-adn_imp_w_gene_data <- adn_imp_w_gene_data %>% slice(1:25)
 
-# Get top 25 most predictive genes according to picrust for carcinoma
+# Generate the kegg id information for carcinoma
 crc_imp_w_gene_data <- summary_imp_lists[["crc_model_imp"]] %>% 
   left_join(
     select(adn_imp_w_gene_data, kegg_id, gene_name, pathways, kegg_orthologs), by = "kegg_id")
 
+# Get top 25 most predictive genes according to picrust for adenoma
+adn_imp_w_gene_data <- adn_imp_w_gene_data %>% slice(1:25) %>% 
+  mutate(kegg_orthologs = as.character(kegg_orthologs), 
+         pathways = as.character(pathways))
+
+
+# Get top 25 most predictive genes according to picrust for carcinoma
 crc_imp_w_gene_data <- crc_imp_w_gene_data %>% slice(1:25)
 
+# Count scfa pathway of interest occurances in adenoma model top 25
+adn_imp_w_gene_data <- adn_imp_w_gene_data %>% 
+  bind_cols(as.data.frame(sapply(names(pathways_of_interest), 
+               function(x) get_scfa_grouping(x, adn_imp_w_gene_data, 
+                                             pathways_of_interest, "kegg_orthologs"), 
+               simplify = T))) %>% 
+  mutate(other_pathway = ifelse(
+    propionate_pathway == 0 & 
+      butyrate_pathway == 0 &
+      acetate_pathway == 0 &
+      isobutyrate_pathway == 0, invisible(1), invisible(0)))
 
-
-
-
-
-
-
-
-
+# Count scfa pathway of interest occurances in carcinoma model top 25
+crc_imp_w_gene_data <- crc_imp_w_gene_data %>% 
+  bind_cols(as.data.frame(sapply(names(pathways_of_interest), 
+                                 function(x) get_scfa_grouping(x, crc_imp_w_gene_data, 
+                                                               pathways_of_interest, "kegg_orthologs"), 
+                                 simplify = T))) %>% 
+  mutate(other_pathway = ifelse(
+    propionate_pathway == 0 & 
+      butyrate_pathway == 0 &
+      acetate_pathway == 0 &
+      isobutyrate_pathway == 0, invisible(1), invisible(0)))
 
 
 
