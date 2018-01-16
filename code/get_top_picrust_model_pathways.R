@@ -120,7 +120,7 @@ pathways_of_interest <- list(
                        "ko00680", "ko00720", "ko00908", "ko00920"), 
   isobutyrate_pathway = c("ko00280"))
 
-
+top10_percent <- round(length(summary_imp_lists$adn_model_imp$kegg_id)*0.1)
 
 # Get the summary imp data
 summary_imp_lists <- sapply(models_used, 
@@ -135,13 +135,13 @@ crc_imp_w_gene_data <- summary_imp_lists[["crc_model_imp"]] %>%
     select(adn_imp_w_gene_data, kegg_id, gene_name, pathways, kegg_orthologs), by = "kegg_id")
 
 # Get top 25 most predictive genes according to picrust for adenoma
-adn_imp_w_gene_data <- adn_imp_w_gene_data %>% slice(1:25) %>% 
+adn_imp_w_gene_data <- adn_imp_w_gene_data %>% slice(1:top10_percent) %>% 
   mutate(kegg_orthologs = as.character(kegg_orthologs), 
          pathways = as.character(pathways))
 
 
 # Get top 25 most predictive genes according to picrust for carcinoma
-crc_imp_w_gene_data <- crc_imp_w_gene_data %>% slice(1:25)
+crc_imp_w_gene_data <- crc_imp_w_gene_data %>% slice(1:top10_percent)
 
 # Count scfa pathway of interest occurances in adenoma model top 25
 adn_imp_w_gene_data <- adn_imp_w_gene_data %>% 
@@ -166,6 +166,9 @@ crc_imp_w_gene_data <- crc_imp_w_gene_data %>%
       butyrate_pathway == 0 &
       acetate_pathway == 0 &
       isobutyrate_pathway == 0, invisible(1), invisible(0)))
+
+# Write out data tables for later graping use
+
 
 
 
