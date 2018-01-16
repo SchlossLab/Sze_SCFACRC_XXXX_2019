@@ -120,11 +120,12 @@ pathways_of_interest <- list(
                        "ko00680", "ko00720", "ko00908", "ko00920"), 
   isobutyrate_pathway = c("ko00280"))
 
-top10_percent <- round(length(summary_imp_lists$adn_model_imp$kegg_id)*0.1)
-
 # Get the summary imp data
 summary_imp_lists <- sapply(models_used, 
                             function(x) group_stats(x), simplify = F)
+
+# Generate what the top 10% of most important genes
+top10_percent <- round(length(summary_imp_lists$adn_model_imp$kegg_id)*0.1)
 
 # Generate the kegg id information for adenoma
 adn_imp_w_gene_data <- get_gene_ids(summary_imp_lists[["adn_model_imp"]], "kegg_id")
@@ -133,6 +134,10 @@ adn_imp_w_gene_data <- get_gene_ids(summary_imp_lists[["adn_model_imp"]], "kegg_
 crc_imp_w_gene_data <- summary_imp_lists[["crc_model_imp"]] %>% 
   left_join(
     select(adn_imp_w_gene_data, kegg_id, gene_name, pathways, kegg_orthologs), by = "kegg_id")
+
+# Read out full data summaries so it won't have to be pulled again unless needed
+write_csv(adn_imp_w_gene_data, "data/process/tables/picrust_adn_imp_model_summary.csv")
+write_csv(crc_imp_w_gene_data, "data/process/tables/picrust_crc_imp_model_summary.csv")
 
 # Get top 25 most predictive genes according to picrust for adenoma
 adn_imp_w_gene_data <- adn_imp_w_gene_data %>% slice(1:top10_percent) %>% 
@@ -168,8 +173,8 @@ crc_imp_w_gene_data <- crc_imp_w_gene_data %>%
       isobutyrate_pathway == 0, invisible(1), invisible(0)))
 
 # Write out data tables for later graping use
-
-
+write_csv(adn_imp_w_gene_data, "data/process/tables/picrust_adn_top10percent_imp_model_summary.csv")
+write.csv(crc_imp_w_gene_data, "data/process/tables/picrust_crc_top10percent_imp_model_summary.csv")
 
 
 
