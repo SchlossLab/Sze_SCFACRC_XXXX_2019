@@ -98,11 +98,27 @@ models_used <- c("adn_model_imp", "crc_model_imp")
 summary_imp_lists <- sapply(models_used, 
                             function(x) group_stats(x), simplify = F)
 
-top_ten_pathways <- sapply(models_used, 
-               function(x) top_model_pathways(summary_imp_lists[[x]], kegg_pathway, 20), simplify = F)
-
-
+# Get top 25 most predictive genes according to picrust for adenoma
 adn_imp_w_gene_data <- get_gene_ids(summary_imp_lists[["adn_model_imp"]], "kegg_id")
+adn_imp_w_gene_data <- adn_imp_w_gene_data %>% slice(1:25)
+
+# Get top 25 most predictive genes according to picrust for carcinoma
+crc_imp_w_gene_data <- summary_imp_lists[["crc_model_imp"]] %>% 
+  left_join(
+    select(adn_imp_w_gene_data, kegg_id, gene_name, pathways, kegg_orthologs), by = "kegg_id")
+
+crc_imp_w_gene_data <- crc_imp_w_gene_data %>% slice(1:25)
+
+
+
+
+
+
+
+
+
+
+
 
 
 
