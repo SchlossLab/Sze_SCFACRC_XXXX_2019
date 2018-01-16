@@ -87,12 +87,22 @@ pull_respective_kegg_data <- function(ID_of_int){
 }
 
 
+
+
+
 ##############################################################################################
 ############### Run the actual programs to get the data ######################################
 ##############################################################################################
 
 # Create vectors to be used in aggregating the adenoma and crc models
 models_used <- c("adn_model_imp", "crc_model_imp")
+
+# Group kegg orthologs that feed into specific scfa pathway of interest
+propionate_pathway <- c("ko00640")
+butyrate_pathway <- c("ko00650")
+acetate_pathway <- c("ko00010", "ko00430", "ko00440", "ko00620", "ko00640", "ko00660", 
+                     "ko00680", "ko00720", "ko00908", "ko00920", "")
+isobutyrate_pathway <- c("ko00280")
 
 # Get the summary imp data
 summary_imp_lists <- sapply(models_used, 
