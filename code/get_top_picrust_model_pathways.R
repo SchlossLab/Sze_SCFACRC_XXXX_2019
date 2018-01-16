@@ -5,8 +5,12 @@
 # Load in needed functions and libraries
 source('code/functions.R')
 
+source("https://bioconductor.org/biocLite.R")
+
+library(KEGGREST)
+
 # Load needed libraries
-loadLibs(c("tidyverse"))
+loadLibs(c("tidyverse", "stringr"))
 
 # Load in needed kegg pathway data
 kegg_pathway <- read_csv("data/process/tables/kegg_id_key.csv") 
@@ -46,17 +50,59 @@ top_model_pathways <- function(dataTable, mapFile, topNumber){
 }
 
 
+# Function to pull specific gene names, pathway, and kegg ortholog
+get_gene_ids <- function(dataTable, column_w_keggs){
+  
+  tempIDs <- as.data.frame(dataTable)[, column_w_keggs]
+  
+  tempData <- as.data.frame(t(sapply(tempIDs, 
+                     function(x) pull_respective_kegg_data(x))))
+  
+  names(tempData) <- c("kegg_id", "gene_name", "pathways", "kegg_orthologs")
+  
+  temp_combined_data <- dataTable %>% 
+    left_join(mutate(tempData, kegg_id = as.character(kegg_id)), by = "kegg_id")
+  
+  return(temp_combined_data)
+}
+
+# Function to do the actual data pulling
+pull_respective_kegg_data <- function(ID_of_int){
+  
+  tempKEGG <- try(keggGet(ID_of_int))
+  
+  tempEntry <- try(c(unname(tempKEGG[[1]]$ENTRY), tempKEGG[[1]]$NAME, 
+                     paste(unname(tempKEGG[[1]]$PATHWAY), "_", 
+                           collapse = "", sep = ""), 
+                     paste(names(tempKEGG[[1]]$PATHWAY), "_", collapse = "", sep = "")))
+  
+  if(length(tempEntry) <= 1){
+    
+    tempEntry <- c(ID_of_int, NA, NA, NA)
+  }
+  
+  print(paste("Completed processing KEGG ID: ", ID_of_int, sep = ""))
+  
+  return(tempEntry)
+}
+
 
 ##############################################################################################
 ############### Run the actual programs to get the data ######################################
 ##############################################################################################
 
+# Create vectors to be used in aggregating the adenoma and crc models
+models_used <- c("adn_model_imp", "crc_model_imp")
+
 # Get the summary imp data
-summary_imp_lists <- sapply(c("adn_model_imp", "crc_model_imp"), 
+summary_imp_lists <- sapply(models_used, 
                             function(x) group_stats(x), simplify = F)
-  
-top_ten_pathways <- sapply(c("adn_model_imp", "crc_model_imp"), 
+
+top_ten_pathways <- sapply(models_used, 
                function(x) top_model_pathways(summary_imp_lists[[x]], kegg_pathway, 20), simplify = F)
+
+
+adn_imp_w_gene_data <- get_gene_ids(summary_imp_lists[["adn_model_imp"]], "kegg_id")
 
 
 
