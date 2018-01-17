@@ -39,6 +39,9 @@ def create_samples_to_download(keep_file_name):
 
 		temp_samples.append(line.strip('\n'))
 
+	# Close the reading of the file
+	temp_file.close()	
+
 	return(temp_samples)
 
 
@@ -47,45 +50,49 @@ def download_files(keep_files):
 
 	for files in keep_files:
 
-	# Runs the actual download
-	os.system("ascp -QTr -k 1 -l 1G -i %s %s/%s/%s/%s/%s/ %s" % 
-		(asp, sra_nih, database, seq_dir, study, files, workdir))
-	# Moves file back up a directory
-	os.system("mv %s%s/%s.sra %s" % (workdir, files, files, workdir))
+		# Runs the actual download
+		os.system("ascp -QTr -k 1 -l 1G -i %s %s/%s/%s/%s/%s/ %s" % 
+			(asp, sra_nih, database, seq_dir, study, files, workdir))
+		# Moves file back up a directory
+		os.system("mv %s%s/%s.sra %s" % (workdir, files, files, workdir))
 	# Removes extra empty directory
-	os.system("rm -r %s%s" % (workdir, files))
+		os.system("rm -r %s%s" % (workdir, files))
 	
-	print("Completed downloading and moving sample: %s" % (files))
-
-
-#for files in chr(range(9)):
+		print("Completed downloading and moving sample: %s" % (files))
 
 
 
 # Convert the sra file to fastq files (one forward (F) and one reverse (R))
-#for i in os.listdir(workdir):
-	
-#	if "sra" in i:
+def convert_sra_to_fastq(keep_files):
 
-#		os.system("fastq-dump --split-files %s%s -O %s" % (workdir, i, workdir))
+	for files in keep_files:
+
+		print("Started creating fastq for: %s.sra" % (files))
+
+		os.system("fastq-dump --split-files %s%s.sra -O %s" % (workdir, files, workdir))
+
+		print("Completed creating fastq for: %s.sra" % (files))
+
+
 
 
 # Quality filter and toss out reads that don't make the cut 
 # -t quality filter of nucleotide (trimmed from the end of sequence)
 # -Q average quality cutoff of sequence
 # -l minimum length of sequence if shorter after trimming it is tossed
-#for fastq_sample in d_files:
-    
- #   os.system("sickle pe -f %s%s_1.fastq -r %s%s_2.fastq \
-#-t sanger -o %s%s_qf_1.fastq -p %s%s_qf_2.fastq \
-#-s %s%s_qf.orphan.fastq -q 30 -l 75" % 
-#    	(workdir, fastq_sample, workdir, fastq_sample, 
-#    		workdir, fastq_sample, workdir, fastq_sample, 
-#    		workdir, fastq_sample))
-    
-#    print("Completed quality filtering of sample %s" % (fastq_sample))
+def run_quality_filter(keep_files):
 
+	for files in keep_files:
 
+		print("Started quality filtering of F(1) and R(2) sample %s fastq" % (files))
+
+		print("sickle pe -f %s%s_1.fastq -r %s%s_2.fastq \
+-t sanger -o %s%s_qf_1.fastq -p %s%s_qf_2.fastq \
+-s %s%s_qf.orphan.fastq -q 30 -l 75" % 
+			(workdir, files, workdir, files, workdir, files, 
+				workdir, files, workdir, files))
+
+		print("Completed quality filtering of sample %s" % (files))
 
 
 # Run the actual program
@@ -94,6 +101,7 @@ def main():
 	meta_genome_file_name = command_line()
 	samples_to_download = create_samples_to_download(meta_genome_file_name)
 	download_files(samples_to_download)
-
+	convert_sra_to_fastq(samples_to_download)
+	run_quality_filter(samples_to_download)
 
 if __name__ == '__main__': main()
