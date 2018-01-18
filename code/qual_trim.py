@@ -26,7 +26,7 @@ study = "SRP108915"
 def command_line():
 	commands = sys.argv
 	metagenome_sample_file = commands[1]
-	
+
 	return metagenome_sample_file
 
 # Function to read in samples in stated text file for samples of interest
