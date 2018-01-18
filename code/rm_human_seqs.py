@@ -46,10 +46,10 @@ def human_database_download():
 
 	else:
 
-		#os.system("wget -P %s ftp://ftp.ccb.jhu.edu/pub/data/bowtie2_indexes/hg19.zip" % 
-		#	(refdir))
-		print("hmmmmm")
-		#os.system("unzip %shg19.zip -d %s" % (refdir, refdir))
+		os.system("wget -P %s ftp://ftp.ccb.jhu.edu/pub/data/bowtie2_indexes/hg19.zip" % 
+			(refdir))
+
+		os.system("unzip %shg19.zip -d %s" % (refdir, refdir))
 
 
 def main():
