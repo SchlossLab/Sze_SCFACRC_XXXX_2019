@@ -2,7 +2,7 @@
 
 # This code is used to remove human seqs from fastq files.
 # It uses samtools to complete this task but any program that IDs human sequences can be used
-
+# and it can be subsituted in that part of the code.
 
 ############## Internal parameters used by all functions is program ########################
 
@@ -14,21 +14,35 @@ from qual_trim import command_line, create_samples_to_download
 
 # Set up working directory
 workdir = "data/raw/"
+refdir = "data/references/"
 
 
 ############################################################################################
 
+# Function used to download human reference genome or to skip the step if present already
+def human_database_download(human_db_present):
 
+	file_dirs = os.listdir(refdir)
 
+	if "hg19" in file_dirs:
+
+		print("Human database present, skipping download step.")
+
+	else:
+
+	#	os.system("wget -P %s ftp://ftp.ccb.jhu.edu/pub/data/bowtie2_indexes/hg19.zip" % 
+	#		(refdir))
+		print("uh oh")
+	#	os.system("unzip %s*.zip -d %s" % (refdir, refdir))
 
 
 def main():
 
 	meta_genome_file_name = command_line()
 	samples_to_be_used = create_samples_to_download(meta_genome_file_name)
+	human_database_download(hdb_present)
 
-
-	print(samples_to_be_used)
+	#print(samples_to_be_used)
 
 
 
