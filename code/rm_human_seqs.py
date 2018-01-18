@@ -20,27 +20,43 @@ refdir = "data/references/"
 ############################################################################################
 
 # Function used to download human reference genome or to skip the step if present already
-def human_database_download(human_db_present):
+def human_database_download():
 
 	file_dirs = os.listdir(refdir)
 
-	if "hg19" in file_dirs:
+	hg19_present = False
+
+	x = 0
+
+	while hg19_present == False:
+
+		if "hg19" in file_dirs[x]:
+
+			hg19_present = True
+
+		else:
+
+			hg19_present = False
+
+		x += 1
+
+	if hg19_present == True:
 
 		print("Human database present, skipping download step.")
 
 	else:
 
-	#	os.system("wget -P %s ftp://ftp.ccb.jhu.edu/pub/data/bowtie2_indexes/hg19.zip" % 
-	#		(refdir))
-		print("uh oh")
-	#	os.system("unzip %s*.zip -d %s" % (refdir, refdir))
+		#os.system("wget -P %s ftp://ftp.ccb.jhu.edu/pub/data/bowtie2_indexes/hg19.zip" % 
+		#	(refdir))
+		print("hmmmmm")
+		#os.system("unzip %shg19.zip -d %s" % (refdir, refdir))
 
 
 def main():
 
 	meta_genome_file_name = command_line()
 	samples_to_be_used = create_samples_to_download(meta_genome_file_name)
-	human_database_download(hdb_present)
+	human_database_download()
 
 	#print(samples_to_be_used)
 
