@@ -86,7 +86,7 @@ def run_quality_filter(keep_files):
 
 		print("Started quality filtering of F(1) and R(2) sample %s fastq" % (files))
 
-		print("sickle pe -f %s%s_1.fastq -r %s%s_2.fastq \
+		os.system("sickle pe -f %s%s_1.fastq -r %s%s_2.fastq \
 -t sanger -o %s%s_qf_1.fastq -p %s%s_qf_2.fastq \
 -s %s%s_qf.orphan.fastq -q 30 -l 75" % 
 			(workdir, files, workdir, files, workdir, files, 
@@ -100,8 +100,8 @@ def run_quality_filter(keep_files):
 def main():
 	meta_genome_file_name = command_line()
 	samples_to_download = create_samples_to_download(meta_genome_file_name)
-	download_files(samples_to_download)
-	convert_sra_to_fastq(samples_to_download)
+	#download_files(samples_to_download)
+	#convert_sra_to_fastq(samples_to_download)
 	run_quality_filter(samples_to_download)
 
 if __name__ == '__main__': main()
