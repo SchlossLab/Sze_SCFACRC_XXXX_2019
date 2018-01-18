@@ -54,13 +54,51 @@ def human_database_download():
 		# Unzips the downloaded reference database in reference directory
 		os.system("unzip %shg19.zip -d %s" % (refdir, refdir))
 
+
+# Function to map and remove human sequences
+def remove_human_seqs(samplesList):
+
+	# Remove host sequences using bowtie2 and samtools
+	for fastq_sample in samplesList:
+		# Map sequences to human (hg19)
+		print("Mapping reads to human geneome for %s." % (fastq_sample))
+
+		os.system("bowtie2 -x hg19 -1 %s%s_qf_1.fastq -2 %s%s_qf_2.fastq -S %s%s_map_unmap.sam" % 
+			(workdir, fastq_sample, workdir, fastq_sample, workdir, fastq_sample))
+
+		# Convert files to bam
+		print("Converting files to BAM format for %s." % (fastq_sample))
+		os.system("samtools view -bS %s%s_map_unmap.sam > %s%s.map_unmap.bam" % (workdir, fastq_sample, workdir, fastq_sample))
+		
+		# Filter unmapped pairs
+		print("Removing unmapped sequence pairs for %s." % (fastq_sample))
+		os.system("samtools view -b -f 12 -F 256 %s%s.map_unmap.bam > %s%s.bothends_unmap.bam" % 
+    		(workdir, fastq_sample, workdir, fastq_sample))
+				# -f 12 = Extract only (-f) alignments with both reads unmapped: <read unmapped><mate unmapped>
+        		# -F 256 = Do not(-F) extract alignments which are: <not primary alignment>
+
+        # split paired-ends reads into separated fastq files		
+		print("Splitting paired-end reads into F and R fastq for %s." % (fastq_sample))
+		os.system("samtools sort -n %s%s.bothends_unmap.bam -o %s%s_bothends_unmap_sorted.bam" % 
+    		(workdir, fastq_sample, workdir, fastq_sample))
+
+		os.system("bedtools bamtofastq -i %s%s_bothends_unmap_sorted.bam -fq %s%s_hrm_r1.fastq -fq2 %s%s_hrm_r2.fastq" % 
+    		(workdir, fastq_sample, workdir, fastq_sample, workdir, fastq_sample))
+
+		# Remove intermediary files
+		print("Removing uneeded intermediate files for %s." % (fastq_sample))
+		os.system("rm %s%s.map_unmap.bam %s%s.bothends_unmap.bam %s%s_bothends_unmap_sorted.bam" % 
+    		(workdir, fastq_sample, workdir, fastq_sample, workdir, fastq_sample))
+
+    	
+    	
 # Runs the overall program 
 def main():
 
 	meta_genome_file_name = command_line()
 	samples_to_be_used = create_samples_to_download(meta_genome_file_name)
 	human_database_download()
-
+	remove_human_seqs(samples_to_be_used)
 	#print(samples_to_be_used)
 
 
