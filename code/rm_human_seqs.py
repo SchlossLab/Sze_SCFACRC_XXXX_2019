@@ -2,7 +2,8 @@
 
 # This code is used to remove human seqs from fastq files.
 # It uses samtools to complete this task but any program that IDs human sequences can be used
-# and it can be subsituted in that part of the code.
+# and it can be subsituted in that part of the code
+# Workflow taken from http://www.metagenomics.wiki/tools/short-read/remove-host-sequences.
 # The code also used hg19 but if you really want to you can use the newer hg23 instead.
 
 ############## Internal parameters used by all functions is program ########################
