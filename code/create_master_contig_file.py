@@ -62,18 +62,39 @@ def get_fasta_header(sampleList):
 
 #Function to write out the the combined dictionary into an overall fasta file
 def create_complete_fasta(combinedDict):
-	
-	test = open("%sall_contigs.fasta" % (workdir), 'w')
+	# Set up initial file call and directory variable to search
+	file_dirs = os.listdir(workdir)
+	file_present = False
+	# Set initial counter to 0
+	x = 0
+	# iterate through the directory list and only stop if the file end is reached
+	# or if file with the same name is found
+	while file_present == False and x <= (len(file_dirs)-1):
 
-	for seq_name in combinedDict:
-		temp_seq = combinedDict[seq_name]
+		# check for file in directory
+		if "all_contigs.fasta" in file_dirs[x]:
+			# change to true if present
+			file_present = True
 
-		test.write(seq_name+'\n'+temp_seq+'\n')
+		else:
 
-	test.close()  
+			file_present = False
+		# add one to the counter
+		x += 1
+	# Only create combined contig fasta if file doesn't already exist
+	if file_present == False:
+		# Sets up the file that will be read into
+		test = open("%sall_contigs.fasta" % (workdir), 'w')
 
+		for seq_name in combinedDict:
+			temp_seq = combinedDict[seq_name]
 
+			test.write(seq_name+'\n'+temp_seq+'\n')
 
+		test.close() 
+
+	else:
+		print("File already exists.") 
 
 
 # Runs the overall program 
@@ -83,9 +104,6 @@ def main():
 	samples_to_be_used = create_samples_to_download(meta_genome_file_name)
 	all_contig_dict = get_fasta_header(samples_to_be_used)
 	create_complete_fasta(all_contig_dict)
-
-	#print(test[">SRR5665186_k101_48 flag=1 multi=6.0000 len=1359"])
-
 
 
 if __name__ == '__main__': main()
