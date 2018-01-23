@@ -5,6 +5,9 @@
 # contig relative abundnace.
 # This task was completed using BowTie2
 
+# Geof used the first generated reference file bowtieReference.1.bt2 for 
+# contig alignment of the R2 (reverse) reads.
+
 
 ############## Internal parameters used by all functions is program ########################
 
