@@ -17,14 +17,20 @@ from qual_trim import command_line, create_samples_to_download
 # Set up working directory
 workdir = "data/raw/"
 refdir = "data/references/"
-contig_fa = "final.contigs.fa"
+all_contigs = "all_contigs.fasta"
 
 
 ############################################################################################
 
+# Function that creates a bowtie reference file from all contigs
+def make_ref_file():
 
+	print("Starting to build reference database")
 
+	os.system("bowtie2-build -q %s%s %s/bowtieReference" % 
+		(workdir, all_contigs, workdir))
 
+	print("Completed building reference database")
 
 
 
@@ -34,7 +40,7 @@ def main():
 
 	meta_genome_file_name = command_line()
 	samples_to_be_used = create_samples_to_download(meta_genome_file_name)
-	
+	make_ref_file()	
 
 
 if __name__ == '__main__': main()
