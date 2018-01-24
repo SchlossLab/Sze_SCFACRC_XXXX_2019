@@ -42,6 +42,19 @@ def run_alignment(sampleList):
 			(workdir, reference, workdir, r2_fasta, workdir, r2_fasta))
 
 
+# Function to count specific abundances within the generated sam files
+
+
+# Needs to take in a sam file and then write an output file (tsv)
+	# Read in sam file
+	# Parse file and find /^@[A-Z]{2}/ 
+	# separate on the \t and take the second component 
+	# find matching contig and add a count to it.
+	# Read out as a tsv
+# Need to be able to do this for every sample
+# Keep as individual tsv files for now
+
+
 # Runs the overall program 
 def main():
 
