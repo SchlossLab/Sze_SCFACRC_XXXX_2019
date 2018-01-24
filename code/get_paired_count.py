@@ -16,6 +16,7 @@ from qual_trim import command_line, create_samples_to_download
 # Set up working directory
 workdir = "data/raw/"
 refdir = "data/references/"
+summarydir = "data/process/tables/"
 
 
 ############################################################################################
@@ -45,24 +46,37 @@ def get_seq_counts(sampleList, seq_ending):
 
 		temp_dict[fastq_name] = x
 
+		temp_file_qf.close()
+
+
 	return(temp_dict)
 
 
+# Function to write out a summary file
+def write_summary(full_dict, qf_dict, hrm_dict):
 
+	test = open("%sseq_filter_summary.tsv" % (summarydir),'w')
 
+	x = 0
 
-# Example code for file read in
-#temp_samples = []
-#	temp_file = open(keep_file_name, 'r')
+	for sample_name in full_dict:
+		
+		if x == 0:
 
-#	for line in temp_file:
+			test.write("sample"+'\t'+"all_seqs"+'\t'+ \
+				"quality_filtered_seqs"+'\t'+"human_filtered_seqs"+'\n'+ \
+				sample_name+'\t'+ str(full_dict[sample_name])+'\t'+ \
+				str(qf_dict[sample_name])+'\t'+str(hrm_dict[sample_name])+'\n')
 
-#		temp_samples.append(line.strip('\n'))
+		else:
 
-	# Close the reading of the file
-#	temp_file.close()	
+			test.write(sample_name+'\t'+ str(full_dict[sample_name])+'\t'+ \
+				str(qf_dict[sample_name])+'\t'+str(hrm_dict[sample_name])+'\n')
 
-#	return(temp_samples)
+		
+		x += 1
+
+	test.close()
 
 
 # Runs the overall program 
@@ -74,8 +88,6 @@ def main():
 	test_qf = get_seq_counts(samples_to_be_used, "_qf_1.fastq")
 	test_hrm = get_seq_counts(samples_to_be_used, "_hrm_r1.fastq")
 
-	print(test_full)
-	print(test_qf)
-	print(test_hrm)
+	write_summary(test_full, test_qf, test_hrm)
 
 if __name__ == '__main__': main()
