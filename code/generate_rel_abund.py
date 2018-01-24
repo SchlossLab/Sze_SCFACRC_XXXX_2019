@@ -5,9 +5,6 @@
 # contig relative abundnace.
 # This task was completed using BowTie2
 
-# Geof used the first generated reference file bowtieReference.1.bt2 for 
-# contig alignment of the R2 (reverse) reads.
-
 
 ############## Internal parameters used by all functions is program ########################
 
@@ -21,7 +18,7 @@ from qual_trim import command_line, create_samples_to_download
 workdir = "data/raw/"
 refdir = "data/references/"
 all_contigs = "all_contigs.fasta"
-
+reference = "bowtieReference"
 
 ############################################################################################
 
@@ -36,6 +33,13 @@ def make_ref_file():
 	print("Completed building reference database")
 
 
+# Function to align reverse sequences to the master contig reference database
+def run_alignment(sampleList):
+
+	for r2_fasta in sampleList:
+
+		os.system("bowtie2 -x %s%s -q %s%s_qf_2.fastq -S %s%s_bowtie.sam -p 8 -L 25 -N 1" % 
+			(workdir, reference, workdir, r2_fasta, workdir, r2_fasta))
 
 
 # Runs the overall program 
@@ -43,7 +47,8 @@ def main():
 
 	meta_genome_file_name = command_line()
 	samples_to_be_used = create_samples_to_download(meta_genome_file_name)
-	make_ref_file()	
+	#make_ref_file()
+	run_alignment(samples_to_be_used)	
 
 
 if __name__ == '__main__': main()
