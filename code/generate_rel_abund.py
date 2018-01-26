@@ -114,12 +114,14 @@ def get_contig_abundance(sampleList, countNames):
 			# Checks if it is the first sample
 			if x == 0:
 				# Adds header and sample counts
-				write_file.write("contig"+'\t'+"count"+'\n'+ \
-					sample_name+'\t'+ str(tempDict[sample_name])+'\n')
+				write_file.write("sample_name"+'\t'+"contig"+'\t'+"count"+'\n'+ \
+					sample_id+'\t'+sample_name+'\t'+ \
+					str(tempDict[sample_name])+'\n')
 
 			else:
 				# Adds only sample counts
-				write_file.write(sample_name+'\t'+ str(tempDict[sample_name])+'\n')
+				write_file.write(sample_id+'\t'+ \
+					sample_name+'\t'+ str(tempDict[sample_name])+'\n')
 
 			# adds to count
 			x += 1
