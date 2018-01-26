@@ -20,6 +20,7 @@ refdir = "data/references/"
 all_contigs = "all_contigs.fasta"
 reference = "bowtieReference"
 
+
 ############################################################################################
 
 # Function that creates a bowtie reference file from all contigs
@@ -43,11 +44,11 @@ def run_alignment(sampleList):
 
 
 # Function to create a dictionary with 0 counts for all the contigs 
-def create_count_dict():
+def create_count_names():
 
-	print("Generating blank contig count dictionary")
+	print("Generating names for contig dictionary")
 
-	tempDict = {}
+	tempList = []
 
 	temp_file = open("%s%s" % (workdir, all_contigs), 'r')
 
@@ -61,25 +62,48 @@ def create_count_dict():
 
 			tempName = test.strip('>')
 
-			tempDict[tempName] = 0
+			tempList.append(tempName)
 
 	temp_file.close()
 
-	print("Completed generation of blank contig count dictionary")
+	print("Completed generation of names list for contig dictionary")
 
-	return tempDict
+	return tempList
 
 
 
 # Function to count specific abundances within the generated sam files
-def get_contig_abundance(sampleList, countDict):
+def get_contig_abundance(sampleList, countNames):
 
 	for sample_id in sampleList:
 
-		tempDict = countDict
+		tempDict = {}
+
+		for sample_name in countNames:
+
+			tempDict[sample_name] = 0
+
+		print(tempDict["SRR5665141_k101_18670"])
 
 		temp_file = open("%s%s_bowtie.sam" % (workdir, sample_id), 'r')
 
+
+		for line in temp_file:
+			# regex line matching (taken from Geof perl code)
+			if re.match('^@[A-Z]{2}', line) is None:
+
+				test = line.split('\t')[2]
+
+				if test in tempDict:
+
+					tempDict[test] += 1
+
+		
+		print(tempDict["SRR5665141_k101_18670"])
+
+		temp_file.close()	
+
+		
 		
 
 # Needs to take in a sam file and then write an output file (tsv)
@@ -99,6 +123,7 @@ def main():
 	samples_to_be_used = create_samples_to_download(meta_genome_file_name)
 	#make_ref_file()
 	#run_alignment(samples_to_be_used)	
-	blank_count_dict = create_count_dict()
+	count_dict_names = create_count_names()
+	get_contig_abundance(samples_to_be_used, count_dict_names)
 
 if __name__ == '__main__': main()
