@@ -42,8 +42,45 @@ def run_alignment(sampleList):
 			(workdir, reference, workdir, r2_fasta, workdir, r2_fasta))
 
 
-# Function to count specific abundances within the generated sam files
+# Function to create a dictionary with 0 counts for all the contigs 
+def create_count_dict():
 
+	print("Generating blank contig count dictionary")
+
+	tempDict = {}
+
+	temp_file = open("%s%s" % (workdir, all_contigs), 'r')
+
+	x = 0
+
+	for line in temp_file:
+
+		if ">" in line:
+
+			test = line.split(" ")[0]
+
+			tempName = test.strip('>')
+
+			tempDict[tempName] = 0
+
+	temp_file.close()
+
+	print("Completed generation of blank contig count dictionary")
+
+	return tempDict
+
+
+
+# Function to count specific abundances within the generated sam files
+def get_contig_abundance(sampleList, countDict):
+
+	for sample_id in sampleList:
+
+		tempDict = countDict
+
+		temp_file = open("%s%s_bowtie.sam" % (workdir, sample_id), 'r')
+
+		
 
 # Needs to take in a sam file and then write an output file (tsv)
 	# Read in sam file
@@ -61,7 +98,7 @@ def main():
 	meta_genome_file_name = command_line()
 	samples_to_be_used = create_samples_to_download(meta_genome_file_name)
 	#make_ref_file()
-	run_alignment(samples_to_be_used)	
-
+	#run_alignment(samples_to_be_used)	
+	blank_count_dict = create_count_dict()
 
 if __name__ == '__main__': main()
