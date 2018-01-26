@@ -9,7 +9,6 @@ module load bowtie2/2.1.0
 module load sickle/1.33.6
 module load bedtools2/2.20.1
 module load megahit/1.0.6
-module load concoct/0.4.1
 module load python-anaconda-arc-connect/latest
 
 # Control pathing

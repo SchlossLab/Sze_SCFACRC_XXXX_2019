@@ -44,36 +44,39 @@ def run_alignment(sampleList):
 
 
 # Function to create a dictionary with 0 counts for all the contigs 
-def create_count_names():
+def create_contig_dict():
 
 	print("Generating names for contig dictionary")
 
-	tempList = []
+	tempDict = {}
 
 	temp_file = open("%s%s" % (workdir, all_contigs), 'r')
-
-	x = 0
 
 	for line in temp_file:
 
 		if ">" in line:
 
-			test = line.split(" ")[0]
+			all_info = line.split(" ")
 
-			tempName = test.strip('>')
+			temp_length = all_info[3].strip('len=\n')
 
-			tempList.append(tempName)
+			tempName = all_info[0].strip('>')
+
+			tempDict[tempName] = temp_length
+
 
 	temp_file.close()
 
 	print("Completed generation of names list for contig dictionary")
 
-	return tempList
+	return tempDict
 
 
 
 # Function to count specific abundances within the generated sam files
-def get_contig_abundance(sampleList, countNames):
+def get_contig_abundance(sampleList, contig_dict):
+
+	countNames = contig_dict.keys()
 
 	for sample_id in sampleList:
 
@@ -93,7 +96,9 @@ def get_contig_abundance(sampleList, countNames):
 			# regex line matching (taken from Geof perl code)
 			if re.match('^@[A-Z]{2}', line) is None:
 
-				test = line.split('\t')[2]
+				all_info = line.split('\t')
+
+				test = all_info[2]
 
 				if test in tempDict:
 
@@ -114,14 +119,17 @@ def get_contig_abundance(sampleList, countNames):
 			# Checks if it is the first sample
 			if x == 0:
 				# Adds header and sample counts
-				write_file.write("sample_name"+'\t'+"contig"+'\t'+"count"+'\n'+ \
+				write_file.write("sample_name"+'\t'+"contig"+'\t'+ \
+					"contig_length"+'\t'+"count"+'\n'+ \
 					sample_id+'\t'+sample_name+'\t'+ \
+					str(contig_dict[sample_name])+'\t'+ \
 					str(tempDict[sample_name])+'\n')
 
 			else:
 				# Adds only sample counts
 				write_file.write(sample_id+'\t'+ \
-					sample_name+'\t'+ str(tempDict[sample_name])+'\n')
+					sample_name+'\t'+str(contig_dict[sample_name])+'\t'+ \
+					str(tempDict[sample_name])+'\n')
 
 			# adds to count
 			x += 1
@@ -138,7 +146,7 @@ def main():
 	samples_to_be_used = create_samples_to_download(meta_genome_file_name)
 	#make_ref_file()
 	#run_alignment(samples_to_be_used)	
-	count_dict_names = create_count_names()
-	get_contig_abundance(samples_to_be_used, count_dict_names)
+	contig_name_dict = create_contig_dict()
+	get_contig_abundance(samples_to_be_used, contig_name_dict)
 
 if __name__ == '__main__': main()
