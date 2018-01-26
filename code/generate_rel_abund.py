@@ -19,7 +19,7 @@ workdir = "data/raw/"
 refdir = "data/references/"
 all_contigs = "all_contigs.fasta"
 reference = "bowtieReference"
-
+summarydir = "data/process/tables/"
 
 ############################################################################################
 
@@ -83,10 +83,11 @@ def get_contig_abundance(sampleList, countNames):
 
 			tempDict[sample_name] = 0
 
-		print(tempDict["SRR5665141_k101_18670"])
 
 		temp_file = open("%s%s_bowtie.sam" % (workdir, sample_id), 'r')
 
+
+		print("Generating count data for %s" %(sample_id))
 
 		for line in temp_file:
 			# regex line matching (taken from Geof perl code)
@@ -99,11 +100,33 @@ def get_contig_abundance(sampleList, countNames):
 					tempDict[test] += 1
 
 		
-		print(tempDict["SRR5665141_k101_18670"])
-
 		temp_file.close()	
 
-		
+		print("Writing count data for %s" %(sample_id))
+
+		# Opens the necessary summary file
+		write_file = open("%s%s_contig_rel_abund.tsv" % 
+			(workdir, sample_id),'w')
+		# Counter
+		x = 0
+		# Iterates through every sample 
+		for sample_name in countNames:
+			# Checks if it is the first sample
+			if x == 0:
+				# Adds header and sample counts
+				write_file.write("contig"+'\t'+"count"+'\n'+ \
+					sample_name+'\t'+ str(tempDict[sample_name])+'\n')
+
+			else:
+				# Adds only sample counts
+				write_file.write(sample_name+'\t'+ str(tempDict[sample_name])+'\n')
+
+			# adds to count
+			x += 1
+		# Clost the file
+		write_file.close()
+
+		print("Finished counting for %s" %(sample_id))
 		
 
 # Needs to take in a sam file and then write an output file (tsv)
