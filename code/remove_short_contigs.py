@@ -16,7 +16,7 @@ from qual_trim import command_line, create_samples_to_download
 workdir = "data/raw/"
 refdir = "data/references/"
 all_contig = "all_contigs.fasta"
-tables = "data/process/tables/"
+output_file = "all_contigs_greater1kb.fasta"
 
 
 ############################################################################################
@@ -50,6 +50,9 @@ def get_needed_data(sampleList):
 
 
 	return temp_dict, count_dict
+
+
+# Function to only write back out to file contigs larger than 1Kb
 
 
 
