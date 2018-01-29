@@ -15,12 +15,41 @@ from qual_trim import command_line, create_samples_to_download
 # Set up working directory
 workdir = "data/raw/"
 refdir = "data/references/"
-contig_fa = "final.contigs.fa"
+all_contig = "all_contigs.fasta"
+tables = "data/process/tables/"
 
 
 ############################################################################################
 
+# Function to read in the all_contig file and return need dictionaries
+def get_needed_data(sampleList):
 
+	# Set up empty dictionaries
+	temp_dict = {}
+	count_dict = {}
+
+	contig_file = open("%s%s" % (workdir, all_contig), 'r')
+
+	for line in contig_file:
+		
+		if ">" in line:
+
+			all_info = line.split(" ")
+
+			temp_length = all_info[3].strip('len=\n')
+
+			tempName = all_info[0]
+
+		else:
+
+			sequence_info = line
+
+			temp_dict[tempName] = sequence_info
+
+			count_dict[tempName] = temp_length
+
+
+	return temp_dict, count_dict
 
 
 
@@ -29,8 +58,10 @@ def main():
 
 	meta_genome_file_name = command_line()
 	samples_to_be_used = create_samples_to_download(meta_genome_file_name)
-	all_contig_dict = get_fasta_header(samples_to_be_used)
-	create_complete_fasta(all_contig_dict)
+	seq_dict, length_dict = get_needed_data(samples_to_be_used)
+
+	print(len(seq_dict), len(length_dict))
+
 
 
 if __name__ == '__main__': main()
