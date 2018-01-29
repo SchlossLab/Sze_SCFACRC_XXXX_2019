@@ -23,3 +23,5 @@ mothur*logfile
 *.sra
 
 code/__pycache__/
+
+exploratory/notebook/jenior_stuff/matt_scripts/
