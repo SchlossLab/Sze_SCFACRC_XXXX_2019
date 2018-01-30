@@ -142,21 +142,20 @@ def get_contig_abundance(sampleList, contig_dict, outputEnd):
 # Runs the overall program 
 def main(sampleListFile, contigFile, refFile, outputEnding):
 
-	#print(sampleListFile, contigFile, refFile)
-	
 	samples_to_be_used = create_samples_to_download(sampleListFile)
 	make_ref_file(contigFile, refFile)
 	run_alignment(samples_to_be_used, refFile, outputEnding)	
 	contig_name_dict = create_contig_dict(contigFile)
 	get_contig_abundance(samples_to_be_used, contig_name_dict, outputEnding)
 
+# Upon program call executes these commands automatically
 if __name__ == '__main__': 
-
+	# Command line argument parser with tags for componenets within the program
 	parser = argparse.ArgumentParser(description=__doc__)
 	parser.add_argument("-s", "--sample_list", default="%swhole_metagenome_samples.txt" % (workdir), type=str, help="Text file with list of samples\n")
 	parser.add_argument("-c", "--contig_file", default="%sall_contigs.fasta" % (workdir), type=str, help="Combined contig fasta file\n")
 	parser.add_argument("-r", "--reference", default="%sbowtieReference" % (workdir), type=str, help="Bowtie2 Reference file name\n")
 	parser.add_argument("-o", "--output", default="all_contig", type=str, help="Universal output file ending (outputs in tab format)\n")
 	args = parser.parse_args()
-
-	main(args.sample_list, args.contig_file, args.reference, arg.output)
+	# Runs the main function with the following cmd line arguments ported into it
+	main(args.sample_list, args.contig_file, args.reference, args.output)
