@@ -19,7 +19,7 @@ workdir = "data/raw/"
 refdir = "data/references/"
 #all_contigs = "all_contigs.fasta"
 #reference = "bowtieReference"
-summarydir = "data/process/tables/"
+#summarydir = "data/process/tables/"
 
 ############################################################################################
 
@@ -35,12 +35,12 @@ def make_ref_file(contigPath, referencePath):
 
 
 # Function to align reverse sequences to the master contig reference database
-def run_alignment(sampleList, referencePath):
+def run_alignment(sampleList, referencePath, outputEnding):
 
 	for r2_fasta in sampleList:
 
-		os.system("bowtie2 -x %s -q %s%s_qf_2.fastq -S %s%s_bowtie.sam -p 8 -L 25 -N 1" % 
-			(referencePath, workdir, r2_fasta, workdir, r2_fasta))
+		os.system("bowtie2 -x %s -q %s%s_qf_2.fastq -S %s%s%s_bowtie.sam -p 8 -L 25 -N 1" % 
+			(referencePath, workdir, r2_fasta, workdir, r2_fasta, outputEnding))
 
 
 # Function to create a dictionary with 0 counts for all the contigs 
@@ -74,7 +74,7 @@ def create_contig_dict(contigPath):
 
 
 # Function to count specific abundances within the generated sam files
-def get_contig_abundance(sampleList, contig_dict):
+def get_contig_abundance(sampleList, contig_dict, outputEnd):
 
 	countNames = contig_dict.keys()
 
@@ -110,8 +110,8 @@ def get_contig_abundance(sampleList, contig_dict):
 		print("Writing count data for %s" %(sample_id))
 
 		# Opens the necessary summary file
-		write_file = open("%s%s_contig_rel_abund.tsv" % 
-			(workdir, sample_id),'w')
+		write_file = open("%s%s_%s_rel_abund.tsv" % 
+			(workdir, sample_id, outputEnd),'w')
 		# Counter
 		x = 0
 		# Iterates through every sample 
@@ -140,15 +140,15 @@ def get_contig_abundance(sampleList, contig_dict):
 		
 
 # Runs the overall program 
-def main(sampleListFile, contigFile, refFile):
+def main(sampleListFile, contigFile, refFile, outputEnding):
 
 	#print(sampleListFile, contigFile, refFile)
 	
 	samples_to_be_used = create_samples_to_download(sampleListFile)
 	make_ref_file(contigFile, refFile)
-	run_alignment(samples_to_be_used, refFile)	
+	run_alignment(samples_to_be_used, refFile, outputEnding)	
 	contig_name_dict = create_contig_dict(contigFile)
-	get_contig_abundance(samples_to_be_used, contig_name_dict)
+	get_contig_abundance(samples_to_be_used, contig_name_dict, outputEnding)
 
 if __name__ == '__main__': 
 
@@ -156,6 +156,7 @@ if __name__ == '__main__':
 	parser.add_argument("-s", "--sample_list", default="%swhole_metagenome_samples.txt" % (workdir), type=str, help="Text file with list of samples\n")
 	parser.add_argument("-c", "--contig_file", default="%sall_contigs.fasta" % (workdir), type=str, help="Combined contig fasta file\n")
 	parser.add_argument("-r", "--reference", default="%sbowtieReference" % (workdir), type=str, help="Bowtie2 Reference file name\n")
+	parser.add_argument("-o", "--output", default="all_contig", type=str, help="Universal output file ending (outputs in tab format)\n")
 	args = parser.parse_args()
 
-	main(args.sample_list, args.contig_file, args.reference)
+	main(args.sample_list, args.contig_file, args.reference, arg.output)
