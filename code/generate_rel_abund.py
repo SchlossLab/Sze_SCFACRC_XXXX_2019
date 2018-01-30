@@ -152,8 +152,7 @@ def main(sampleListFile, contigFile, refFile):
 
 if __name__ == '__main__': 
 
-	parser = argparse.ArgumentParser(description=__doc__,
-                formatter_class=argparse.RawDescriptionHelpFormatter)
+	parser = argparse.ArgumentParser(description=__doc__)
 	parser.add_argument("-s", "--sample_list", default="%swhole_metagenome_samples.txt" % (workdir), type=str, help="Text file with list of samples\n")
 	parser.add_argument("-c", "--contig_file", default="%sall_contigs.fasta" % (workdir), type=str, help="Combined contig fasta file\n")
 	parser.add_argument("-r", "--reference", default="%sbowtieReference" % (workdir), type=str, help="Bowtie2 Reference file name\n")
