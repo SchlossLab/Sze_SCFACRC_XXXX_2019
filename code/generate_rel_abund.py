@@ -43,7 +43,7 @@ def run_alignment(sampleList, referencePath, outputEnding):
 			(referencePath, workdir, r2_fasta, workdir, r2_fasta, outputEnding))
 
 
-# Function to create a dictionary with 0 counts for all the contigs 
+# Function to create a dictionary with the lengths of the contigs 
 def create_contig_dict(contigPath):
 
 	print("Generating names for contig dictionary")
@@ -67,7 +67,7 @@ def create_contig_dict(contigPath):
 
 	temp_file.close()
 
-	print("Completed generation of names list for contig dictionary")
+	print("Completed grabbing length of contigs and dictionary creation")
 
 	return tempDict
 
@@ -141,12 +141,16 @@ def get_contig_abundance(sampleList, contig_dict, outputEnd):
 
 # Runs the overall program 
 def main(sampleListFile, contigFile, refFile, outputEnding):
-
+	# read in file list from -s call
 	samples_to_be_used = create_samples_to_download(sampleListFile)
+	# create a bowtie reference with the -c and -r input calls
 	make_ref_file(contigFile, refFile)
+	# run alignment call with -r and -o input calls
 	run_alignment(samples_to_be_used, refFile, outputEnding)	
-	contig_name_dict = create_contig_dict(contigFile)
-	get_contig_abundance(samples_to_be_used, contig_name_dict, outputEnding)
+	# generate contig names based on the -c input call
+	contig_length_dict = create_contig_dict(contigFile)
+	# create contig abundance tables with the -o input call
+	get_contig_abundance(samples_to_be_used, contig_length_dict, outputEnding)
 
 # Upon program call executes these commands automatically
 if __name__ == '__main__': 
