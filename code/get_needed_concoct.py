@@ -42,19 +42,71 @@ def create_bam_files(sampleList, contigName, outputName):
 			(workdir, sam_file, outputName))
 
 
+# Function to call picard to mark and remove duplicates
+def mark_duplicates(sampleList, outputName):
 
-# mark duplicates and sort
-# get coverage data
-# Call specific code for genome coverage table
-	#python2 /sw/med/centos7/concoct/0.4.1/bin/gen_input_table.py
-# get linkage table
+	for bam_file in sampleList:
+		# mark and remove duplicates
+		print("java -jar $PICARD_JARS/picard.jar MarkDuplicates \
+INPUT=%s%s_%s_sort.bam \
+OUTPUT=%s%s_%s_sort_rmdup.bam \
+METRIC_FILE=%s%s_%s_sort_rmdup.metrics \
+AS=TRUE \
+VALIDATION_STRINGENCY=LENIENT \
+MAX_FILE_HANDLES_FOR_READ_ENDS_MAP=1000 \
+REMOVE_DUPLICATES=TRUE" % 
+(workdir, bam_file, outputName, workdir, bam_file, outputName, 
+	workdir, bam_file, outputName))
+
+		# Re sort the resulting bam file
+		print("samtools sort %s%s_%s_sort_rmdup.bam %s%s_%s_sort_rmdup_sort.bam" % 
+			(workdir, bam_file, outputName, workdir, bam_file, outputName))
+		# Re index the resulting re-sorted bam file
+		print("samtools index %s%s_%s_sort_rmdup_sort.bam" % 
+			(workdir, bam_file, outputName))
+
+
+# Function to create final needed coverage and linkage files for concoct
+def get_cover_and_link(sampleList, contigName, outputName):
+
+	# execute coverage data command for every sample
+	for bam_file in sampleList:
+		# get coverage data
+		print("genomeCoverageBed -ibam %s%s_%s_sort_rmdup_sort.bam \
+-g %s.fasta > %s%s_%s_final_contigs_coverage.txt" % 
+(workdir, bam_file, outputName, contigName, workdir, bam_file, outputName))
+
+	# create a temp text file with the sample names
+	write_file = open("%stemp_coverage_file_names.txt" % (workdir),'w')
+	# add each sample to the temp text file
+	for sampleN in sampleList:
+
+		write_file.write("%s%s_%s_final_contigs_coverage.txt" % 
+			(workdir, sampleN, outputName)+'\n')
+	# close the file
+	write_file.close()
+	
+	# creates the coverage table
+	print("python2 /sw/med/centos7/concoct/0.4.1/bin/gen_input_table.py \
+--isbedfiles \
+--samplenames %stemp_coverage_file_names.txt %s.fasta > \
+%soverall_coverage_table.tsv" % (workdir, contigName, workdir))
+
+	# creates the linkage table
+	print("python2 /sw/med/centos7/concoct/0.4.1/bin/bam_to_linkage.py \
+-m 8 --regionlength 500 \
+--fullsearch --samplenames %stemp_coverage_file_names.txt \
+%s.fasta > %soverall_linkage_table.tsv" % (workdir, contigName, workdir))
+
+
 
 # Runs the overall program 
 def main(sampleListFile, contigFile, outputEnding):
 	# read in file list from -s call
 	samples_to_be_used = create_samples_to_download(sampleListFile)
-	create_bam_files(samples_to_be_used, contigFile, outputEnding)
-
+	#create_bam_files(samples_to_be_used, contigFile, outputEnding)
+	#mark_duplicates(samples_to_be_used, outputEnding)
+	get_cover_and_link(samples_to_be_used, contigFile, outputEnding)
 
 
 # Upon program call executes these commands automatically
