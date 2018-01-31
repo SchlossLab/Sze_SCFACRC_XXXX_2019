@@ -1,6 +1,7 @@
 #!bash
 
 #Load needed modules
+# To find info about the modules use command `module show`
 # Needs to be executed with the source command not with bash
 
 
@@ -17,6 +18,9 @@ module load bowtie2/2.1.0
 module load sickle/1.33.6
 module load bedtools2/2.20.1
 module load megahit/1.0.6
+module load bedtools2/2.20.1
+module load picard/2.4.1
+	# To run picard tools use java -jar $PICARD_JARS/picard.jar <PROGRAM> <commands>
 module load python-anaconda-arc-connect/latest
 
 
