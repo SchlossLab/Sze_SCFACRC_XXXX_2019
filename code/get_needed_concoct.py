@@ -21,13 +21,14 @@ refdir = "data/references/"
 
 ############################################################################################
 
-
-
-
-
-
-
-
+# create a fai file
+# convert to bam
+# sort and index the bam
+# mark duplicates and sort
+# get coverage data
+# Call specific code for genome coverage table
+	#python2 /sw/med/centos7/concoct/0.4.1/bin/gen_input_table.py
+# get linkage table
 
 # Runs the overall program 
 def main(sampleListFile, contigFile, outputEnding):
