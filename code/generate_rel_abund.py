@@ -39,7 +39,7 @@ def run_alignment(sampleList, referencePath, outputEnding):
 
 	for r2_fasta in sampleList:
 
-		os.system("bowtie2 -x %s -q %s%s_qf_2.fastq -S %s%s%s_bowtie.sam -p 8 -L 25 -N 1" % 
+		os.system("bowtie2 -x %s -q %s%s_qf_2.fastq -S %s%s_%s_bowtie.sam -p 8 -L 25 -N 1" % 
 			(referencePath, workdir, r2_fasta, workdir, r2_fasta, outputEnding))
 
 
