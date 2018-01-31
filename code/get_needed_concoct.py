@@ -21,19 +21,28 @@ refdir = "data/references/"
 
 ############################################################################################
 
+# Function to create bam files from sam files
 def create_bam_files(sampleList, contigName, outputName):
 
 	# create fai file
 	print("samtools faidx %s.fasta" % (contigName))
 	
-
+	# Iterate through each individual sam file and convert to bam
 	for sam_file in sampleList:
 		# convert to bam 
 		print("samtools view -bt %s.fasta.fai %s%s_%s_bowtie.sam > %s%s_%s.bam" % 
 			(contigName, workdir, sam_file, outputName, workdir, sam_file, outputName))
 
+		# sort the bam file
+		print("samtools sort %s%s_%s.bam %s%s_%s_sort.bam" % 
+			(workdir, sam_file, outputName, workdir, sam_file, outputName))
 
-# sort and index the bam
+		#index the bam file
+		print("samtools index %s%s_%s_sort.bam" % 
+			(workdir, sam_file, outputName))
+
+
+
 # mark duplicates and sort
 # get coverage data
 # Call specific code for genome coverage table
