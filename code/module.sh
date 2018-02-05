@@ -13,6 +13,7 @@ module load geomicro/omics
 # Other modules that are needed but can be loaded as normal on flux
 module load R/3.3.3
 module load sratoolkit/2.8.2-1
+module load cutadapt/1.14
 module load samtools/1.3.1
 module load bowtie2/2.1.0
 module load sickle/1.33.6
