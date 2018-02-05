@@ -25,21 +25,31 @@ refdir = "data/references/"
 def create_bam_files(sampleList, contigName, outputName):
 
 	# create fai file
-	print("samtools faidx %s.fasta" % (contigName))
+	print("Creating fai file.")
+	os.system("samtools faidx %s.fasta" % (contigName))
+	print("Completed creation of fai file.")
 	
 	# Iterate through each individual sam file and convert to bam
 	for sam_file in sampleList:
 		# convert to bam 
-		print("samtools view -bt %s.fasta.fai %s%s_%s_bowtie.sam > %s%s_%s.bam" % 
+		print("Converting %s to bam format." % (sam_file))
+
+		os.system("samtools view -bt %s.fasta.fai %s%s_%s_bowtie.sam > %s%s_%s.bam" % 
 			(contigName, workdir, sam_file, outputName, workdir, sam_file, outputName))
 
 		# sort the bam file
-		print("samtools sort %s%s_%s.bam %s%s_%s_sort.bam" % 
+		print("Sorting created bam file.")
+
+		os.system("samtools sort -o %s%s_%s_sort.bam %s%s_%s.bam" % 
 			(workdir, sam_file, outputName, workdir, sam_file, outputName))
 
 		#index the bam file
-		print("samtools index %s%s_%s_sort.bam" % 
+		print("Indexing the sorted and created bam file.")
+		
+		os.system("samtools index %s%s_%s_sort.bam" % 
 			(workdir, sam_file, outputName))
+
+		print("Completed %s bam creation." % (sam_file))
 
 
 # Function to call picard to mark and remove duplicates
@@ -47,10 +57,13 @@ def mark_duplicates(sampleList, outputName):
 
 	for bam_file in sampleList:
 		# mark and remove duplicates
-		print("java -jar $PICARD_JARS/picard.jar MarkDuplicates \
+		print("Marking and removing duplicate sequences from %s." % 
+			(bam_file))
+
+		os.system("java -jar $PICARD_JARS/picard.jar MarkDuplicates \
 INPUT=%s%s_%s_sort.bam \
 OUTPUT=%s%s_%s_sort_rmdup.bam \
-METRIC_FILE=%s%s_%s_sort_rmdup.metrics \
+METRICS_FILE=%s%s_%s_sort_rmdup.metrics \
 AS=TRUE \
 VALIDATION_STRINGENCY=LENIENT \
 MAX_FILE_HANDLES_FOR_READ_ENDS_MAP=1000 \
@@ -59,10 +72,15 @@ REMOVE_DUPLICATES=TRUE" %
 	workdir, bam_file, outputName))
 
 		# Re sort the resulting bam file
-		print("samtools sort %s%s_%s_sort_rmdup.bam %s%s_%s_sort_rmdup_sort.bam" % 
+		print("Re-sorting the bam file.")
+
+		os.system("samtools sort -o %s%s_%s_sort_rmdup_sort.bam %s%s_%s_sort_rmdup.bam" % 
 			(workdir, bam_file, outputName, workdir, bam_file, outputName))
+		
 		# Re index the resulting re-sorted bam file
-		print("samtools index %s%s_%s_sort_rmdup_sort.bam" % 
+		print("Re-indexing the re-sorted bam file.")
+
+		os.system("samtools index %s%s_%s_sort_rmdup_sort.bam" % 
 			(workdir, bam_file, outputName))
 
 
@@ -70,33 +88,66 @@ REMOVE_DUPLICATES=TRUE" %
 def get_cover_and_link(sampleList, contigName, outputName):
 
 	# execute coverage data command for every sample
-	for bam_file in sampleList:
+#	for bam_file in sampleList:
 		# get coverage data
-		print("genomeCoverageBed -ibam %s%s_%s_sort_rmdup_sort.bam \
--g %s.fasta > %s%s_%s_final_contigs_coverage.txt" % 
-(workdir, bam_file, outputName, contigName, workdir, bam_file, outputName))
+#		print("Obtaining coverage data for %s." % (bam_file))
+
+#		os.system("genomeCoverageBed -ibam %s%s_%s_sort_rmdup_sort.bam \
+#-g %s.fasta > %s%s_%s_final_contigs_coverage.txt" % 
+#(workdir, bam_file, outputName, contigName, workdir, bam_file, outputName))
 
 	# create a temp text file with the sample names
-	write_file = open("%stemp_coverage_file_names.txt" % (workdir),'w')
+	cov_file = open("%stemp_coverage_file_names.txt" % (workdir),'w')
+
 	# add each sample to the temp text file
+	print("Creating a temporary sample file for coverage analysis.")
+
 	for sampleN in sampleList:
 
-		write_file.write("%s%s_%s_final_contigs_coverage.txt" % 
+		cov_file.write("%s%s_%s_final_contigs_coverage.txt" % 
 			(workdir, sampleN, outputName)+'\n')
 	# close the file
-	write_file.close()
+	cov_file.close()
 	
 	# creates the coverage table
-	print("python2 /sw/med/centos7/concoct/0.4.1/bin/gen_input_table.py \
+	print("Creating coverage table.")
+
+	os.system("python2 /sw/med/centos7/concoct/0.4.1/bin/gen_input_table.py \
 --isbedfiles \
---samplenames %stemp_coverage_file_names.txt %s.fasta > \
-%soverall_coverage_table.tsv" % (workdir, contigName, workdir))
+--samplenames %stemp_coverage_file_names.txt \
+%s.fasta \
+%s*_final_contigs_coverage.txt > \
+%soverall_coverage_table.tsv" % 
+(workdir, contigName, workdir, workdir))
+
+
+	# create a temp text file with the sample names
+	link_file = open("%stemp_linkage_file_names.txt" % (workdir),'w')
+
+	# add each sample to the temp text file
+	print("Creating a temporary sample file for linkage analysis.")
+
+	for bam_file in sampleList:
+
+		link_file.write("%s%s_%s_sort_rmdup_sort.bam" % 
+			(workdir, bam_file, outputName)+'\n')
+	# close the file
+	link_file.close()
+
 
 	# creates the linkage table
-	print("python2 /sw/med/centos7/concoct/0.4.1/bin/bam_to_linkage.py \
+	print("Creating linkage table.")
+
+	os.system("python2 /sw/med/centos7/concoct/0.4.1/bin/bam_to_linkage.py \
 -m 8 --regionlength 500 \
---fullsearch --samplenames %stemp_coverage_file_names.txt \
-%s.fasta > %soverall_linkage_table.tsv" % (workdir, contigName, workdir))
+--fullsearch --samplenames %stemp_linkage_file_names.txt \
+%s.fasta \
+%s*_%s_sort_rmdup_sort.bam > %soverall_linkage_table.tsv" % 
+(workdir, contigName, workdir, outputName, workdir))
+
+	# Remove the temporary sample text file
+	os.system("rm %stemp_coverage_file_names.txt" % (workdir))
+	os.system("rm %stemp_linkage_file_names.txt" % (workdir))
 
 
 
@@ -104,9 +155,9 @@ def get_cover_and_link(sampleList, contigName, outputName):
 def main(sampleListFile, contigFile, outputEnding):
 	# read in file list from -s call
 	samples_to_be_used = create_samples_to_download(sampleListFile)
-	create_bam_files(samples_to_be_used, contigFile, outputEnding)
+	#create_bam_files(samples_to_be_used, contigFile, outputEnding)
 	#mark_duplicates(samples_to_be_used, outputEnding)
-	#get_cover_and_link(samples_to_be_used, contigFile, outputEnding)
+	get_cover_and_link(samples_to_be_used, contigFile, outputEnding)
 
 
 # Upon program call executes these commands automatically
