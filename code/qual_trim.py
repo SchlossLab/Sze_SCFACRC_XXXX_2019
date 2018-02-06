@@ -83,8 +83,10 @@ def run_cutadpat(keep_files, metafileName, runReverseComplement):
 	# set a counter
 	x = 0
 	# Set up the storage dictionaires
-	F_temp_samples = {}
-	R_temp_samples = {}
+	F_three_temp_samples = {}
+	R_three_temp_samples = {}
+	F_five_temp_samples = {}
+	R_five_temp_samples = {}
 	# Open the needed data file (manually set above)
 	temp_file = open(metafileName, 'r')
 	# run through each line adding the forward and reverse seq components
@@ -97,58 +99,67 @@ def run_cutadpat(keep_files, metafileName, runReverseComplement):
 			# split into a list based on the \t 
 			temp_vector = temp_line.split('\t')
 			# add a full sequence primer that includes adapter and index
-			F_temp_samples[temp_vector[0]] = temp_vector[3]
+			F_five_temp_samples[temp_vector[0]] = temp_vector[3]
 
-			# temporarily store the reverse sequence primer 
+			# temporarily store the reverse sequence primer
+			F_three_temp_samples[temp_vector[0]] = temp_vector[4]
+			
 			temp_R_seq = temp_vector[4]
+			temp_F_seq = temp_vector[3]
 
 			if runReverseComplement == False:
 
-				rev_seq = temp_R_seq
+				R_five_temp_samples[temp_vector[0]] = temp_vector[5]
 
-				R_temp_samples[temp_vector[0]] = rev_seq
+				R_three_temp_samples[temp_vector[0]] = temp_vector[6]
 
 			else:
+				R_five_temp_samples[temp_vector[0]] = run_rev_complement(temp_R_seq)
 
-				# create an empty character place holder
-				rev_seq = ""
-				# run through each chr and change to the complement base
-				for i in temp_R_seq:
-
-					if i == "A":
-
-						rev_seq = "%sT" % (rev_seq)
-
-					elif i == "T":
+				R_three_temp_samples[temp_vector[0]] = run_rev_complement(temp_F_seq)
+		
 				
-						rev_seq = "%sA" % (rev_seq)
-
-					elif i == "C":
-
-						rev_seq = "%sG" % (rev_seq)
-
-					elif i == "G":
-
-						rev_seq = "%sC" % (rev_seq)
-				
-					else:
-
-						rev_seq = "%sN" % (rev_seq)
-
-				# add the reverse complement to the reverse dictionary
-				R_temp_samples[temp_vector[0]] = rev_seq[::-1]
 		# Move counter up by 1
 		x += 1
 	# for each sample run the cutadapt code to remove them
 	for sample_fastq in keep_files:
 		# Runs the actual cutadapt command
 		os.system("cutadapt --error-rate=0.1 --overlap=10 \
--a %s -a %s -o %s%s_adp_trim_1.fastq -p %s%s_adp_trim_2.fastq \
+-a %s -g %s -A %s -G %s -o %s%s_adp_trim_1.fastq -p %s%s_adp_trim_2.fastq \
 %s%s_qf_1.fastq %s%s_qf_2.fastq" % 
-			(F_temp_samples[sample_fastq], R_temp_samples[sample_fastq], 
+			(F_five_temp_samples[sample_fastq], 
+				R_five_temp_samples[sample_fastq], 
+				F_three_temp_samples[sample_fastq], 
+				R_three_temp_samples[sample_fastq], 
 				workdir, sample_fastq, workdir, sample_fastq, 
 				workdir, sample_fastq, workdir, sample_fastq))
 
+
+
+# Function that runs a reverse complement of a DNA string
+def run_rev_complement(dna_sequence):
+
+	# create an empty character place holder
+	rev_seq = ""
+	# run through each chr and change to the complement base
+	for i in dna_sequence:
+
+		if i == "A":
+			rev_seq = "%sT" % (rev_seq)
+		elif i == "T":
+			rev_seq = "%sA" % (rev_seq)
+		elif i == "C":
+			rev_seq = "%sG" % (rev_seq)
+		elif i == "G":
+			rev_seq = "%sC" % (rev_seq)
+		else:
+			rev_seq = "%sN" % (rev_seq)
+
+	# add the reverse complement 
+	temp_rev_sequence = rev_seq[::-1]
+
+	return(temp_rev_sequence)
+	
 
 
 # Quality filter and toss out reads that don't make the cut 
@@ -220,7 +231,9 @@ if __name__ == '__main__':
 		default="data/process/sequence_meta_data.tsv", 
 		type=str, help="Must have the following order for columns in a \
 		tab-delimited text file: sample_name, subjectID, diseaseClass, \
-		forward adapter, forward index, forward primer, reverse primer.\n")
+		five_prime_adapter, three_prime_adapter. \
+		OPTIONAL to have columns that are also \
+		rc_five_prime_adapter, rc_three_prime_adapter.\n")
 	parser.add_argument("-rc", "--reverse_complement", 
 		default=False, 
 		type=bool, help="Argument to select whether to reverse complement \
