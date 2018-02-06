@@ -103,7 +103,7 @@ def main(sampleListFile):
 
 
 
-
+# Initializes at the start of the program
 if __name__ == '__main__': 
 
 	# Command line argument parser with tags for componenets within the program
