@@ -7,7 +7,7 @@
 ############## Internal parameters used by all functions is program ########################
 
 # Import needed libraries
-import os, sys
+import os, sys, argparse
 
 # Set up working directory
 workdir = "data/raw/"
@@ -97,7 +97,7 @@ def run_quality_filter(keep_files):
 ### the SRA. 
 
 # Function to run the cutadapt step 
-def run_cutapdat(keep_files, metafileName = "sequence_meta_data.tsv"):
+def run_cutapdat(keep_files, metafileName):
 
 	# set a counter
 	x = 0
@@ -105,7 +105,7 @@ def run_cutapdat(keep_files, metafileName = "sequence_meta_data.tsv"):
 	F_temp_samples = {}
 	R_temp_samples = {}
 	# Open the needed data file (manually set above)
-	temp_file = open("data/process/%s" % (metafileName), 'r')
+	temp_file = open(metafileName, 'r')
 	# run through each line adding the forward and reverse seq components
 	# to the respective dictionary
 	for line in temp_file:
@@ -161,12 +161,31 @@ def run_cutapdat(keep_files, metafileName = "sequence_meta_data.tsv"):
 
 # Run the actual program
 
-def main():
-	meta_genome_file_name = command_line()
-	samples_to_download = create_samples_to_download(meta_genome_file_name)
+def main(sampleListFile, needCutadapt, primerfileName):
+	samples_to_download = create_samples_to_download(sampleListFile)
 	download_files(samples_to_download)
 	convert_sra_to_fastq(samples_to_download)
 	run_quality_filter(samples_to_download)
-	run_cutapdat(samples_to_download)
+	
+	if needCutadapt == True:
 
-if __name__ == '__main__': main()
+		run_cutapdat(samples_to_download, primerfileName)
+
+if __name__ == '__main__': 
+	# Command line argument parser with tags for componenets within the program
+	parser = argparse.ArgumentParser(description=__doc__)
+	parser.add_argument("-s", "--sample_list", 
+		default="%swhole_metagenome_samples.txt" % (workdir), 
+		type=str, help="Text file with list of samples.\n")
+	parser.add_argument("-ca", "--cut_adapt", default=False, 
+		type=bool, help="Whether samples need adapters cut or not. \
+		Default is 'false'. If 'true' need to provide a meta data file \
+		with the '-m' tag or else program will fail.\n")
+	parser.add_argument("-m", "--meta_data", 
+		default="data/process/sequence_meta_data.tsv", 
+		type=str, help="Must have the following order for columns in a \
+		tab-delimited text file: sample_name, subjectID, diseaseClass, \
+		forward adapter, forward index, forward primer, reverse primer.\n")
+	args = parser.parse_args()
+	# Runs the main function with the following cmd line arguments ported into it
+	main(args.sample_list, args.cut_adapt, args.meta_data)
