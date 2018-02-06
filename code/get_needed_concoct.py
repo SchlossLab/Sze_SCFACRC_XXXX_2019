@@ -88,13 +88,13 @@ REMOVE_DUPLICATES=TRUE" %
 def get_cover_and_link(sampleList, contigName, outputName):
 
 	# execute coverage data command for every sample
-#	for bam_file in sampleList:
+	for bam_file in sampleList:
 		# get coverage data
-#		print("Obtaining coverage data for %s." % (bam_file))
+		print("Obtaining coverage data for %s." % (bam_file))
 
-#		os.system("genomeCoverageBed -ibam %s%s_%s_sort_rmdup_sort.bam \
-#-g %s.fasta > %s%s_%s_final_contigs_coverage.txt" % 
-#(workdir, bam_file, outputName, contigName, workdir, bam_file, outputName))
+		os.system("genomeCoverageBed -ibam %s%s_%s_sort_rmdup_sort.bam \
+-g %s.fasta > %s%s_%s_final_contigs_coverage.txt" % 
+(workdir, bam_file, outputName, contigName, workdir, bam_file, outputName))
 
 	# create a temp text file with the sample names
 	cov_file = open("%stemp_coverage_file_names.txt" % (workdir),'w')
@@ -164,9 +164,15 @@ def main(sampleListFile, contigFile, outputEnding):
 if __name__ == '__main__': 
 	# Command line argument parser with tags for componenets within the program
 	parser = argparse.ArgumentParser(description=__doc__)
-	parser.add_argument("-l", "--sample_list", default="%swhole_metagenome_samples.txt" % (workdir), type=str, help="Text file with list of samples\n")
-	parser.add_argument("-c", "--contig_file", default="%sall_contigs_1kbto10kb" % (workdir), type=str, help="Combined cut contig fasta fil name\n")
-	parser.add_argument("-s", "--sam_file_end", default="contig_1to10kb", type=str, help="Unique Ending of Samfiles\n")
+	parser.add_argument("-l", "--sample_list", 
+		default="%swhole_metagenome_samples.txt" % (workdir), 
+		type=str, help="Text file with list of samples that will be analyzed.\n")
+	parser.add_argument("-c", "--contig_file", 
+		default="%sall_contigs_1kbto10kb" % (workdir), 
+		type=str, help="Combined fasta file name that has the cut contigs. \
+		Ideal is to have them minimum of 1Kb and maximum 10Kb.\n")
+	parser.add_argument("-s", "--sam_file_end", 
+		default="contig_1to10kb", type=str, help="Unique Ending of Samfiles\n")
 	args = parser.parse_args()
 	# Runs the main function with the following cmd line arguments ported into it
 	main(args.sample_list, args.contig_file, args.sam_file_end)
