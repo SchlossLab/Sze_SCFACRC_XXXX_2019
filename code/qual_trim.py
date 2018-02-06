@@ -74,30 +74,11 @@ def convert_sra_to_fastq(keep_files):
 		print("Completed creating fastq for: %s.sra" % (files))
 
 
-# Quality filter and toss out reads that don't make the cut 
-# -t quality filter of nucleotide (trimmed from the end of sequence)
-# -Q average quality cutoff of sequence
-# -l minimum length of sequence if shorter after trimming it is tossed
-def run_quality_filter(keep_files):
-
-	for files in keep_files:
-
-		print("Started quality filtering of F(1) and R(2) sample %s fastq" % (files))
-
-		os.system("sickle pe -f %s%s_1.fastq -r %s%s_2.fastq \
--t sanger -o %s%s_qf_1.fastq -p %s%s_qf_2.fastq \
--s %s%s_qf.orphan.fastq -q 30 -l 75" % 
-			(workdir, files, workdir, files, workdir, files, 
-				workdir, files, workdir, files))
-
-		print("Completed quality filtering of sample %s" % (files))
-
-
 ### Need to modify the cutadapt step based on jenior blog if seqs not from
 ### the SRA. 
 
 # Function to run the cutadapt step 
-def run_cutapdat(keep_files, metafileName):
+def run_cutadpat(keep_files, metafileName):
 
 	# set a counter
 	x = 0
@@ -159,18 +140,63 @@ def run_cutapdat(keep_files, metafileName):
 				workdir, sample_fastq, workdir, sample_fastq, 
 				workdir, sample_fastq, workdir, sample_fastq))
 
-# Run the actual program
 
+
+# Quality filter and toss out reads that don't make the cut 
+# -t quality filter of nucleotide (trimmed from the end of sequence)
+# -Q average quality cutoff of sequence
+# -l minimum length of sequence if shorter after trimming it is tossed
+def run_quality_filter(keep_files, runningCutadapt):
+
+	if runningCutadapt == False:
+
+		for files in keep_files:
+
+			print("Started quality filtering of F(1) and R(2) sample %s fastq" % 
+				(files))
+
+			os.system("sickle pe -f %s%s_1.fastq -r %s%s_2.fastq \
+-t sanger -o %s%s_qf_1.fastq -p %s%s_qf_2.fastq \
+-s %s%s_qf.orphan.fastq -q 30 -l 75" % 
+			(workdir, files, workdir, files, workdir, files, 
+				workdir, files, workdir, files))
+
+			print("Completed quality filtering of sample %s" % (files))
+
+	else:
+
+		for files in keep_files:
+
+			print("Started quality filtering of F(1) and R(2) sample %s fastq" % 
+				(files))
+
+			os.system("sickle pe -f %s%s_adp_trim_1.fastq -r %s%s_adp_trim_2.fastq \
+-t sanger -o %s%s_qf_1.fastq -p %s%s_qf_2.fastq \
+-s %s%s_qf.orphan.fastq -q 30 -l 75" % 
+			(workdir, files, workdir, files, workdir, files, 
+				workdir, files, workdir, files))
+
+			print("Completed quality filtering of sample %s" % (files))
+
+
+
+# Run the actual program
 def main(sampleListFile, needCutadapt, primerfileName):
 	samples_to_download = create_samples_to_download(sampleListFile)
 	download_files(samples_to_download)
 	convert_sra_to_fastq(samples_to_download)
-	run_quality_filter(samples_to_download)
 	
 	if needCutadapt == True:
 
-		run_cutapdat(samples_to_download, primerfileName)
+		run_cutadpat(samples_to_download, primerfileName)
+		run_quality_filter(samples_to_download, needCutadapt)
 
+	else:
+
+		run_quality_filter(samples_to_download, needCutadapt)
+	
+	
+# Initialized when program starts
 if __name__ == '__main__': 
 	# Command line argument parser with tags for componenets within the program
 	parser = argparse.ArgumentParser(description=__doc__)
