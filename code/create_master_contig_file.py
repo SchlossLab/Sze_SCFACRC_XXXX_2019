@@ -8,21 +8,20 @@
 ############## Internal parameters used by all functions is program ########################
 
 # Import needed libraries
-import os, sys, re
+import os, sys, re, argparse
 
 # Import other code with useful functions that will be used
-from qual_trim import command_line, create_samples_to_download
+from qual_trim import create_samples_to_download
 
 # Set up working directory
 workdir = "data/raw/"
 refdir = "data/references/"
-contig_fa = "final.contigs.fa"
 
 
 ############################################################################################
 
 # Function to rename the given sequence file
-def get_fasta_header(sampleList):
+def get_fasta_header(sampleList, contig_fa):
 
 	# Set up empty dictionary
 	temp_dict = {}
@@ -98,12 +97,26 @@ def create_complete_fasta(combinedDict):
 
 
 # Runs the overall program 
-def main():
+def main(sampleListFile, contigNameEnding):
 
-	meta_genome_file_name = command_line()
-	samples_to_be_used = create_samples_to_download(meta_genome_file_name)
-	all_contig_dict = get_fasta_header(samples_to_be_used)
+	samples_to_be_used = create_samples_to_download(sampleListFile)
+	all_contig_dict = get_fasta_header(samples_to_be_used, contigNameEnding)
 	create_complete_fasta(all_contig_dict)
 
 
-if __name__ == '__main__': main()
+# Initializes at the start of the program
+if __name__ == '__main__': 
+
+	# Command line argument parser with tags for componenets within the program
+	parser = argparse.ArgumentParser(description=__doc__)
+	parser.add_argument("-s", "--sample_list", 
+		default="%swhole_metagenome_samples.txt" % (workdir), 
+		type=str, help="Text file with list of samples to run through the program.\n")
+	parser.add_argument("-e", "--file_ending", 
+		default="final.contigs.fa", type=str, 
+		help="Ending assigned for each individual contig file. \
+		The default is 'final.contigs.fa'.\n")
+	args = parser.parse_args()
+
+	# Runs the main function with the following cmd line arguments ported into it
+	main(args.sample_list, args.file_ending)
