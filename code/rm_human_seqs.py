@@ -9,10 +9,10 @@
 ############## Internal parameters used by all functions is program ########################
 
 # Import needed libraries
-import os, sys
+import os, sys, argparse
 
 # Import other code with useful functions that will be used
-from qual_trim import command_line, create_samples_to_download
+from qual_trim import create_samples_to_download
 
 # Set up working directory
 workdir = "data/raw/"
@@ -94,10 +94,9 @@ def remove_human_seqs(samplesList):
     	
     	
 # Runs the overall program 
-def main():
+def main(sampleListFile):
 
-	meta_genome_file_name = command_line()
-	samples_to_be_used = create_samples_to_download(meta_genome_file_name)
+	samples_to_be_used = create_samples_to_download(sampleListFile)
 	human_database_download()
 	remove_human_seqs(samples_to_be_used)
 	#print(samples_to_be_used)
@@ -105,4 +104,14 @@ def main():
 
 
 
-if __name__ == '__main__': main()
+if __name__ == '__main__': 
+
+	# Command line argument parser with tags for componenets within the program
+	parser = argparse.ArgumentParser(description=__doc__)
+	parser.add_argument("-s", "--sample_list", 
+		default="%swhole_metagenome_samples.txt" % (workdir), 
+		type=str, help="Text file with list of samples to run through the program.\n")
+	args = parser.parse_args()
+
+	# Runs the main function with the following cmd line arguments ported into it
+	main(args.sample_list)
