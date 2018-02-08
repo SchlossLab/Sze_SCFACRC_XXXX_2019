@@ -1,7 +1,12 @@
 #!python
 
 #This code will run concoct and create contig clusters based on 
-# both the coverage and linkage tables provided
+# both the coverage and linkage tables provided. I have decided to use
+# a combination approach of both Matt and Geoff. Mostly the concoct part
+# will be a merger of the two approaches while the linkage and binning will
+# mostly draw from Matt.
+
+# Changes from Geof protocol is using default 500 iterations
 
 ############# Internal parameters used by all functions is program ########################
 
@@ -18,18 +23,23 @@ refdir = "data/references/"
 
 ############################################################################################
 
+# needed files
+# "data/raw/all_contigs_1kbto10kb.fasta" 
+# "data/raw/overall_coverage_table.tsv"
 
-# Geof way
-#concoct \
-#		--coverage_file ./data/ContigAbundForConcoctVirus.tsv \
-#		--composition_file ./data/totalcontigsvirus.fa \
-#		--clusters 500 \
-#		--kmer_length 4 \
-#		--length_threshold 1000 \
-#		--read_length 150 \
-#		--basename ./data/ContigClustersVirus/ \
-#		--no_total_coverage \
-#		--iterations 50
+
+def create_concoct_clusters(contigfile, coveragefile, outputName):
+
+	os.system("concoct \
+--coverage_file %s \
+--composition_file %s \
+--clusters 500 \
+--kmer_length 4 \
+--length_threshold 1000 \
+--read_length 150 \
+--basename %s" % (coveragefile, contigfile, outputName))
+
+
 
 
 # Matt way
@@ -56,10 +66,11 @@ refdir = "data/references/"
 
 
 # Runs the overall program 
-def main(sampleListFile):
+def main(contigfileName, coveragetableName, outputDirectoryName):
 
-	samples_to_be_used = create_samples_to_download(sampleListFile)
-	make_contigs(samples_to_be_used)
+	create_concoct_clusters(contigfileName, coveragetableName, outputDirectoryName)
+
+	
 
 
 # Initializes at the start of the program
@@ -67,10 +78,19 @@ if __name__ == '__main__':
 
 	# Command line argument parser with tags for componenets within the program
 	parser = argparse.ArgumentParser(description=__doc__)
-	parser.add_argument("-s", "--sample_list", 
-		default="%swhole_metagenome_samples.txt" % (workdir), 
-		type=str, help="Text file with list of samples to run through the program.\n")
+	parser.add_argument("-ct", "--contig_table", 
+		default="%sall_contigs_1kbto10kb.fasta" % (workdir), 
+		type=str, help="Overall combined contig file. \
+		The default is set to 'all_contigs_1kbto10kb.fasta'.\n")
+	parser.add_argument("-cov", "--coverage_table", 
+		default="%soverall_coverage_table.tsv" % (workdir), 
+		type=str, help="Overall coverage table. \
+		The default is set to 'overall_coverage_table.tsv'.\n")
+	parser.add_argument("-of", "--output_file", 
+		default="%sconcoct_output/" % (workdir), 
+		type=str, help="File where concoct ouput goes. \
+		The default is set to 'data/raw/concoct_output/'.\n")
 	args = parser.parse_args()
 
 	# Runs the main function with the following cmd line arguments ported into it
-	main(args.sample_list)
+	main(args.contig_table, args.coverage_table, args.output_file)
