@@ -122,7 +122,7 @@ carcinoma_graph <- pvalue_taxa_counts[["crc"]] %>%
 sig_occurence_plot <- grid.arrange(adenoma_graph, adv_adenoma_graph, carcinoma_graph, nrow = 1, ncol = 3)
 
 # Write out to specific directory
-ggsave("results/figures/top10_RF_sig_occurence.pdf", sig_occurence_plot, width = 15, height = 6)
+ggsave("results/figures/top10_RF_sig_occurence.tiff", sig_occurence_plot, width = 15, height = 6)
 
 
 
