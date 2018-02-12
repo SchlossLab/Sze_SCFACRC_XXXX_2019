@@ -1,5 +1,5 @@
-### Prelim analys of butyrate
-### cursory look at butyrate and CRC
+### Prelim analysis of measured SCFAs by HPLC
+### cursory look at SCFAs and Tumor groups
 ### Marc Sze
 
 
@@ -71,46 +71,6 @@ merge_data <- function(scfa_name, meta_data, dataList, not_enough){
   
 }
 
-# Function to generate first pass visualizations
-create_graphs <- function(scfa_name, dataList){
-  # scfa_name is a variable that stores the scfa of interest e.g. "acetate"
-  # dataList is a list of combined data (meta + scfa) 
-  
-  #create a tempData table for the scfa of interest
-  tempData <- dataList[[scfa_name]]
-  
-  # Graph the results to visualize if patterns exits beween groups
-  tempPlot <- ggplot(tempData, aes(factor(Dx_Bin, 
-                                   levels = c("Normal", "Adenoma", "adv_Adenoma", "Cancer"), 
-                                   labels = c("Control", "Adenoma", "Advanced\nAdenoma", "Carcinoma")), 
-                            mmol_kg)) + 
-    geom_jitter(aes(color = Dx_Bin), width = 0.3, show.legend = F) + 
-    stat_summary(fun.y = median, fun.ymin = median, fun.ymax = median, 
-                 colour = "black", geom = "crossbar", size = 0.5, width = 0.5)  + 
-    scale_color_manual(values = c('#228B22', '#FFD700', '#DC143C', '#808069')) + 
-    xlab("") + ylab("mmol per Kg") + theme_bw()
-  
-  # Graph the overall distributions of the values by group
-  tempPlot2 <- tempData %>% 
-    mutate(
-      Dx_Bin = factor(Dx_Bin, 
-                      levels = c("Normal", "Adenoma", "adv_Adenoma", "Cancer"), 
-                      labels = c("Control", "Adenoma", "Advanced\nAdenoma", "Carcinoma"))) %>% 
-    ggplot(aes(mmol_kg, group = Dx_Bin, fill = Dx_Bin)) + 
-    geom_density(alpha = 0.3, show.legend = F) + 
-    xlab("mmol per Kg") + ylab("Density") + theme_bw() + 
-    scale_x_continuous(expand = c(0, 0)) + scale_y_continuous(expand = c(0, 0)) + 
-    scale_fill_manual(values = c('#228B22', '#FFD700', '#DC143C', '#808069')) + 
-    ggtitle(paste(scfa_name))
-  
-  
-  # Combine the two graphs into a single figure
-  tempFinalGraph <- grid.arrange(tempPlot2, tempPlot, nrow = 2)
-  # Return the combined figure to the global work environment
-  return(tempFinalGraph)
-  
-}
-
 
 #Run an ANOVA with Tukey post hoc test to look for differences within each group
 get_anova_comparisons <- function(scfa_name, dataList, 
@@ -131,21 +91,6 @@ get_anova_comparisons <- function(scfa_name, dataList,
   
 }
 
-
-# Function to save plots as pdfs to be viewed as needed
-save_gg_plots <- function(scfa_name, graphLists, path_to_save, ending){
-  # scfa_name is a variable that stores the scfa of interest e.g. "acetate"
-  # graphLists is a list that stores all the graph information
-  # path_to_save is the directory path where the file will go
-  # ending is the unique file name ending
-  
-  # The command that initializes the save
-  ggsave(paste(path_to_save, scfa_name, ending, sep = ""), graphLists[[scfa_name]], 
-         device = "pdf", width = 8, height = 6)
-  # Prints out that the file was saved
-  print(paste("completed saving graph for ", scfa_name, sep = ""))
-  
-}
 
 
 # Function to save ANOVA results
@@ -183,18 +128,11 @@ scfa_data <- sapply(scfas,
 # combine all the necessary data together into a single file
 combined_data <- sapply(scfas, 
                         function(x) merge_data(x, metaI, scfa_data, not_measured), simplify = F)
-# Create preliminary graphs to view the distribution of data
-graphs <- sapply(scfas, 
-                 function(x) create_graphs(x, combined_data), simplify = F)
+
 # run a krsukal wallis test on every scfa of interest
 test <- sapply(scfas, 
                function(x) get_anova_comparisons(x, combined_data), simplify = F)
-# write out all the graphs
-lapply(scfas, 
-       function(x) 
-         save_gg_plots(x, graphs, 
-                       "exploratory/notebook/exploratory_graphs/", 
-                       "_general_distributions.pdf"))
+
 # write out all the kruskal tests to computer
 lapply(scfas, 
        function(x) 
