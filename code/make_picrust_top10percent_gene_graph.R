@@ -66,7 +66,7 @@ total_scfa_occurence_data <- sapply(tumors,
 
 
 # Generate the adenoma graph
-total_scfa_occurence_data %>%  
+picrust_top10_model_graph <- total_scfa_occurence_data %>%  
   ggplot(aes(tumor, percent_total, group = pathway, fill = pathway)) + 
   geom_bar(stat = "identity") + 
   labs(x = "", y = "Pathway Proportion in Top 10% of Model") + 
@@ -82,7 +82,8 @@ total_scfa_occurence_data %>%
   
   
   
- 
+# Write out to specific directory
+ggsave("results/figures/picrust_RF_model_pathway_proportions.tiff", picrust_top10_model_graph, width = 7, height = 6)
 
 
 
