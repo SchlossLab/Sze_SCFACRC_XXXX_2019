@@ -23,76 +23,173 @@ loadLibs(c("tidyverse", "caret"))
 
 lowest_txID <- list(adn = c("Lachnospiraceae", "Clostridiales", "Blautia", "Bacteroides", 
                             "Odoribacter", "Ruminococcaceae", "Flavonifractor", 
-                            "Roseburia", "Escherichia/Shigella", "Clostridium_XIVa"), 
-                    adv_adn = c("Clostridiales", "Clostridium_XIVa", "Roseburia", "Odoribacter", "Bacteroides", 
-                                "Ruminococcaceae", "Streptococcus", "Blautia", "Lachnospiraceae", "Ruminococcus"), 
+                            "Roseburia", "Escherichia/Shigella", "Clostridium_XlVa", "Anaerostipes", "Streptococcus", 
+                            "Ruminococcus", "Clostridium_IV", "Faecalibacterium", "Bifidobacterium", "Enterococcus", 
+                            "Clostridium_XI", "Coriobacteriaceae", "Coprobacillus", "Actinomyces", "Alistipes", 
+                            "Dorea", "Clostridium_XlVb", "Lactococcus", "Firmicutes", "Clostridium_XVIII", "Gemella", 
+                            "Collinsella", "Akkermansia", "Eggerthella", "Coprococcus"), 
                     crc = c("Porphyromonas", "Parvimonas", "Fusobacterium", "Gemella", "Prevotella", "Streptococcus", 
-                            "Coprobacillus", "Pasteurellaceae", "Collinsella", "Bilophila"))
+                            "Coprobacillus", "Pasteurellaceae", "Collinsella", "Bilophila", "Bacteroides", "Parabacteroides", 
+                            "Clostridium_XlVa", "Odoribacter", "Anaerostipes", "Clostridium_XlVb", "Dorea", "Ruminococcaceae", 
+                            "Lachnospiraceae", "Alistipes", "Streptococcus", "Enterobacteriaceae", "Clostridium_XI", 
+                            "Blautia", "Clostridium_IV", "Ruminococcus", "Clostridiales"))
 
-shared_data <- read_tsv("data/process/final.0.03.subsample.shared")
-
-
-otus_present <- colnames(select(shared_data, -label, -Group, -numOtus))
-
-
-taxonomic_data <- read_tsv("data/process/final.taxonomy") %>% 
-  mutate(Taxonomy = str_replace_all(Taxonomy, "\\((\\d{2,3})\\)", ""), 
-         Taxonomy = str_replace_all(Taxonomy, "_unclassified", ""), 
-         Taxonomy = str_replace_all(Taxonomy, "2", "")) %>% 
-  separate(Taxonomy, c("kingdom", "phyla", "class", "order", "family", "genus", "species"), sep = ";") %>% 
-  filter(OTU %in% otus_present)
 
 combined_meta_data <- read_csv("data/raw/metadata/metaI_final.csv") %>% 
   mutate(Dx_Bin = ifelse(Dx_Bin == "High Risk Normal" | Dx_Bin == "Normal", invisible("control"), 
                          ifelse(Dx_Bin == "Adenoma", invisible("adenoma"), 
-                                ifelse(Dx_Bin == "adv Adenoma", invisible("adv_adenoma"), 
+                                ifelse(Dx_Bin == "adv Adenoma", invisible("adenoma"), 
                                        ifelse(Dx_Bin == "Cancer", invisible("cancer"), invisible(Dx_Bin)))))) %>% 
   select(sample, Dx_Bin, dx) %>% 
   bind_rows(read_csv("data/raw/metadata/good_metaf_final.csv") %>% 
-              mutate(sample = initial) %>% 
+              mutate(sample = initial, 
+                     Dx_Bin = ifelse(Dx_Bin == "adv_adenoma", invisible("adenoma"), invisible(Dx_Bin))) %>% 
               select(sample, Dx_Bin, dx))
   
-
 
 ##############################################################################################
 ############### List of functions to get things to run nice ##################################
 ##############################################################################################
 
-# Function to generate tax lists for select IDs by tumor type
-get_relevent_taxa <- function(tumor_type, taxa_list, tax_file){
+# Function to get a subsamples genus file
+get_genera_subsample <- function(run_number, dataList){
   
-  temp_df <- tax_file %>% filter(genus %in% taxa_list[[tumor_type]])
+  #tempData <- as.matrix(dataList)
+  tempData <- dataList
   
-  return(temp_df)
+  lowest_seq_count <- min(rowSums(tempData))
+  
+  total_genera <- length(colnames(tempData))
+  
+  genera_names <- colnames(tempData)
+  
+  stored_draws_List <- NULL
+  
+  # Iteratres through each sample in data set
+  for(j in rownames(tempData)){
+    
+    tempdraw <- c()
+    tempVector <- unname(tempData[j, ])
+    
+    # creates a temp vector with each genus (as a number)
+    # repeated based on the number of counts in data frame
+    for(k in 1:total_genera){
+      
+      tempdraw <- c(tempdraw, rep(k, tempVector[k]))
+      
+    }
+    # saves the created data in a new list
+    stored_draws_List[[j]] <- tempdraw
+  }
+  
+  # Applies a randome sampling accross the store vector of repeats
+  stored_rd <- lapply(stored_draws_List, function(x) sample(x, lowest_seq_count))
+  # Generates the counts from the sampling
+  num_counts <- lapply(stored_rd, function(x) as.data.frame(table(x), stringsAsFactors = FALSE))
+  # Runs the assign genera function
+  agg_genera <- lapply(num_counts, 
+                       function(x) assign_genera(x, genera_names))
+  # Converts the output to a matrix of the same orientation as the data files
+  # in the inputted data list
+  final_table <- t(as.data.frame.list(agg_genera))
+  
+  print(paste("Completed", run_number, "sampling"))
+  
+  # Returns the data
+  return(final_table)
 }
 
 
-# Function to prune shared file based on taxIDs and by meta_data then remove nzv data
-get_specific_otu <- function(tumor_type, metafile, sharedfile, taxaList){
+# Function to get the assignments needed from the sampling
+assign_genera <- function(dataTable, generaVector){
+  # dataTable is part of a list where each dataTable is an individual sample
+  # generaVector is a vector of genera names
+  
+  # Creates a temporary variable of all taxa with 0 and names the vector
+  tempVector <- rep(0, length(generaVector))
+  names(tempVector) <- generaVector
+  
+  # Iteratres through each genera sampled and changes the 0 to the
+  # correct number of counts
+  updatedVector <- grab_values(tempVector, dataTable)
+  
+  
+  # returns the final vector
+  return(updatedVector)  
+}
+
+
+# Function to pull specific value
+grab_values <- function(vec_of_int, refTable){
+  
+  vec_of_int[as.numeric(refTable[, "x"])] <- refTable[, "Freq"]
+  
+  return(vec_of_int)
+  
+}
+
+
+# Function to run the sampling x number of times and generate an average from this
+get_average_counts <- function(i, repeats, dataList){
+  
+  total_samples <- length(rownames(dataList))
+  genera_names <- colnames(dataList)
+  
+  full_100_runs <- lapply(1:repeats, function(x) get_genera_subsample(x, dataList))
+  
+  
+  temp_avg_list <- lapply(c(1:total_samples), 
+                          function(x) grab_row(full_100_runs, x, i, genera_names))
+  
+  
+  final_avg_data <- t(as.data.frame.list(temp_avg_list))
+  rownames(final_avg_data) <- rownames(dataList)
+  
+  print(paste("Completed study ", i, ": taxa subsampling.", sep = ""))
+  
+  return(final_avg_data)
+  
+}
+
+
+# Function to grab rows for averaging 
+grab_row <- function(list_of_int, j, study, genera_file){
+  
+  test <- lapply(list_of_int, function(x) x[j, ])
+  
+  test <- t(as.data.frame.list(test))
+  
+  colnames(test) <- genera_file
+  rownames(test) <- c(1:length(rownames(test)))
+  
+  average_vector <- colMeans(test)
+  
+  return(average_vector)
+}
+
+
+get_merge_table <- function(tumor_type, metafile, genus_sharedfile, select_taxa_list){
   
   tumor_names <- list(adn = "adenoma", adv_adn = "adv_adenoma", crc = "cancer")
-  temp_taxa_file <- as.data.frame(taxaList[[tumor_type]])
+  
+  tempData <- genus_sharedfile[[tumor_type]] %>% mutate(Group = as.numeric(Group))
+  
   
   temp_df <- metafile %>% select(sample, Dx_Bin) %>% 
-    left_join(sharedfile, by = c("sample" = "Group")) %>% 
+    left_join(tempData, by = c("sample" = "Group")) %>% 
     filter(Dx_Bin == "control" | Dx_Bin == tumor_names[[tumor_type]]) %>% 
-    select(sample, Dx_Bin, one_of(temp_taxa_file$OTU))
-  
-  nzv <- nearZeroVar(temp_df)
-  
-  temp_df <- temp_df[, -nzv]
+    select(sample, Dx_Bin, one_of(select_taxa_list[[tumor_type]]))
   
   return(temp_df)
 }
+
 
 
 # Function to run the wilcoxson rank sum test on each provided OTU
-get_wilcox_testing <- function(tumor_type, test_data, taxaList){
+get_wilcox_testing <- function(tumor_type, test_data){
   
   tempData <- as.data.frame(test_data[[tumor_type]])
-  tempTaxa <- taxaList[[tumor_type]] %>% 
-    select(OTU, genus)
-  
+
   tumor_names <- list(adn = "adenoma", adv_adn = "adv_adenoma", crc = "cancer")
   
   vars_to_test <- colnames(select(test_data[[tumor_type]], -sample, -Dx_Bin))
@@ -103,12 +200,11 @@ get_wilcox_testing <- function(tumor_type, test_data, taxaList){
            filter(tempData, Dx_Bin == tumor_names[[tumor_type]])[, x], 
            alternative = "two.sided")$p.value, simplify = F) %>% bind_rows()) %>% 
     as.data.frame() %>% 
-    mutate(otus = rownames(.), 
+    mutate(taxa = rownames(.), 
            bh = p.adjust(V1, method = "BH")) %>% 
-    left_join(tempTaxa, by = c("otus" = "OTU")) %>% 
     rename(pvalue = V1) %>% 
-    select(otus, genus, pvalue, bh) %>% 
-    arrange(pvalue)
+    arrange(pvalue) %>% 
+    select(taxa, pvalue, bh)
 
   
   
@@ -121,22 +217,41 @@ get_wilcox_testing <- function(tumor_type, test_data, taxaList){
 ############### Run the actual programs to get the data ######################################
 ##############################################################################################
 
+# Create genera table
+genera_data <- get_tax_level_shared("baxter", read_tsv("data/process/final.shared"), 
+                                    read_tsv("data/process/final.taxonomy"), 6)
+
+rownames(genera_data) <- genera_data$Group
+genera_data <- genera_data[, -1]
+
+
+avg_subsample_table <- get_average_counts("baxter", 100, genera_data)
+
+avg_subsample_table <- avg_subsample_table %>% 
+  as.data.frame() %>% 
+  mutate(Group = rownames(genera_data))
+
+
 # generate vector to make sapply run
-tumors <- c("adn", "adv_adn", "crc")
+tumors <- c("adn", "crc")
 # Grabs the specific taxa in the top 10 of the previous models
 specific_taxa <- sapply(tumors, 
-                        function(x) get_relevent_taxa(x, lowest_txID, taxonomic_data), simplify = F)
-# Pares down the candidate taxa OTUs to a manageable number
-taxa_for_testing <- sapply(tumors, 
-                           function(x) get_specific_otu(x, combined_meta_data, shared_data, specific_taxa), simplify = F)
+                        function(x) 
+                          avg_subsample_table %>% select(Group, one_of(lowest_txID[[x]])), simplify = F)
+
+genera_test_tables_list <- sapply(tumors, 
+                                  function(x) get_merge_table(x, combined_meta_data, 
+                                                              specific_taxa, lowest_txID), simplify = F) 
+
+
 # Runs a standard wilcoxson rank sum test and a BH correction 
 test_result_tables <- sapply(tumors, 
-                             function(x) get_wilcox_testing(x, taxa_for_testing, specific_taxa), simplify = F)
+                             function(x) get_wilcox_testing(x, genera_test_tables_list), simplify = F)
 
 # Write out the data
 sapply(tumors, 
        function(x) write_csv(test_result_tables[[x]], 
-                             paste("data/process/tables/", x, "_16S_top10_RF_taxa_testing.csv", sep = "")))
+                             paste("data/process/tables/", x, "_16S_RF_taxa_testing.csv", sep = "")))
 
 
 
