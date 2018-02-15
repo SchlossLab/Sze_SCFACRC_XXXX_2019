@@ -2,8 +2,6 @@
 ### from previous RF models
 ### Marc Sze
 
-
-
 # Load in needed functions and libraries
 source('code/functions.R')
 
@@ -13,19 +11,24 @@ loadLibs(c("tidyverse"))
 
 lowest_txID <- list(adn = c("Lachnospiraceae", "Clostridiales", "Blautia", "Bacteroides", 
                             "Odoribacter", "Ruminococcaceae", "Flavonifractor", 
-                            "Roseburia", "Escherichia/Shigella", "Clostridium_XIVa"), 
-                    adv_adn = c("Clostridiales", "Clostridium_XIVa", "Roseburia", "Odoribacter", "Bacteroides", 
-                                "Ruminococcaceae", "Streptococcus", "Blautia", "Lachnospiraceae", "Ruminococcus"), 
+                            "Roseburia", "Escherichia/Shigella", "Clostridium_XlVa", "Anaerostipes", "Streptococcus", 
+                            "Ruminococcus", "Clostridium_IV", "Faecalibacterium", "Bifidobacterium", "Enterococcus", 
+                            "Clostridium_XI", "Coriobacteriaceae", "Coprobacillus", "Actinomyces", "Alistipes", 
+                            "Dorea", "Clostridium_XlVb", "Lactococcus", "Firmicutes", "Clostridium_XVIII", "Gemella", 
+                            "Collinsella", "Akkermansia", "Eggerthella", "Coprococcus"), 
                     crc = c("Porphyromonas", "Parvimonas", "Fusobacterium", "Gemella", "Prevotella", "Streptococcus", 
-                            "Coprobacillus", "Pasteurellaceae", "Collinsella", "Bilophila"))
+                            "Coprobacillus", "Pasteurellaceae", "Collinsella", "Bilophila", "Bacteroides", "Parabacteroides", 
+                            "Clostridium_XlVa", "Odoribacter", "Anaerostipes", "Clostridium_XlVb", "Dorea", "Ruminococcaceae", 
+                            "Lachnospiraceae", "Alistipes", "Streptococcus", "Enterobacteriaceae", "Clostridium_XI", 
+                            "Blautia", "Clostridium_IV", "Ruminococcus", "Clostridiales"))
 
 
 # generate vector to make sapply run
-tumors <- c("adn", "adv_adn", "crc")
+tumors <- c("adn", "crc")
 
 data_tables <- sapply(tumors, 
                       function(x) read_csv(paste("data/process/tables/", x, 
-                                                 "_16S_top10_RF_taxa_testing.csv", sep = "")), simplify = F)
+                                                 "_16S_top10percent_RF_taxa_testing.csv", sep = "")), simplify = F)
 
 
 # Filter based on pvalues
