@@ -118,7 +118,7 @@ get_tax_level_shared <- function(i, shared_List, tax_List, tax_level){
       shared_tax_level <- cbind(shared_tax_level, tax_level_count)
     }
   }  
-  colnames(shared_tax_level) <- unique_taxa
+  colnames(shared_tax_level) <- str_replace_all(unique_taxa, "_unclassified", "")
   shared_tax_level <- shared_tax_level %>% as.data.frame() %>% 
     mutate(Group = shared_List$Group) %>% 
     select(Group, matches("."))
