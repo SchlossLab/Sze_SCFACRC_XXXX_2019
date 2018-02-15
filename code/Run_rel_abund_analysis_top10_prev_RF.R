@@ -231,6 +231,8 @@ avg_subsample_table <- avg_subsample_table %>%
   as.data.frame() %>% 
   mutate(Group = rownames(genera_data))
 
+write.csv(avg_subsample_table, "data/process/tables/all_genera_subsample_table.csv")
+
 
 # generate vector to make sapply run
 tumors <- c("adn", "crc")
