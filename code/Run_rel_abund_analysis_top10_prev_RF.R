@@ -251,7 +251,7 @@ test_result_tables <- sapply(tumors,
 # Write out the data
 sapply(tumors, 
        function(x) write_csv(test_result_tables[[x]], 
-                             paste("data/process/tables/", x, "_16S_RF_taxa_testing.csv", sep = "")))
+                             paste("data/process/tables/", x, "_16S_top10percent_RF_taxa_testing.csv", sep = "")))
 
 
 
