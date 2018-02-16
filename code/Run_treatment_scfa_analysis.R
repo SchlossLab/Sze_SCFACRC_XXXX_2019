@@ -8,7 +8,7 @@
 source('code/functions.R')
 
 # Load needed libraries
-loadLibs(c("dplyr", "tidyr", "ggplot2", "gridExtra"))
+loadLibs(c("tidyverse", "gridExtra"))
 
 #setup variables that will be used
 scfas <- c("acetate", "butyrate", "isobutyrate", "propionate")
@@ -71,6 +71,24 @@ merge_data <- function(scfa_name, meta_data, dataList, not_enough){
   
 }
 
+
+# Function to run the paired wilcoxson test
+run_wilcox_test <- function(int_scfa, dataList, disease){
+  
+  tempData <- as.data.frame(filter(dataList[[int_scfa]], dx == disease, !is.na(time_point)) %>% 
+                              group_by(EDRN) %>% filter(n() == 2) %>% 
+                              mutate(mmol_kg = ifelse(mmol_kg < 0, invisible(0), invisible(mmol_kg))))
+  
+  tempTest <- wilcox.test(filter(tempData, time_point == "initial")[, "mmol_kg"], 
+                          filter(tempData, time_point == "followUp")[, "mmol_kg"], 
+                          paired = TRUE)$p.value
+  
+  return(tempTest)
+  
+}
+
+
+
 ##############################################################################################
 ############### Run the actual programs to get the data ######################################
 ##############################################################################################
@@ -90,6 +108,33 @@ scfa_data <- sapply(scfas,
 # combine all the necessary data together into a single file
 combined_data <- sapply(scfas, 
                         function(x) merge_data(x, metaF, scfa_data, not_measured), simplify = F)
+
+# Run the paired wilcox test
+adn_test <- t(sapply(scfas, 
+                     function(x) run_wilcox_test(x, combined_data, "adenoma"), simplify = F) %>% 
+                bind_rows()) %>% as.data.frame() %>% 
+  mutate(scfa = rownames(.), 
+         bh = p.adjust(V1, method = "BH"), 
+         disease = "adenoma") %>% 
+  rename(pvalue = V1) %>% 
+  select(scfa, disease, pvalue, bh)
+
+
+crc_test <- t(sapply(scfas, 
+                     function(x) run_wilcox_test(x, combined_data, "cancer"), simplify = F) %>% 
+                bind_rows()) %>% as.data.frame() %>% 
+  mutate(scfa = rownames(.), 
+         bh = p.adjust(V1, method = "BH"), 
+         disease = "carcinoma") %>% 
+  rename(pvalue = V1) %>% 
+  select(scfa, disease, pvalue, bh)
+
+combined_table <- adn_test %>% bind_rows(crc_test)
+
+
+write_csv(combined_table, "data/process/tables/scfa_treatment_comparison_pvalues.csv")
+
+
 
 
 
