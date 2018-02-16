@@ -49,25 +49,25 @@ fitControl <- trainControl(## 10-fold CV
 #################################################################################
 
 #Set up lists to store the data
-#test_tune_list <- list()
-#test_predictions <- list()
+test_tune_list <- list()
+test_predictions <- list()
 
 #Train the model
-#train_name <- paste("data_split", i, sep = "")
+train_name <- paste("data_split", i, sep = "")
 
-#set.seed(3457)
-#test_tune_list[[paste("data_split", i, sep = "")]] <- assign(train_name, 
-#                                                             train(dx ~ ., data = train_test_data, 
-#                                                                   method = "rf", 
-#                                                                   ntree = 500, 
-#                                                                   trControl = fitControl, 
-#                                                                   metric = "ROC", 
-#                                                                   verbose = FALSE))
+set.seed(3457)
+test_tune_list[[paste("data_split", i, sep = "")]] <- assign(train_name, 
+                                                             train(dx ~ ., data = train_test_data, 
+                                                                   method = "rf", 
+                                                                   ntree = 500, 
+                                                                   trControl = fitControl, 
+                                                                   metric = "ROC", 
+                                                                   verbose = FALSE))
 
-#test_predictions[[paste("data_split", i, sep = "")]] <- 
-#  predict(test_tune_list[[paste("data_split", i, sep = "")]], 
-#          test_test_data)
+test_predictions[[paste("data_split", i, sep = "")]] <- 
+  predict(test_tune_list[[paste("data_split", i, sep = "")]], 
+          test_test_data)
 
 
 # Save image with data and relevant parameters
-#save.image(paste("exploratory/adn_RF_model_", i, ".RData", sep=""))
+save.image(paste("exploratory/crc_full_RF_model_", i, ".RData", sep=""))
