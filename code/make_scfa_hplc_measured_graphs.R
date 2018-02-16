@@ -93,14 +93,14 @@ combined_data <- sapply(scfas,
 ### Acetate overall values by group
 acetate <- combined_data[["acetate"]] %>% 
   ggplot(aes(
-    factor(Dx_Bin, 
-           levels = c("Normal", "Adenoma", "adv_Adenoma", "Cancer"), 
-           labels = c("Control", "Adenoma", "Advanced\nAdenoma", "Carcinoma")), mmol_kg)) + 
-  geom_jitter(aes(color = Dx_Bin), width = 0.3, size = 2.5, alpha = 0.75, show.legend = F) + 
+    factor(dx, 
+           levels = c("normal", "adenoma", "cancer"), 
+           labels = c("Control", "Adenoma", "Carcinoma")), mmol_kg)) + 
+  geom_jitter(aes(color = dx), width = 0.3, size = 2.5, alpha = 0.75, show.legend = F) + 
   stat_summary(fun.y = median, fun.ymin = median, fun.ymax = median, 
                colour = "black", geom = "crossbar", size = 0.75, width = 0.5)  + 
-  scale_color_manual(values = c('#228B22', '#FFD700', '#DC143C', '#808069')) + 
-  annotate("text", label = paste("Acetate"), x = 4, y = 300, size = 4) + 
+  scale_color_manual(values = c('#FFD700', '#DC143C', '#228B22')) + 
+  annotate("text", label = paste("Acetate"), x = 3, y = 300, size = 4) + 
   
   xlab("") + ylab("mmol per Kg") + theme_bw() + ggtitle("A") + 
   theme(plot.title = element_text(face="bold", hjust = -0.07, size = 20), 
@@ -114,14 +114,14 @@ acetate <- combined_data[["acetate"]] %>%
 ### Butyrate overall values by group
 butyrate <- combined_data[["butyrate"]] %>% 
   ggplot(aes(
-    factor(Dx_Bin, 
-           levels = c("Normal", "Adenoma", "adv_Adenoma", "Cancer"), 
-           labels = c("Control", "Adenoma", "Advanced\nAdenoma", "Carcinoma")), mmol_kg)) + 
-  geom_jitter(aes(color = Dx_Bin), width = 0.3, size = 2.5, alpha = 0.75, show.legend = F) + 
+    factor(dx, 
+           levels = c("normal", "adenoma", "cancer"), 
+           labels = c("Control", "Adenoma", "Carcinoma")), mmol_kg)) + 
+  geom_jitter(aes(color = dx), width = 0.3, size = 2.5, alpha = 0.75, show.legend = F) + 
   stat_summary(fun.y = median, fun.ymin = median, fun.ymax = median, 
                colour = "black", geom = "crossbar", size = 0.75, width = 0.5)  + 
-  scale_color_manual(values = c('#228B22', '#FFD700', '#DC143C', '#808069')) + 
-  annotate("text", label = paste("Butyrate"), x = 4, y = 80, size = 4) + 
+  scale_color_manual(values = c('#FFD700', '#DC143C', '#228B22')) + 
+  annotate("text", label = paste("Butyrate"), x = 3, y = 80, size = 4) + 
   xlab("") + ylab("mmol per Kg") + theme_bw() + ggtitle("B") + 
   theme(plot.title = element_text(face="bold", hjust = -0.07, size = 20), 
         panel.grid.major = element_blank(), 
@@ -134,14 +134,14 @@ butyrate <- combined_data[["butyrate"]] %>%
 ### Isobutyrate overall values by group
 isobutyrate <- combined_data[["isobutyrate"]] %>% 
   ggplot(aes(
-    factor(Dx_Bin, 
-           levels = c("Normal", "Adenoma", "adv_Adenoma", "Cancer"), 
-           labels = c("Control", "Adenoma", "Advanced\nAdenoma", "Carcinoma")), mmol_kg)) + 
-  geom_jitter(aes(color = Dx_Bin), width = 0.3, size = 2.5, alpha = 0.75, show.legend = F) + 
+    factor(dx, 
+           levels = c("normal", "adenoma", "cancer"), 
+           labels = c("Control", "Adenoma", "Carcinoma")), mmol_kg)) + 
+  geom_jitter(aes(color = dx), width = 0.3, size = 2.5, alpha = 0.75, show.legend = F) + 
   stat_summary(fun.y = median, fun.ymin = median, fun.ymax = median, 
                colour = "black", geom = "crossbar", size = 0.75, width = 0.5)  + 
-  scale_color_manual(values = c('#228B22', '#FFD700', '#DC143C', '#808069')) + 
-  annotate("text", label = paste("Isobutyrate"), x = 4, y = 30, size = 4) + 
+  scale_color_manual(values = c('#FFD700', '#DC143C', '#228B22')) + 
+  annotate("text", label = paste("Isobutyrate"), x = 3, y = 30, size = 4) + 
   xlab("") + ylab("mmol per Kg") + theme_bw() + ggtitle("C") + 
   theme(plot.title = element_text(face="bold", hjust = -0.07, size = 20), 
         panel.grid.major = element_blank(), 
@@ -154,14 +154,14 @@ isobutyrate <- combined_data[["isobutyrate"]] %>%
 ### Propionate overall values by group
 propionate <- combined_data[["propionate"]] %>% 
   ggplot(aes(
-    factor(Dx_Bin, 
-           levels = c("Normal", "Adenoma", "adv_Adenoma", "Cancer"), 
-           labels = c("Control", "Adenoma", "Advanced\nAdenoma", "Carcinoma")), mmol_kg)) + 
-  geom_jitter(aes(color = Dx_Bin), width = 0.3, size = 2.5, alpha = 0.75, show.legend = F) + 
+    factor(dx, 
+           levels = c("normal", "adenoma", "cancer"), 
+           labels = c("Control", "Adenoma", "Carcinoma")), mmol_kg)) + 
+  geom_jitter(aes(color = dx), width = 0.3, size = 2.5, alpha = 0.75, show.legend = F) + 
   stat_summary(fun.y = median, fun.ymin = median, fun.ymax = median, 
                colour = "black", geom = "crossbar", size = 0.75, width = 0.5)  + 
-  scale_color_manual(values = c('#228B22', '#FFD700', '#DC143C', '#808069')) + 
-  annotate("text", label = paste("Propionate"), x = 4, y = 110, size = 4) + 
+  scale_color_manual(values =  c('#FFD700', '#DC143C', '#228B22')) + 
+  annotate("text", label = paste("Propionate"), x = 3, y = 110, size = 4) + 
   xlab("") + ylab("mmol per Kg") + theme_bw() + ggtitle("D") + 
   theme(plot.title = element_text(face="bold", hjust = -0.07, size = 20), 
         panel.grid.major = element_blank(), 
