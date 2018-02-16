@@ -75,7 +75,7 @@ test_data <- test_data[, -nzv]
 
 
 # Write data table for future use
-write.csv(test_data, "data/process/tables/adn_full_test_data.csv")
+write.csv(test_data, "data/process/tables/adn_full_test_data.csv", row.names = F)
 
 
 #################################################################################
@@ -91,4 +91,4 @@ eighty_twenty_splits <- createDataPartition(test_data$dx,
                                             p = 0.8, list = FALSE, times = 100)
 
 # write out the random splits
-write.csv(eighty_twenty_splits, "data/process/tables/adn_full_eighty_twenty_splits.csv")
+write.csv(eighty_twenty_splits, "data/process/tables/adn_full_eighty_twenty_splits.csv", row.names = F)
