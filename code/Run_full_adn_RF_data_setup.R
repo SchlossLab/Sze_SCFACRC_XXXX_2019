@@ -1,11 +1,11 @@
-### Build the best lesion model possible
-### Find the best based on Jenna Wiens suggestions on test and training
+### Build the best adenoma model possible
+### Generate test and random 80/20 split data needed for full adn RF analysis
 ## Marc Sze
 
 #Load needed libraries
 source('code/functions.R')
 
-loadLibs(c("tidyverse", "caret","scales", "eply"))
+loadLibs(c("tidyverse", "caret", "scales"))
 
 # Read in necessary data frames
 
