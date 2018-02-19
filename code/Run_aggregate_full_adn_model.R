@@ -1,6 +1,6 @@
 ## Combine models from the Training runs
 ### Specifically identify mean and SD of model 
-### and pull out most important OTUs used within it (Adenom Full Models)
+### and pull out most important OTUs used within it (Adenoma Full Models)
 ## Marc Sze
 
 
