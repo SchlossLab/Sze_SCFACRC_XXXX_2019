@@ -53,7 +53,7 @@ summary_results <- rbind(make_comparison(full_adn_summary$test_auc, otu_adn_summ
   rename(avg_full = avg_vec1, avg_otu = avg_vec2, sd_full = sd_vec1, sd_otu = sd_vec2) %>% 
   select(model, avg_full, sd_full, avg_otu, sd_otu, pvalue, bh)
   
-
+write_csv(summary_results, "data/process/tables/rf_model_ttest_comparisons.csv")
 
 
 
