@@ -21,9 +21,13 @@ mothur*logfile
 *.pbs.o*
 *.fastq
 *.sra
+*.RData
 
 code/__pycache__/
 
 exploratory/notebook/jenior_stuff/matt_scripts/
 bin/
+<<<<<<< HEAD
 adn/
+=======
+>>>>>>> e19c7fd6e38707a59d92ca5ee95f58d2faa52d22
