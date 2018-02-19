@@ -1,4 +1,4 @@
-### Build the best adenoma model possible
+### Build the best adenoma model possible for OTUs only
 ### Running the model
 ## Marc Sze
 
