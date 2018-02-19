@@ -155,10 +155,10 @@ summary_otu_mda <- summary_otu_mda %>% left_join(tax_df, by = c("Variable" = "ot
 
 # Write out the raw information for the importantance by MDA to a table
 write.csv(raw_mda_otu_data, 
-          "data/process/tables/adn_raw_mda_values.csv", row.names = F)
+          "data/process/tables/adn_full_raw_mda_values.csv", row.names = F)
 
 
 # Write out the median and IQR for the MDA of the most important variables
 
 write.csv(summary_otu_mda, 
-          "data/process/tables/adn_MDA_Summary.csv", row.names = F)
+          "data/process/tables/adn_full_MDA_Summary.csv", row.names = F)
