@@ -21,6 +21,7 @@ mothur*logfile
 *.pbs.o*
 *.fastq
 *.sra
+*.RData
 
 code/__pycache__/
 
