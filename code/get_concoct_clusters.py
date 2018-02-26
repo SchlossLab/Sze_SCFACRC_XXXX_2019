@@ -7,6 +7,9 @@
 # mostly draw from Matt.
 
 # Changes from Geof protocol is using default 500 iterations
+# Without threading it takes 372 hours 22 minutes and 59 seconds
+	# This is with 1 processor and 46GB
+
 
 ############# Internal parameters used by all functions is program ########################
 
@@ -37,6 +40,7 @@ def create_concoct_clusters(contigfile, coveragefile, outputName):
 --kmer_length 4 \
 --length_threshold 1000 \
 --read_length 150 \
+--num-threads 10 \
 --basename %s" % (coveragefile, contigfile, outputName))
 
 
