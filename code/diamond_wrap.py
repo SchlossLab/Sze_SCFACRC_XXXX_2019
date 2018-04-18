@@ -33,8 +33,36 @@ def make_diamond_db(opf_fasta_name):
 		os.system("mkdir %sdiamond_analysis" % (workdir))
 
 
-	os.system("diamond makedb --in %s -d %sdiamond_analysis/reference_db" % 
-		(opf_fasta_name, workdir))
+
+	# read in mmseqs2 fasta file
+	temp_file = open("test_head.fasta", 'r')
+
+	sequence_dict = {}
+	sequence_name = []
+	protein_seq = []
+	
+	
+	for line in temp_file:
+
+		if ">" in line and "start_type" in line:
+
+			sequence_name.append(line)
+
+		if ">" not in line and "start_type" not in line:
+
+			protein_seq.append(line)
+
+
+	for i, j in enumerate(sequence_name):
+
+		sequence_dict[j] = protein_seq[i]
+
+	
+		
+
+
+	# os.system("diamond makedb --in %s -d %sdiamond_analysis/reference_db" % 
+	# 	(opf_fasta_name, workdir))
 
 
 
