@@ -107,39 +107,39 @@ def run_mmseqs2(mmseq2_dir_path, query_fasta):
 
 	
 	# Cluster the target DB
-	os.system("mmseqs cluster %s/mmseq2_opf_run/target_DB %s/mmseq2_opf_run/target_clu \
-%s/mmseq2_opf_run/tmp -e 0.001 --min-seq-id 0.4" % (workdir, workdir))
+	os.system("mmseqs cluster %smmseq2_opf_run/target_DB %smmseq2_opf_run/target_clu \
+%smmseq2_opf_run/tmp -e 0.001 --min-seq-id 0.4" % (workdir, workdir, workdir))
 
 	# Cluster the result DB
-	os.system("mmseqs cluster %s/mmseq2_opf_run/resultDB %s/mmseq2_opf_run/result_clu \
-%s/mmseq2_opf_run/tmp -e 0.001 --min-seq-id 0.4" % (workdir, workdir))
+	os.system("mmseqs cluster %smmseq2_opf_run/resultDB %smmseq2_opf_run/result_clu \
+%smmseq2_opf_run/tmp -e 0.001 --min-seq-id 0.4" % (workdir, workdir, workdir))
 
 	# Create a target clustered sequence file
-	os.system("mmseqs createseqfiledb %s/mmseq2_opf_run/target_DB \
-%s/mmseq2_opf_run/target_clu %s/mmseq2_opf_run/clu_seq" % (workdir, workdir))
+	os.system("mmseqs createseqfiledb %smmseq2_opf_run/target_DB \
+%smmseq2_opf_run/target_clu %smmseq2_opf_run/clu_seq" % (workdir, workdir, workdir))
 
 	# Create a result clustered sequence file
-	os.system("mmseqs createseqfiledb %s/mmseq2_opf_run/resultDB \
-%s/mmseq2_opf_run/result_clu %s/mmseq2_opf_run/clu_result_seq" % (workdir, workdir))
+	os.system("mmseqs createseqfiledb %smmseq2_opf_run/resultDB \
+%smmseq2_opf_run/result_clu %smmseq2_opf_run/clu_result_seq" % (workdir, workdir, workdir))
 
 	# Create target clustered fasta file
-	os.system("mmseqs result2flat %s/mmseq2_opf_run/target_DB %s/mmseq2_opf_run/target_DB \
-%s/mmseq2_opf_run/clu_seq %s/mmseq2_opf_run/clu_seq.fasta" % 
+	os.system("mmseqs result2flat %smmseq2_opf_run/target_DB %smmseq2_opf_run/target_DB \
+%smmseq2_opf_run/clu_seq %smmseq2_opf_run/clu_seq.fasta" % 
 		(workdir, workdir, workdir, workdir))
 
 	# Create a result clustered fasta file
-	os.system("mmseqs result2flat %s/mmseq2_opf_run/resultDB %s/mmseq2_opf_run/resultDB \
-%s/mmseq2_opf_run/clu_result_seq %s/mmseq2_opf_run/clu_result_seq.fasta" % 
+	os.system("mmseqs result2flat %smmseq2_opf_run/resultDB %smmseq2_opf_run/resultDB \
+%smmseq2_opf_run/clu_result_seq %smmseq2_opf_run/clu_result_seq.fasta" % 
 		(workdir, workdir, workdir, workdir))
 
 	# Create a clustered target sequence tsv file
-	os.system("mmseqs createtsv %s/mmseq2_opf_run/target_DB %s/mmseq2_opf_run/target_DB clu \
-%s/mmseq2_opf_run/clu.tsv" % 
+	os.system("mmseqs createtsv %smmseq2_opf_run/target_DB %smmseq2_opf_run/target_DB clu \
+%smmseq2_opf_run/clu.tsv" % 
 		(workdir, workdir, workdir))
 
 	# Create a clustered result sequence tsv file
-	os.system("mmseqs createtsv %s/mmseq2_opf_run/resultDB %s/mmseq2_opf_run/resultDB clu \
-%s/mmseq2_opf_run/clu_result.tsv" % 
+	os.system("mmseqs createtsv %smmseq2_opf_run/resultDB %smmseq2_opf_run/resultDB clu \
+%smmseq2_opf_run/clu_result.tsv" % 
 		(workdir, workdir, workdir))
 
 
