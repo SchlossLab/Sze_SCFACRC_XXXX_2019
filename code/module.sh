@@ -21,8 +21,9 @@ module load bedtools2/2.20.1
 module load megahit/1.0.6
 module load bedtools2/2.20.1
 module load picard/2.4.1
-module load prodigal/2.6.3
 	# To run picard tools use java -jar $PICARD_JARS/picard.jar <PROGRAM> <commands>
+module load prodigal/2.6.3
+module load diamond/0.8.34
 module load python-anaconda-arc-connect/latest
 
 
