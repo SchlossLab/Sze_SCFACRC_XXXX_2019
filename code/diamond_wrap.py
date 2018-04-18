@@ -33,7 +33,7 @@ def make_diamond_db(opf_fasta_name):
 		os.system("mkdir %sdiamond_analysis" % (workdir))
 
 
-	print("diamond makedb --in %s -d %sdiamond_analysis/reference_db" % 
+	os.system("diamond makedb --in %s -d %sdiamond_analysis/reference_db" % 
 		(opf_fasta_name, workdir))
 
 
