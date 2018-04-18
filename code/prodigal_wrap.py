@@ -2,7 +2,7 @@
 
 # This is re-written python code to accomplish two tasks
 	# Generate ORFs
-	# Get OPFs
+	# Get the OPF groupings
 # Translated Perl from Hannigan ProdigalWrapperLargeFiles.sh and ClusterOPFs.sh program
 
 ############## Internal parameters used by all functions is program ########################
@@ -146,9 +146,9 @@ def run_mmseqs2(mmseq2_dir_path, query_fasta):
 # Run the actual program
 def main(contig_fasta, FileSize, splitLines, temp_folder, mmseq2_dir, query_DB_fasta):
 	
-	#split_files(contig_fasta, FileSize, splitLines, temp_folder)
+	split_files(contig_fasta, FileSize, splitLines, temp_folder)
 
-	#run_prodigal(temp_folder)
+	run_prodigal(temp_folder)
 
 	run_mmseqs2(mmseq2_dir, query_DB_fasta)
 	
