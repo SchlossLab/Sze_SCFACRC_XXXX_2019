@@ -9,15 +9,16 @@
 library(tidyverse)
 
 # Command line input 
-#input <- commandArgs(TRUE)
-#variable_name <- input[1]
+input <- commandArgs(TRUE)
+opf_variable_name <- input[1]
+orf_variable_name <- input[2]
 
 
 # Load in needed data
-opf_metadata <- read_tsv("clu.tsv", col_names = F) %>% 
+opf_metadata <- read_tsv(opf_variable_name, col_names = F) %>% 
   rename(opf_cluster = X1, seq_name = X2) %>% select(-X3)
 
-orf_count_data <- read_tsv("orf_abund.tsv", col_names = F) %>% 
+orf_count_data <- read_tsv(orf_variable_name, col_names = F) %>% 
   rename(total_counts = X1, seq_name = X2, sample_id = X3)
 
 # Create a tidy OPF abundance table
@@ -27,5 +28,5 @@ combined_data <- orf_count_data %>%
   summarise(total_counts = sum(total_counts))
 
 # Write out the data
-write_tsv(combined_data, "opf_shared.tsv")
+write_tsv(combined_data, "data/process/opf_shared.tsv")
 
