@@ -11,6 +11,7 @@ import os, sys, re, argparse
 
 # Import other code with useful functions that will be used
 from qual_trim import create_samples_to_download
+from random import randrange, sample
 
 # Set up working directory
 workdir = "data/raw/"
@@ -85,7 +86,14 @@ REMOVE_DUPLICATES=TRUE" %
 
 
 # Function to create final needed coverage and linkage files for concoct
-def get_cover_and_link(sampleList, contigName, outputName):
+def get_cover_and_link(sampleList, contigName, outputName, proportion_to_sample):
+	# Get total samples in data set
+	total_samples = len(sampleList)
+	# Get proportion of samples from data set
+	sampling_number = round(total_samples * proportion_to_sample)
+	# Randomly sample up to the total proportion of data set to use
+	samples_to_take = sorted(sample(range(1, total_samples), sampling_number))
+
 
 	# execute coverage data command for every sample
 	for bam_file in sampleList:
@@ -101,11 +109,17 @@ def get_cover_and_link(sampleList, contigName, outputName):
 
 	# add each sample to the temp text file
 	print("Creating a temporary sample file for coverage analysis.")
-
+	# Starting coverage counter
+	cov_counter = 1
+	# populates the files that will be taken
 	for sampleN in sampleList:
 
-		cov_file.write("%s%s_%s_final_contigs_coverage.txt" % 
-			(workdir, sampleN, outputName)+'\n')
+		if cov_counter in samples_to_take:
+			cov_file.write("%s%s_%s_final_contigs_coverage.txt" % 
+				(workdir, sampleN, outputName)+'\n')
+		# Moving the counter up
+		cov_counter += 1
+
 	# close the file
 	cov_file.close()
 	
@@ -127,10 +141,18 @@ def get_cover_and_link(sampleList, contigName, outputName):
 	# add each sample to the temp text file
 	print("Creating a temporary sample file for linkage analysis.")
 
+	# Set up linkage counter
+	link_counter = 1
+	# Populate the samples to be taken
 	for bam_file in sampleList:
+		
+		if link_counter in samples_to_take:
 
-		link_file.write("%s%s_%s_sort_rmdup_sort.bam" % 
+			link_file.write("%s%s_%s_sort_rmdup_sort.bam" % 
 			(workdir, bam_file, outputName)+'\n')
+		# Move the counter forward
+		link_counter += 1
+
 	# close the file
 	link_file.close()
 
@@ -152,12 +174,12 @@ def get_cover_and_link(sampleList, contigName, outputName):
 
 
 # Runs the overall program 
-def main(sampleListFile, contigFile, outputEnding):
+def main(sampleListFile, contigFile, outputEnding, sample_proportion):
 	# read in file list from -s call
 	samples_to_be_used = create_samples_to_download(sampleListFile)
-	create_bam_files(samples_to_be_used, contigFile, outputEnding)
-	mark_duplicates(samples_to_be_used, outputEnding)
-	get_cover_and_link(samples_to_be_used, contigFile, outputEnding)
+	# create_bam_files(samples_to_be_used, contigFile, outputEnding)
+	# mark_duplicates(samples_to_be_used, outputEnding)
+	get_cover_and_link(samples_to_be_used, contigFile, outputEnding, sample_proportion)
 
 
 # Upon program call executes these commands automatically
@@ -171,8 +193,11 @@ if __name__ == '__main__':
 		default="%sall_contigs_1kbto10kb" % (workdir), 
 		type=str, help="Combined fasta file name that has the cut contigs. \
 		Ideal is to have them minimum of 1Kb and maximum 10Kb.\n")
+	parser.add_argument("-ps", "--percent_sample", 
+		default=0.25, type=float, help="Proportion of sample set to use. \
+		The tag used is -ps and the default is 0.25.\n")
 	parser.add_argument("-s", "--sam_file_end", 
 		default="contig_1to10kb", type=str, help="Unique Ending of Samfiles\n")
 	args = parser.parse_args()
 	# Runs the main function with the following cmd line arguments ported into it
-	main(args.sample_list, args.contig_file, args.sam_file_end)
+	main(args.sample_list, args.contig_file, args.sam_file_end, args.percent_sample)
