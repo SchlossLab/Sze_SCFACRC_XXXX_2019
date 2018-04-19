@@ -108,7 +108,7 @@ def run_mmseqs2(mmseq2_dir_path, query_fasta):
 %smmseq2_opf_run/resultDB %smmseq2_opf_run/tmp" % (workdir, workdir, workdir, workdir))
 
 
-	Create BLAST formatted file of Result DB (tsv based file)
+	# Create BLAST formatted file of Result DB (tsv based file)
 	os.system("mmseqs convertalis %smmseq2_opf_run/query_DB %smmseq2_opf_run/target_DB \
 %smmseq2_opf_run/resultDB %smmseq2_opf_run/resultDB.m8" % 
 		(workdir, workdir, workdir, workdir))
