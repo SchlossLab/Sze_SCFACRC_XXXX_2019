@@ -177,8 +177,8 @@ def get_cover_and_link(sampleList, contigName, outputName, proportion_to_sample)
 def main(sampleListFile, contigFile, outputEnding, sample_proportion):
 	# read in file list from -s call
 	samples_to_be_used = create_samples_to_download(sampleListFile)
-	# create_bam_files(samples_to_be_used, contigFile, outputEnding)
-	# mark_duplicates(samples_to_be_used, outputEnding)
+	create_bam_files(samples_to_be_used, contigFile, outputEnding)
+	mark_duplicates(samples_to_be_used, outputEnding)
 	get_cover_and_link(samples_to_be_used, contigFile, outputEnding, sample_proportion)
 
 
