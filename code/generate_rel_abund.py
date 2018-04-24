@@ -87,7 +87,7 @@ def get_contig_abundance(sampleList, contig_dict, outputEnd):
 			tempDict[sample_name] = 0
 
 
-		temp_file = open("%s%s_bowtie.sam" % (workdir, sample_id), 'r')
+		temp_file = open("%s%s_all_contig_bowtie.sam" % (workdir, sample_id), 'r')
 
 
 		print("Generating count data for %s" %(sample_id))
