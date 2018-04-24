@@ -100,9 +100,13 @@ def get_cover_and_link(sampleList, contigName, outputName, proportion_to_sample)
 		# get coverage data
 		print("Obtaining coverage data for %s." % (bam_file))
 
-		os.system("genomeCoverageBed -ibam %s%s_%s_sort_rmdup_sort.bam \
+		if bam_file in samples_to_take:
+
+			os.system("genomeCoverageBed -ibam %s%s_%s_sort_rmdup_sort.bam \
 -g %s.fasta > %s%s_%s_final_contigs_coverage.txt" % 
 (workdir, bam_file, outputName, contigName, workdir, bam_file, outputName))
+
+		
 
 	# create a temp text file with the sample names
 	cov_file = open("%stemp_coverage_file_names.txt" % (workdir),'w')
@@ -114,7 +118,7 @@ def get_cover_and_link(sampleList, contigName, outputName, proportion_to_sample)
 	# populates the files that will be taken
 	for sampleN in sampleList:
 
-		if cov_counter in samples_to_take:
+		if sampleN in samples_to_take:
 			cov_file.write("%s%s_%s_final_contigs_coverage.txt" % 
 				(workdir, sampleN, outputName)+'\n')
 		# Moving the counter up
