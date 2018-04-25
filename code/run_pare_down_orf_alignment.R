@@ -24,8 +24,8 @@ temp_align_data <- read_tsv(aligment_file_path, col_names = F) %>%
 opf_shared_data <- read_tsv(opf_file_path)
 
 # generate combined table with only relevent IDs
-combined_data <- opf_shared_data %>% 
-  left_join(temp_align_data, by = c("opf_cluster" = "seq_name")) %>% 
+combined_data <- as.data.frame(opf_shared_data) %>% 
+  left_join(as.data.frame(temp_align_data), by = c("opf_cluster" = "seq_name")) %>% 
   select(sample_id, opf_cluster, sum_counts, total_opf_members, cor_total_counts, gene_id)
 
 
