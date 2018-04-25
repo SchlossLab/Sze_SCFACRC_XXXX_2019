@@ -11,17 +11,17 @@ loadLibs(c("tidyverse"))
 input <- commandArgs(TRUE)
 aligment_file_path <- input[1]
 opf_file_path <- input[2]
-identity_filter <- input[3]
+identity_filter <- as.numeric(input[3])
 
 # Load in needed data and remove those whose sequence ID is less than 50%
 temp_align_data <- read_tsv(aligment_file_path, col_names = F) %>% 
   rename(gene_id = X1, seq_name = X2, seq_id = X3, align_length = X4, mismatch_num = X5, 
          gap_num = X6, domain_start = X7, domain_end = X8, seq_start = X9, seq_start = X10, 
          e_value = X11, bit_score = X12) %>% 
-  filter(seq_id > 0.5)
+  filter(seq_id > identity_filter)
 
 # Load in the opf data
-opf_shared_data <- read_tsv("data/process/opf_shared.tsv")
+opf_shared_data <- read_tsv(opf_file_path)
 
 # generate combined table with only relevent IDs
 combined_data <- opf_shared_data %>% 
