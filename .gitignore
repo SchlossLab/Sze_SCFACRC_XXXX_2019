@@ -11,6 +11,7 @@ data/*/*
 !data/raw/Raw_hplc_files
 !data/raw/scfa_plate_layouts
 !README.md
+data/process/orf_gene_alignment.tsv
 
 
 *.qsub*
