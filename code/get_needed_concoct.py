@@ -118,8 +118,11 @@ def get_cover_and_link(sampleList, contigName, outputName, proportion_to_sample)
 	# create a temp text file with the sample names
 	cov_file = open("%stemp_coverage_file_names.txt" % (workdir),'w')
 
+	# create a temp text file with the sample names
+	link_file = open("%stemp_linkage_file_names.txt" % (workdir),'w')
+
 	# add each sample to the temp text file
-	print("Creating a temporary sample file for coverage analysis.")
+	print("Creating a temporary sample file for coverage and linkage analysis.")
 
 	# populates the files that will be taken
 	for sampleN in sampleList:
@@ -129,8 +132,14 @@ def get_cover_and_link(sampleList, contigName, outputName, proportion_to_sample)
 			cov_file.write("%s%s_%s_final_contigs_coverage.txt" % 
 				(workdir, sampleN, outputName)+'\n')
 
+			link_file.write("%s%s_%s_sort_rmdup_sort.bam" % 
+				(workdir, sampleN, outputName)+'\n')
+
 	# close the file
 	cov_file.close()
+
+	# close the file
+	link_file.close()
 
 	# creates the coverage table
 	print("Creating coverage table.")
@@ -143,34 +152,23 @@ def get_cover_and_link(sampleList, contigName, outputName, proportion_to_sample)
 %soverall_coverage_table.tsv" % 
 (workdir, contigName, workdir, samples_to_keep, workdir))
 
+	# Remove the unneeded bam files
+	for rm_files in sampleList:
 
-	# create a temp text file with the sample names
-	link_file = open("%stemp_linkage_file_names.txt" % (workdir),'w')
+		if rm_files not in samples_to_keep:
 
-	# add each sample to the temp text file
-	print("Creating a temporary sample file for linkage analysis.")
-
-	# Populate the samples to be taken
-	for bam_file in sampleList:
-		
-		if bam_file in samples_to_keep:
-
-			link_file.write("%s%s_%s_sort_rmdup_sort.bam" % 
-			(workdir, bam_file, outputName)+'\n')
-
-	# close the file
-	link_file.close()
+			os.system("rm %s%s_%s_sort_rmdup_sort.bam" % (workdir, rm_files, contigName))
 
 
 	# creates the linkage table
 	print("Creating linkage table.")
 
-	os.system("python2 /sw/med/centos7/concoct/0.4.1/bin/bam_to_linkage.py \
+	print("python2 /sw/med/centos7/concoct/0.4.1/bin/bam_to_linkage.py \
 -m 8 --regionlength 500 \
 --fullsearch --samplenames %stemp_linkage_file_names.txt \
 %s.fasta \
-%s%s_%s_sort_rmdup_sort.bam > %soverall_linkage_table.tsv" % 
-(workdir, contigName, workdir, samples_to_keep, outputName, workdir))
+%s*_%s_sort_rmdup_sort.bam > %soverall_linkage_table.tsv" % 
+(workdir, contigName, workdir, outputName, workdir))
 
 	# Remove the temporary sample text file
 	os.system("rm %stemp_coverage_file_names.txt" % (workdir))
