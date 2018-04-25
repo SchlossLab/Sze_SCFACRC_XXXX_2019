@@ -93,14 +93,21 @@ def get_cover_and_link(sampleList, contigName, outputName, proportion_to_sample)
 	sampling_number = round(total_samples * proportion_to_sample)
 	# Randomly sample up to the total proportion of data set to use
 	samples_to_take = sorted(sample(range(1, total_samples), sampling_number))
+	# Set up the empty list for storage
+	samples_to_keep = []
+	# Get the needed randomly selected samples
+	for i in samples_to_take:
+
+		samples_to_keep.append(sampleList[i])
 
 
 	# execute coverage data command for every sample
 	for bam_file in sampleList:
-		# get coverage data
-		print("Obtaining coverage data for %s." % (bam_file))
 
-		if bam_file in samples_to_take:
+		if bam_file in samples_to_keep:
+
+			# get coverage data
+			print("Obtaining coverage data for %s." % (bam_file))
 
 			os.system("genomeCoverageBed -ibam %s%s_%s_sort_rmdup_sort.bam \
 -g %s.fasta > %s%s_%s_final_contigs_coverage.txt" % 
@@ -113,20 +120,18 @@ def get_cover_and_link(sampleList, contigName, outputName, proportion_to_sample)
 
 	# add each sample to the temp text file
 	print("Creating a temporary sample file for coverage analysis.")
-	# Starting coverage counter
-	cov_counter = 1
+
 	# populates the files that will be taken
 	for sampleN in sampleList:
 
-		if sampleN in samples_to_take:
+		if sampleN in samples_to_keep:
+			
 			cov_file.write("%s%s_%s_final_contigs_coverage.txt" % 
 				(workdir, sampleN, outputName)+'\n')
-		# Moving the counter up
-		cov_counter += 1
 
 	# close the file
 	cov_file.close()
-	
+
 	# creates the coverage table
 	print("Creating coverage table.")
 
@@ -134,9 +139,9 @@ def get_cover_and_link(sampleList, contigName, outputName, proportion_to_sample)
 --isbedfiles \
 --samplenames %stemp_coverage_file_names.txt \
 %s.fasta \
-%s*_final_contigs_coverage.txt > \
+%s%s_final_contigs_coverage.txt > \
 %soverall_coverage_table.tsv" % 
-(workdir, contigName, workdir, workdir))
+(workdir, contigName, workdir, samples_to_keep, workdir))
 
 
 	# create a temp text file with the sample names
@@ -145,17 +150,13 @@ def get_cover_and_link(sampleList, contigName, outputName, proportion_to_sample)
 	# add each sample to the temp text file
 	print("Creating a temporary sample file for linkage analysis.")
 
-	# Set up linkage counter
-	link_counter = 1
 	# Populate the samples to be taken
 	for bam_file in sampleList:
 		
-		if link_counter in samples_to_take:
+		if bam_file in samples_to_keep:
 
 			link_file.write("%s%s_%s_sort_rmdup_sort.bam" % 
 			(workdir, bam_file, outputName)+'\n')
-		# Move the counter forward
-		link_counter += 1
 
 	# close the file
 	link_file.close()
@@ -168,8 +169,8 @@ def get_cover_and_link(sampleList, contigName, outputName, proportion_to_sample)
 -m 8 --regionlength 500 \
 --fullsearch --samplenames %stemp_linkage_file_names.txt \
 %s.fasta \
-%s*_%s_sort_rmdup_sort.bam > %soverall_linkage_table.tsv" % 
-(workdir, contigName, workdir, outputName, workdir))
+%s%s_%s_sort_rmdup_sort.bam > %soverall_linkage_table.tsv" % 
+(workdir, contigName, workdir, samples_to_keep, outputName, workdir))
 
 	# Remove the temporary sample text file
 	os.system("rm %stemp_coverage_file_names.txt" % (workdir))
