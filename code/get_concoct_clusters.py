@@ -31,9 +31,11 @@ refdir = "data/references/"
 # "data/raw/overall_coverage_table.tsv"
 
 
-def create_concoct_clusters(contigfile, coveragefile, outputName):
+def create_concoct_clusters(contigfile, coveragefile, outputName, threading):
 
-	os.system("concoct \
+	if threading == "Yes":
+
+		os.system("concoct \
 --coverage_file %s \
 --composition_file %s \
 --clusters 500 \
@@ -42,6 +44,21 @@ def create_concoct_clusters(contigfile, coveragefile, outputName):
 --read_length 150 \
 --num-threads 10 \
 --basename %s" % (coveragefile, contigfile, outputName))
+
+	else:
+
+		os.system("concoct \
+--coverage_file %s \
+--composition_file %s \
+--clusters 500 \
+--kmer_length 4 \
+--length_threshold 1000 \
+--read_length 150 \
+--basename %s" % (coveragefile, contigfile, outputName))
+
+
+
+
 
 
 
@@ -70,9 +87,10 @@ def create_concoct_clusters(contigfile, coveragefile, outputName):
 
 
 # Runs the overall program 
-def main(contigfileName, coveragetableName, outputDirectoryName):
+def main(contigfileName, coveragetableName, outputDirectoryName, threadingCall):
 
-	create_concoct_clusters(contigfileName, coveragetableName, outputDirectoryName)
+	create_concoct_clusters(contigfileName, coveragetableName, 
+		outputDirectoryName, threadingCall)
 
 	
 
@@ -94,7 +112,12 @@ if __name__ == '__main__':
 		default="%sconcoct_output/" % (workdir), 
 		type=str, help="File where concoct ouput goes. \
 		The default is set to 'data/raw/concoct_output/'.\n")
+	parser.add_argument("-t", "--threading", 
+		default="Yes", 
+		type=str, help="Logical as to whether or not to \
+		include threading or not. \
+		The default is set to 'Yes'.\n")
 	args = parser.parse_args()
 
 	# Runs the main function with the following cmd line arguments ported into it
-	main(args.contig_table, args.coverage_table, args.output_file)
+	main(args.contig_table, args.coverage_table, args.output_file, args.threading)
