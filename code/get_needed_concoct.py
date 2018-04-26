@@ -163,7 +163,7 @@ def get_cover_and_link(sampleList, contigName, outputName, proportion_to_sample)
 	# creates the linkage table
 	print("Creating linkage table.")
 
-	print("python2 /sw/med/centos7/concoct/0.4.1/bin/bam_to_linkage.py \
+	os.system("python2 /sw/med/centos7/concoct/0.4.1/bin/bam_to_linkage.py \
 -m 8 --regionlength 500 \
 --fullsearch --samplenames %stemp_linkage_file_names.txt \
 %s.fasta \
