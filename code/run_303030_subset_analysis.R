@@ -53,11 +53,21 @@ filtered_df <- as.data.frame(select(test, -sample_id))
 # Filter out the genes with near zero variance from the final data frame
 filtered_df <- filtered_df[, -nzv]
 
+# Create Correlation network
+descrCor <- cor(select(filtered_df, -disease))
+# Find and remove variables with a high correlation to each other
+highlyCorDescr <- findCorrelation(descrCor, cutoff = .90)
+
+filtered_df <- filtered_df[, -highlyCorDescr] %>% 
+  mutate(sample_id = test$sample_id, 
+         disease = filtered_df$disease) %>% 
+  select(sample_id, disease, everything())
+
+filtered_df <- filtered_df %>% 
+  gather("opf_cluster", "corr_count", 3:length(colnames(filtered_df)))
 
 
-
-
-
+write_tsv(filtered_df, "data/process/reduced_opf_shared.tsv")
 
 
 
