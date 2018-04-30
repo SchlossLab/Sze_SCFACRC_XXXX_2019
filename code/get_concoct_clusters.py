@@ -30,7 +30,7 @@ refdir = "data/references/"
 # "data/raw/all_contigs_1kbto10kb.fasta" 
 # "data/raw/overall_coverage_table.tsv"
 
-
+# Create a function that generates the contig clusters
 def create_concoct_clusters(contigfile, coveragefile, outputName, threading):
 
 	if threading == "Yes":
@@ -56,7 +56,11 @@ def create_concoct_clusters(contigfile, coveragefile, outputName, threading):
 --read_length 150 \
 --basename %s" % (coveragefile, contigfile, outputName))
 
+
+# Updates the clusters based on linkage analysis (if available)
 def run_linkage_analysis(concoct_file_path, linkage_table, coverage_table):
+
+	# THis throws a divide by 0 error and might be due to only using a subset of the data
 
 	os.system("perl /sw/med/centos7/concoct/0.4.1/bin/ClusterLinkNOverlap.pl \
 --cfile=%sclustering_gt1000.csv \
@@ -67,32 +71,14 @@ def run_linkage_analysis(concoct_file_path, linkage_table, coverage_table):
 
 
 
-# Incorporate linkage with hierarchical clustering
-# example: os.system("python2 /sw/med/centos7/concoct/0.4.1/bin/gen_input_table.py
-#perl /share/apps/rhel6/concoct/0.4.0/scripts/ClusterLinkNOverlap.pl 
-#--cfile=${metagenome}.concoct_output/clustering_gt1000.csv 
-#--lfile=${metagenome}.linkagetable.tsv 
-#--covfile=${metagenome}.coveragetable.tsv 
-#--ofile=${metagenome}.concoct_output/clustering_gt1000_link.csv
-
-# Bin clustered contigs into separate fasta files
-#cd ${metagenome}.concoct_output
-#python /home/mljenior/scripts/bin_contigs.py ../{metagenome}.final.contigs.1k.10k.fa clustering_gt1000.csv
-#cd binned_contigs
-#find . -size -1000k -delete
-#for x in *.fasta; do python /mnt/EXT/Schloss-data/bin/seq_stats.py $x > $x.summary; done
-
-
-
-
 # Runs the overall program 
 def main(contigfileName, coveragetableName, 
 	linkagetableName, outputDirectoryName, threadingCall):
 
-	#create_concoct_clusters(contigfileName, coveragetableName, 
-	#	outputDirectoryName, threadingCall)
+	create_concoct_clusters(contigfileName, coveragetableName, 
+		outputDirectoryName, threadingCall)
 
-	run_linkage_analysis(outputDirectoryName, linkagetableName, coveragetableName)
+	#run_linkage_analysis(outputDirectoryName, linkagetableName, coveragetableName)
 
 
 # Initializes at the start of the program
