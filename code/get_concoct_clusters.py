@@ -56,20 +56,19 @@ def create_concoct_clusters(contigfile, coveragefile, outputName, threading):
 --read_length 150 \
 --basename %s" % (coveragefile, contigfile, outputName))
 
+def run_linkage_analysis(concoct_file_path, linkage_table, coverage_table):
+
+	os.system("perl /sw/med/centos7/concoct/0.4.1/bin/ClusterLinkNOverlap.pl \
+--cfile=%sclustering_gt1000.csv \
+--lfile=%s \
+--covfile=%s \
+--ofile=%s/clustering_gt1000_link.csv" % 
+		(concoct_file_path, linkage_table, coverage_table, concoct_file_path))
 
 
-
-
-
-
-
-# Matt way
-#/share/apps/rhel6/concoct/0.4.0/bin/concoct 
-#-c 400 --coverage_file ${metagenome}.coveragetable.tsv 
-#--composition_file ${metagenome}.final.contigs.1k.10k.fa 
-#-b ${metagenome}.concoct_output/
 
 # Incorporate linkage with hierarchical clustering
+# example: os.system("python2 /sw/med/centos7/concoct/0.4.1/bin/gen_input_table.py
 #perl /share/apps/rhel6/concoct/0.4.0/scripts/ClusterLinkNOverlap.pl 
 #--cfile=${metagenome}.concoct_output/clustering_gt1000.csv 
 #--lfile=${metagenome}.linkagetable.tsv 
@@ -87,12 +86,13 @@ def create_concoct_clusters(contigfile, coveragefile, outputName, threading):
 
 
 # Runs the overall program 
-def main(contigfileName, coveragetableName, outputDirectoryName, threadingCall):
+def main(contigfileName, coveragetableName, 
+	linkagetableName, outputDirectoryName, threadingCall):
 
-	create_concoct_clusters(contigfileName, coveragetableName, 
-		outputDirectoryName, threadingCall)
+	#create_concoct_clusters(contigfileName, coveragetableName, 
+	#	outputDirectoryName, threadingCall)
 
-	
+	run_linkage_analysis(outputDirectoryName, linkagetableName, coveragetableName)
 
 
 # Initializes at the start of the program
@@ -108,6 +108,10 @@ if __name__ == '__main__':
 		default="%soverall_coverage_table.tsv" % (workdir), 
 		type=str, help="Overall coverage table. \
 		The default is set to 'overall_coverage_table.tsv'.\n")
+	parser.add_argument("-lin", "--linkage_table", 
+		default="%soverall_linkage_table.tsv" % (workdir), 
+		type=str, help="Overall linkage table. \
+		The default is set to 'overall_linkage_table.tsv'.\n")
 	parser.add_argument("-of", "--output_file", 
 		default="%sconcoct_output/" % (workdir), 
 		type=str, help="File where concoct ouput goes. \
@@ -120,4 +124,5 @@ if __name__ == '__main__':
 	args = parser.parse_args()
 
 	# Runs the main function with the following cmd line arguments ported into it
-	main(args.contig_table, args.coverage_table, args.output_file, args.threading)
+	main(args.contig_table, args.coverage_table, 
+		args.linkage_table, args.output_file, args.threading)
