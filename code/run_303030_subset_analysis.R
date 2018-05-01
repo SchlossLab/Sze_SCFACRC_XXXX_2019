@@ -53,21 +53,34 @@ filtered_df <- as.data.frame(select(test, -sample_id))
 # Filter out the genes with near zero variance from the final data frame
 filtered_df <- filtered_df[, -nzv]
 
-# Create Correlation network
-descrCor <- cor(select(filtered_df, -disease))
-# Find and remove variables with a high correlation to each other
-highlyCorDescr <- findCorrelation(descrCor, cutoff = .90)
+# Remove ambiguous clusters
+filtered_df <- filtered_df %>% select(-Prodigal_Seq_11_1, -Prodigal_Seq_20_1, -SRR56_1, -SRR566_1)
 
-filtered_df <- filtered_df[, -highlyCorDescr] %>% 
-  mutate(sample_id = test$sample_id, 
-         disease = filtered_df$disease) %>% 
+# gather the columns back together
+filtered_df <- filtered_df %>% 
+  mutate(sample_id = test$sample_id) %>% 
   select(sample_id, disease, everything())
 
 filtered_df <- filtered_df %>% 
-  gather("opf_cluster", "corr_count", 3:length(colnames(filtered_df)))
+  gather("opf_cluster", "corr_counts", 3:length(colnames(filtered_df)))
 
+# Save memory and remove uneeded data
+rm(greater_than_1_count, in_more_than_1_individual, test, opf_data)
 
-write_tsv(filtered_df, "data/process/reduced_opf_shared.tsv")
+# Run a kruskal test to find differences between specific genes
+test <- filtered_df %>% 
+  mutate(disease = factor(disease, 
+                          levels = c("Healthy", "Adenoma", "Cancer"), 
+                          labels = c("Normal", "Adenoma", "Cancer"))) %>% 
+  group_by(opf_cluster) %>% 
+  nest() %>% 
+  mutate(kruskal_analysis = map(data, ~kruskal.test(corr_counts ~ disease, data = .x)), 
+         summary_data = map(kruskal_analysis, broom::tidy)) %>% 
+  select(opf_cluster, summary_data) %>% 
+  unnest(summary_data) %>% 
+  select(opf_cluster, method, parameter, statistic, p.value) %>% 
+  mutate(bh = p.adjust(p.value, method = "fdr")) %>% 
+  arrange(p.value)
 
 
 
