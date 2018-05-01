@@ -79,7 +79,7 @@ test <- filtered_df %>%
   select(opf_cluster, summary_data) %>% 
   unnest(summary_data) %>% 
   select(opf_cluster, method, parameter, statistic, p.value) %>% 
-  mutate(bh = p.adjust(p.value, method = "bh")) %>% 
+  mutate(bh = p.adjust(p.value, method = "BH")) %>% 
   arrange(p.value)
 
 
