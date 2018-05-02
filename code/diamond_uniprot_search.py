@@ -127,7 +127,7 @@ if __name__ == '__main__':
 		type=bool, help="Flag to determine if full database is to be used or not. \
 		The default is to use the swiss-prot rather than the TREMBL. \
 		The default value is thus 'False'.\n")
-	parser.add_argument("-0", "--output_file", 
+	parser.add_argument("-o", "--output_file", 
 		default="data/process/sig_dunn_protein_matches.tsv", 
 		type=str, help="A tsv file of protein matches from the uniprot database. \
 		The default file used for the output to be saved under is \
