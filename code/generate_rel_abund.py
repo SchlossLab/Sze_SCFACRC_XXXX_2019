@@ -168,9 +168,9 @@ def main(sampleListFile, contigFile, refFile, contigSizeLimit, outputEnding):
 	# read in file list from -s call
 	samples_to_be_used = create_samples_to_download(sampleListFile)
 	# # create a bowtie reference with the -c and -r input calls
-	# make_ref_file(contigFile, refFile)
+	make_ref_file(contigFile, refFile)
 	# # # run alignment call with -r and -o input calls
-	# run_alignment(samples_to_be_used, refFile, outputEnding)	
+	run_alignment(samples_to_be_used, refFile, outputEnding)	
 	# generate contig names based on the -c input call
 	contig_length_dict = create_contig_dict(contigFile, contigSizeLimit)
 	# create contig abundance tables with the -o input call
