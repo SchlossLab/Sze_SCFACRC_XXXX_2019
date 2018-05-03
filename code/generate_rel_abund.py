@@ -44,17 +44,19 @@ def run_alignment(sampleList, referencePath, outputEnding):
 
 
 # Function to create a dictionary with the lengths of the contigs 
-def create_contig_dict(contigPath):
+def create_contig_dict(contigPath, size_limit_used):
 
 	print("Generating names for contig dictionary")
 
 	tempDict = {}
+	tempName = []
+	temp_length = []
 
 	temp_file = open("%s" % (contigPath), 'r')
-
+	# Parse each line of the contig file
 	for line in temp_file:
-
-		if ">" in line:
+		# This is performed if using the defaults without any size selection
+		if ">" in line and size_limit_used == False:
 
 			all_info = line.split(" ")
 
@@ -64,12 +66,34 @@ def create_contig_dict(contigPath):
 
 			tempDict[tempName] = temp_length
 
+		# From here beyond is done if the contig file has a size selection included
+		elif ">" in line and size_limit_used == True:
 
-	temp_file.close()
+			tempName.append(line.strip('>\n')) 
+
+		elif ">" not in line and size_limit_used == True:
+
+			x = 1
+
+			for nucleotide in line:
+
+				x +=1
+
+			temp_length.append(x) 
+
+	
+	if size_limit_used == True:
+
+		for i, contig in enumerate(tempName):
+
+			tempDict[contig] = temp_length[i]
 
 	print("Completed grabbing length of contigs and dictionary creation")
 
-	return tempDict
+	temp_file.close()
+
+
+	return(tempDict)
 
 
 
@@ -140,15 +164,15 @@ def get_contig_abundance(sampleList, contig_dict, outputEnd):
 		
 
 # Runs the overall program 
-def main(sampleListFile, contigFile, refFile, outputEnding):
+def main(sampleListFile, contigFile, refFile, contigSizeLimit, outputEnding):
 	# read in file list from -s call
 	samples_to_be_used = create_samples_to_download(sampleListFile)
-	# create a bowtie reference with the -c and -r input calls
-	make_ref_file(contigFile, refFile)
-	# run alignment call with -r and -o input calls
-	run_alignment(samples_to_be_used, refFile, outputEnding)	
+	# # create a bowtie reference with the -c and -r input calls
+	# make_ref_file(contigFile, refFile)
+	# # # run alignment call with -r and -o input calls
+	# run_alignment(samples_to_be_used, refFile, outputEnding)	
 	# generate contig names based on the -c input call
-	contig_length_dict = create_contig_dict(contigFile)
+	contig_length_dict = create_contig_dict(contigFile, contigSizeLimit)
 	# create contig abundance tables with the -o input call
 	get_contig_abundance(samples_to_be_used, contig_length_dict, outputEnding)
 
@@ -159,7 +183,10 @@ if __name__ == '__main__':
 	parser.add_argument("-s", "--sample_list", default="%swhole_metagenome_samples.txt" % (workdir), type=str, help="Text file with list of samples\n")
 	parser.add_argument("-c", "--contig_file", default="%sall_contigs.fasta" % (workdir), type=str, help="Combined contig fasta file\n")
 	parser.add_argument("-r", "--reference", default="%sbowtieReference" % (workdir), type=str, help="Bowtie2 Reference file name\n")
+	parser.add_argument("-sl", "--size_limit", default=False, 
+		type=bool, help="Whether contig fasta file is size limited or not. \
+		The default is that there is no size limitation (e.g. 'False'). \n")
 	parser.add_argument("-o", "--output", default="all_contig", type=str, help="Universal output file ending (outputs in tab format)\n")
 	args = parser.parse_args()
 	# Runs the main function with the following cmd line arguments ported into it
-	main(args.sample_list, args.contig_file, args.reference, args.output)
+	main(args.sample_list, args.contig_file, args.reference, args.size_limit, args.output)
