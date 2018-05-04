@@ -9,6 +9,8 @@ source('code/functions.R')
 # Load needed libraries
 loadLibs(c("tidyverse", "biomformat", "caret", "FSA"))
 
+library(KEGGREST)
+
 
 # Load in needed metadata and rename sample column
 picrust_meta <- read_tsv("data/process/picrust_metadata") %>% 
@@ -64,9 +66,9 @@ kruskal_test <- cross_sectional_data %>%
 
 
 # Run a dunn's test post-hoc to find which components are most significant 
-# Used an BH cutoff of 0.05 
+# Used an pvalue cutoff of 0.05 to be more lenient 
 picrust_genes <- kruskal_test %>% 
-  filter(bh < 0.05) %>% 
+  filter(p.value < 0.05) %>% 
   pull(kegg_ortholog)
 
 dunn_test <- cross_sectional_data %>% 
@@ -80,15 +82,98 @@ dunn_test <- cross_sectional_data %>%
 
 dunn_testing <- dunn_test %>% select(kegg_ortholog, dunn_analysis) %>% unnest()
 
+
+# Find consistent directions
+all_neg <- dunn_testing %>% group_by(kegg_ortholog) %>% 
+  count(fulfills_req = Z < 0) %>% 
+  filter(n == 3 & fulfills_req == TRUE) %>% 
+  pull(kegg_ortholog)
+
+all_pos <- dunn_testing %>% group_by(kegg_ortholog) %>% 
+  count(fulfills_req = Z > 0) %>% 
+  filter(n == 3 & fulfills_req == TRUE) %>% 
+  pull(kegg_ortholog)
+
+direction_consistent_dunn <- dunn_testing %>% 
+  filter(kegg_ortholog %in% c(all_neg, all_pos))
+
+# Pull only those that have at least 2 out of 3 significant comparisons
+sig_comparisons <- direction_consistent_dunn %>% 
+  group_by(kegg_ortholog) %>% 
+  count(fulfills_req = P.adj < 0.05) %>% 
+  filter(n >= 2 & fulfills_req == TRUE) %>% 
+  pull(kegg_ortholog)
+
+sig_dir_consistent_dunn <- direction_consistent_dunn %>% 
+  filter(kegg_ortholog %in% sig_comparisons)
+
+
+# Find only those that have carcinoma and adenoma different versus normal
+specific_sig_comparisons <- sig_dir_consistent_dunn %>% 
+  group_by(kegg_ortholog) %>% 
+  filter(Comparison == "Adenoma - Normal" | Comparison == "Cancer - Normal") %>% 
+  count(fulfills_req = P.adj < 0.05) %>% 
+  filter(n == 2 & fulfills_req == TRUE) %>% 
+  pull(kegg_ortholog)
+
+
+specific_sig_dir_cons_dunn <- sig_dir_consistent_dunn %>% 
+  filter(kegg_ortholog %in% specific_sig_comparisons)
+
+
 # Save the resulting tables for both the kruskal-wallis and dunn's post hoc test
 write_csv(kruskal_test, "data/process/picrust_kruskal_summary.csv")
 write_csv(dunn_testing, "data/process/picrust_dunns_post_hoc_summary.csv")
 
 
+# Identify the Kegg orthologs
+
+##############################################################################################
+############### List of functions to get things to run nice ##################################
+##############################################################################################
+
+
+# Function to do the actual data pulling
+pull_respective_kegg_data <- function(ID_of_int){
+  
+  tempKEGG <- try(keggGet(ID_of_int))
+  
+  tempEntry <- data_frame(kegg_id = try(unname(tempKEGG[[1]]$ENTRY)), 
+          gene = try(tempKEGG[[1]]$NAME), 
+          full_gene = try(paste(unname(tempKEGG[[1]]$PATHWAY), "_", 
+                                collapse = "", sep = "")), 
+          ortholog = try(paste(names(tempKEGG[[1]]$PATHWAY), "_", collapse = "", sep = "")))
+  
+  if(length(tempEntry) <= 1){
+    
+    tempEntry <- data_frame(kegg_id = ID_of_int, gene = NA, full_gene = NA, ortholog = NA)
+  }
+  
+  print(paste("Completed processing KEGG ID: ", ID_of_int, sep = ""))
+  
+  
+  
+  return(tempEntry)
+}
 
 
 
+##############################################################################################
+############### Run the actual programs to get the data ######################################
+##############################################################################################
 
+
+kegg_ids_of_int <- dunn_testing %>% 
+  group_by(kegg_ortholog) %>% 
+  nest() %>% 
+  mutate(test = map(kegg_ortholog, function(x) pull_respective_kegg_data(x))) %>% 
+  select(kegg_ortholog, test) %>% 
+  unnest(test)
+  # Note K00534 is the only gene that is up in both adenoma and carcinoma based in the same direction
+
+pull_respective_kegg_data("K03851")
+
+unlist(kegg_ids_of_int$test)
 
 
 
