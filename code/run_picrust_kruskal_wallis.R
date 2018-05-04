@@ -3,12 +3,11 @@
 ### Marc Sze
 
 
-
 # Load in needed functions and libraries
 source('code/functions.R')
 
 # Load needed libraries
-loadLibs(c("tidyverse", "biomformat", "caret"))
+loadLibs(c("tidyverse", "biomformat", "caret", "FSA"))
 
 
 # Load in needed metadata and rename sample column
@@ -39,9 +38,51 @@ nzv <- nearZeroVar(full_pi_data)
 nzv_full_pi_data <- full_pi_data[, -nzv]
 
 
-##############################################################################################
-############### List of functions to get things to run nice ##################################
-##############################################################################################
+# Use only cross-sectional data and add the needed meta data
+cross_sectional_data <- nzv_full_pi_data %>% 
+  filter(!(sample_id %in% c(metaF$initial, metaF$followUp))) %>% 
+  left_join(picrust_meta, by = c("sample_id" = "Group")) %>% 
+  select(sample_id, Dx_Bin, dx, everything()) %>% 
+  select(-fit_result) %>% 
+  gather("kegg_ortholog", "rel_abund", 4:length(colnames(.)))
+  
+
+# Run the Kruskal-wallis analysis
+kruskal_test <- cross_sectional_data %>% 
+  group_by(kegg_ortholog) %>% 
+  mutate(dx = factor(dx, 
+                     levels = c("normal", "adenoma", "cancer"), 
+                     labels = c("Normal", "Adenoma", "Cancer"))) %>% 
+  nest() %>% 
+  mutate(kruskal_analysis = map(data, ~kruskal.test(rel_abund ~ dx, data = .x)), 
+         summary_data = map(kruskal_analysis, broom::tidy)) %>% 
+  select(kegg_ortholog, summary_data) %>% 
+  unnest(summary_data) %>% 
+  select(kegg_ortholog, method, parameter, statistic, p.value) %>% 
+  mutate(bh = p.adjust(p.value, method = "BH")) %>% 
+  arrange(p.value)
+
+
+# Run a dunn's test post-hoc to find which components are most significant 
+# Used an BH cutoff of 0.05 
+picrust_genes <- kruskal_test %>% 
+  filter(bh < 0.05) %>% 
+  pull(kegg_ortholog)
+
+dunn_test <- cross_sectional_data %>% 
+  mutate(dx = factor(dx, 
+                     levels = c("normal", "adenoma", "cancer"), 
+                     labels = c("Normal", "Adenoma", "Cancer"))) %>% 
+  filter(kegg_ortholog %in% picrust_genes) %>% 
+  group_by(kegg_ortholog) %>% 
+  nest() %>% 
+  mutate(dunn_analysis = map(data, ~dunnTest(rel_abund ~ dx, data = .x, method = "bh")[["res"]])) 
+
+dunn_testing <- dunn_test %>% select(kegg_ortholog, dunn_analysis) %>% unnest()
+
+# Save the resulting tables for both the kruskal-wallis and dunn's post hoc test
+write_csv(kruskal_test, "data/process/picrust_kruskal_summary.csv")
+write_csv(dunn_testing, "data/process/picrust_dunns_post_hoc_summary.csv")
 
 
 
@@ -63,9 +104,6 @@ nzv_full_pi_data <- full_pi_data[, -nzv]
 
 
 
-##############################################################################################
-############### Run the actual programs to get the data ######################################
-##############################################################################################
 
 
 
