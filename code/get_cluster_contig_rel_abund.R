@@ -23,6 +23,9 @@ option_list = list(
 opt_parser = OptionParser(option_list=option_list)
 command_line_input = parse_args(opt_parser)
 
+# Unzip needed files
+system(paste("gunzip ", command_line_input[["initial_abundance_file"]], ".gz", sep = ""), intern = TRUE, ignore.stderr = TRUE)
+
 # Read contig clustering data
 cluster_data <- read_csv(command_line_input[["cluster_file"]], col_names = F) %>% 
   rename(contig = X1, cluster_group = X2)
@@ -50,6 +53,9 @@ final_abund_data <- corr_adund_data %>%
 
 # Write out the corrected abundnace table
 write_csv(final_abund_data, command_line_input[["output_file"]])
+
+# Gzip back up used file
+system(paste("gzip ", command_line_input[["initial_abundance_file"]], sep = ""), intern = TRUE, ignore.stderr = TRUE)
 
 
 
