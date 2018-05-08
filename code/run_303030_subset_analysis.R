@@ -154,6 +154,8 @@ write_csv(kruskal_test, "data/process/opf_kruskal_analysis.csv")
 
 write_csv(ordered_sp_sig_dir_cons_dunn, "data/process/opf_dunn_select_results.csv")
 
+write_csv(dunn_testing, "data/process/opf_all_dunn_results.csv")
+
 
 
 
