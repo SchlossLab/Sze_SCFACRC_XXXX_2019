@@ -110,64 +110,78 @@ def get_contig_abundance(sampleList, contig_dict, outputEnd):
 
 			tempDict[sample_name] = 0
 
-
-		temp_file = open("%s%s_all_contig_bowtie.sam" % (workdir, sample_id), 'r')
-
-
 		print("Generating count data for %s" %(sample_id))
 
-		for line in temp_file:
-			# regex line matching (taken from Geof perl code)
-			if re.match('^@[A-Z]{2}', line) is None:
+		try:
 
-				all_info = line.split('\t')
+			temp_file = open("%s%s_%s_bowtie.sam" % 
+				(workdir, sample_id, outputEnd), 'r')
+				
+			for line in temp_file:
+				# regex line matching (taken from Geof perl code)
+				if re.match('^@[A-Z]{2}', line) is None:
 
-				test = all_info[2]
+					all_info = line.split('\t')
 
-				if test in tempDict:
+					test = all_info[2]
 
-					tempDict[test] += 1
+					if test in tempDict:
+
+						tempDict[test] += 1
 
 		
-		temp_file.close()	
+			temp_file.close()
 
-		print("Writing count data for %s" %(sample_id))
+		except IOError:
 
-		# Opens the necessary summary file
-		write_file = open("%s%s_%s_rel_abund.tsv" % 
-			(workdir, sample_id, outputEnd),'w')
-		# Counter
-		x = 0
-		# Iterates through every sample 
-		for sample_name in countNames:
-			# Checks if it is the first sample
-			if x == 0:
-				# Adds header and sample counts
-				write_file.write("sample_name"+'\t'+"contig"+'\t'+ \
-					"contig_length"+'\t'+"count"+'\n'+ \
-					sample_id+'\t'+sample_name+'\t'+ \
-					str(contig_dict[sample_name])+'\t'+ \
-					str(tempDict[sample_name])+'\n')
+			print("No final sam file found, skipping %s%s_%s_bowtie.sam" % 
+				(workdir, sample_id, outputEnd))
 
-			else:
-				# Adds only sample counts
-				write_file.write(sample_id+'\t'+ \
-					sample_name+'\t'+str(contig_dict[sample_name])+'\t'+ \
-					str(tempDict[sample_name])+'\n')
+		try:
 
-			# adds to count
-			x += 1
-		# Clost the file
-		write_file.close()
+			print("Writing count data for %s" %(sample_id))
 
-		print("Finished counting for %s" %(sample_id))
+			# Opens the necessary summary file
+			write_file = open("%s%s_%s_rel_abund.tsv" % 
+				(workdir, sample_id, outputEnd),'w')
+			# Counter
+			x = 0
+			# Iterates through every sample 
+			for sample_name in countNames:
+				# Checks if it is the first sample
+				if x == 0:
+					# Adds header and sample counts
+					write_file.write("sample_name"+'\t'+"contig"+'\t'+ \
+						"contig_length"+'\t'+"count"+'\n'+ \
+						sample_id+'\t'+sample_name+'\t'+ \
+						str(contig_dict[sample_name])+'\t'+ \
+						str(tempDict[sample_name])+'\n')
+
+				else:
+					# Adds only sample counts
+					write_file.write(sample_id+'\t'+ \
+						sample_name+'\t'+str(contig_dict[sample_name])+'\t'+ \
+						str(tempDict[sample_name])+'\n')
+
+				# adds to count
+				x += 1
+			# Clost the file
+			write_file.close()
+
+			print("Finished counting for %s" %(sample_id))
+
+		except:
+
+			print("No final sam file found, skipping counting.")
+
+
 		
 
 # Runs the overall program 
 def main(sampleListFile, contigFile, refFile, contigSizeLimit, outputEnding):
 	# read in file list from -s call
 	samples_to_be_used = create_samples_to_download(sampleListFile)
-	# # create a bowtie reference with the -c and -r input calls
+	# create a bowtie reference with the -c and -r input calls
 	make_ref_file(contigFile, refFile)
 	# # # run alignment call with -r and -o input calls
 	run_alignment(samples_to_be_used, refFile, outputEnding)	
