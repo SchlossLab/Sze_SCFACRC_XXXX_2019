@@ -26,15 +26,15 @@ refdir = "data/references/"
 def get_ids_of_int(keggids):
 
 	print("Reading in the specific KEGG IDs.")
-
+	# Read in the text file
 	temp_file = open(keggids, 'r')
-
+	# Set up initial temp list to hold the info
 	temp_list = []
-
+	# Add each name in file to the list 
 	for kegg in temp_file:
 
 		temp_list.append(kegg.strip('\n'))
-
+	# Send out the completed list
 	return(temp_list)
 
 
@@ -42,11 +42,11 @@ def get_ids_of_int(keggids):
 def make_opf_dict(orf_path):
 
 	print("Creating the search dictionary")
-
+	# Read in the orf alignment file
 	temp_file = open(orf_path, 'r')
-
+	# Set up the initial temporary dictionary
 	temp_contig_dict = {}
-
+	# Cycle through each opf and add an entry to the dictionary
 	for opf in temp_file:
 
 		temp_line = opf.split('\t')
@@ -58,7 +58,7 @@ def make_opf_dict(orf_path):
 		temp_kegg_id = temp_kegg_list[len(temp_kegg_list)-1]
 
 		temp_contig_dict[temp_contig_id] = temp_kegg_id
-
+	# Return the completed dictionary
 	return(temp_contig_dict)
 
 
@@ -67,9 +67,9 @@ def make_opf_dict(orf_path):
 def make_matches(list_of_keggs, dict_of_contigs):
 
 	print("Finding matches from specified file.")
-
+	# Set up the initial temporary dictionary
 	temp_dict = {}
-
+	# Cycle through each OPF and add to temp dictionary if it matches a KEGG ID in the list
 	for contig in dict_of_contigs:
 
 		temp_kegg = dict_of_contigs[contig]
@@ -78,15 +78,15 @@ def make_matches(list_of_keggs, dict_of_contigs):
 
 			temp_dict[contig] = temp_kegg
 
-
+	# Return the completed matched dictionary
 	return(temp_dict)
 
 
 # Function to write out matched data into a new tsv file
 def write_the_file(final_dict, output_name):
-
+	# Open file to write to
 	write_file = open("%s" % (output_name),'w')
-
+	# Cycle through each contig in dictionary and add to tsv file.
 	for contig in final_dict:
 
 		write_file.write(contig+'\t'+str(final_dict[contig])+'\n')
