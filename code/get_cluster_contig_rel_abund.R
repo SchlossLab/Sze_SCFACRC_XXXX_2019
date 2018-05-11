@@ -12,13 +12,13 @@ loadLibs(c("tidyverse", "optparse"))
 # Command line input 
 option_list = list(
   make_option(c("-cf", "--cluster_file"), type="character", default="data/process/clustering_gt1000.csv", 
-              help="dataset file name", metavar="character"),
+              help="Contig Cluster file (CONCOCT output)", metavar="character"),
   make_option(c("-lt", "--length_table"), type="character", default="data/process/contig_length_table.tsv", 
-              help="output file name [default= %default]", metavar="character"), 
+              help="Length of each contig [default= %default]", metavar="character"), 
   make_option(c("-iaf", "--initial_abundance_file"), type="character", default="data/process/total_contig_1to10kb_rel_abund.tsv", 
-              help="first standard start position [default= %default]", metavar="character"), 
+              help="Initial abundance file [default= %default]", metavar="character"), 
   make_option(c("-o", "--output_file"), type="character", default="data/process/cluster_contig_final_abund.csv", 
-              help="first standard start position [default= %default]", metavar="character"))
+              help="Output file name to write to [default= %default]", metavar="character"))
 
 opt_parser = OptionParser(option_list=option_list)
 command_line_input = parse_args(opt_parser)
