@@ -23,14 +23,14 @@ refdir = "data/references/"
 
 # Function to create needed dictionaries
 def create_dictionaires(contig_fasta_path, cluster_table_path):
-
+	# Generalized output for user
 	print("Creating needed dictionaries.")
-
+	# Create empty storage dictionaries
 	temp_contig_dict = {}
 	temp_cluster_dict = {}
-
+	# Read in the contig fasta file
 	temp_fasta = open(contig_fasta_path, 'r')
-
+	# Create the contig dictionary
 	for line in temp_fasta:
 
 		if ">" in line:
@@ -41,11 +41,11 @@ def create_dictionaires(contig_fasta_path, cluster_table_path):
 
 			temp_contig_dict[temp_name] = line.strip('\n')
 
-
+	# Close the file
 	temp_fasta.close()
-
+	# Read in the cluster data
 	temp_cluster = open(cluster_table_path, 'r')
-
+	# Create the cluster dictionary
 	for line in temp_cluster:
 
 		temp_info = line.split(',')
@@ -55,20 +55,19 @@ def create_dictionaires(contig_fasta_path, cluster_table_path):
 		temp_group = temp_info[1].strip('\n')
 
 		temp_cluster_dict[temp_name] = int(temp_group)
-
-
+	# Close the file
 	temp_cluster.close()
-
+	# Return the completed dictionaries
 	return(temp_contig_dict, temp_cluster_dict)
 
 
 # Function to create a unique list of the total cluster groups
 def get_cluster_groups(cluster_data):
-
+	# Output to screen for user
 	print("Getting cluster groups.")
-
+	# Create an empty temprorary list
 	temp_clusters = []
-
+	# Get the unique cluster groups
 	for seq in cluster_data:
 
 		temp_group = cluster_data[seq]
@@ -77,8 +76,7 @@ def get_cluster_groups(cluster_data):
 
 			temp_clusters.append(temp_group)
 
-
-
+	# Return the completed cluster group list
 	return(temp_clusters)
 
 
@@ -87,7 +85,7 @@ def get_cluster_groups(cluster_data):
 # Function to create the needed output directory to put fasta files
 def create_output_dir(outputDir):
 
-	# Create a directory to hold diamond analysis
+	# Create a directory to hold clustered fasta files
 	if os.path.exists(outputDir):
 
 		print("Clustered fasta directory exists")
@@ -104,14 +102,14 @@ def create_output_dir(outputDir):
 
 # Function to selectively add sequences to specific fasta files
 def create_clustered_fastas(cluster_info, contigDict, clusterDict, output):
-
+	# cycle through the different unique cluster groups
 	for i in cluster_info:
-
+		# Output to screen for the user
 		print("Making fasta file for cluster group %s." % (i))
-
+		# create the fasta file to be written to
 		test_file = open("%scluster_group_%s.fasta" % 
 			(output, i), 'w')
-
+		# Find cluster matches and only write those sequences to the fasta file
 		for contig in contigDict:
 
 			temp_num = clusterDict[contig]
