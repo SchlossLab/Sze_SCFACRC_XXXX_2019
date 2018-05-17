@@ -270,7 +270,13 @@ metaF <- read_csv("data/raw/metadata/good_metaf_final.csv")
 # Load in shared data
 shared <- read_tsv("data/process/final.0.03.subsample.shared") %>% 
   mutate(Group = as.character(Group)) %>% 
-  select(-label, -numOtus)
+  select(-label, -numOtus) %>% 
+  mutate_at(vars(contains("Otu")), funs(log10(. + 1)))
+
+log_shared <- read_tsv("data/process/final.0.03.subsample.shared") %>% 
+  mutate(Group = as.character(Group)) %>% 
+  select(-label, -numOtus) %>% 
+  mutate_at(vars(contains("Otu")), funs(log10(. + 1)))
 
 # Generate IDs that are initial and follow up
 initial_IDs <- as.character(metaF$initial)
@@ -284,15 +290,22 @@ scfa_data <- sapply(scfas,
 # Combine all data into a single list of lists and remove follow samples
 all_data <- pare_down_data(c(initial_IDs, follow_IDs), scfa_data, shared, picrust_meta)
 
+log_all_data <- pare_down_data(c(initial_IDs, follow_IDs), scfa_data, log_shared, picrust_meta)
+
 # Get medians for each scfa measured
 scfa_medians <- lapply(all_data, function(x) median(x$mmol_kg))
 
 # get final data tables to be used in the RF analysis
 final_data <- get_high_low(all_data, scfa_medians, scfas)
 
+log_final_data <- get_high_low(log_all_data, scfa_medians, scfas)
+
 #split the data for the downstream nzv that needs to occur
 final_sp_data <- sapply(scfas, 
                         function(x) split_dataframe(x, final_data), simplify = F)
+
+log_final_sp_data <- sapply(scfas, 
+                            function(x) split_dataframe(x, log_final_data), simplify = F)
 
 # Set up initial store for summary data
 class_summary_model_data <- list(acetate = data_frame(), butyrate = data_frame(), 
@@ -306,6 +319,15 @@ class_important_vars <- list(acetate = data_frame(), butyrate = data_frame(),
 
 reg_important_vars <- list(acetate = data_frame(), butyrate = data_frame(), 
                              isobutyrate = data_frame(), propionate = data_frame())
+
+
+# Set up initial store for summary data based on log data
+log_reg_summary_model_data <- list(acetate = data_frame(), butyrate = data_frame(), 
+                               isobutyrate = data_frame(), propionate = data_frame())
+
+
+log_reg_important_vars <- list(acetate = data_frame(), butyrate = data_frame(), 
+                           isobutyrate = data_frame(), propionate = data_frame())
 
 
 # Run a 100 different splits for each SCFA on classification
@@ -347,19 +369,36 @@ for(j in 1:100){
   reg_rf_data <- sapply(scfas, 
                         function(x) eighty_twenty_split(x, "rf_regression", final_sp_data), simplify = F)
   
+  log_reg_rf_data <- sapply(scfas, 
+                        function(x) eighty_twenty_split(x, "rf_regression", log_final_sp_data), simplify = F)
+  
   regression_test <- sapply(scfas, 
                             function(x) make_rf_model(x, j, "training_data", 
                                                       "mmol_kg", "rf", "Rsquared", reg_rf_data), simplify = F)
+  
+  log_regression_test <- sapply(scfas, 
+                            function(x) make_rf_model(x, j, "training_data", 
+                                                      "mmol_kg", "rf", "Rsquared", log_reg_rf_data), simplify = F)
   
   reg_pred <- sapply(scfas, function(x) 
     run_prediction(x, regression_test, "test_data", "raw", "mmol_kg", reg_rf_data), 
     simplify = F)
   
+  log_reg_pred <- sapply(scfas, function(x) 
+    run_prediction(x, log_regression_test, "test_data", "raw", "mmol_kg", log_reg_rf_data), 
+    simplify = F)
+  
   reg_summary_model_data <- sapply(scfas, function(x) 
     add_model_summary_data(x, regression_test, reg_pred, reg_summary_model_data, classif = F), simplify = F)
   
+  log_reg_summary_model_data <- sapply(scfas, function(x) 
+    add_model_summary_data(x, log_regression_test, log_reg_pred, log_reg_summary_model_data, classif = F), simplify = F)
+  
   reg_important_vars <- sapply(scfas, function(x) 
     grab_importance(x, j, "regression", regression_test, reg_important_vars), simplify = F)
+  
+  log_reg_important_vars <- sapply(scfas, function(x) 
+    grab_importance(x, j, "regression", log_regression_test, log_reg_important_vars), simplify = F)
 }
 
 sapply(scfas, function(x) 
@@ -369,5 +408,16 @@ sapply(scfas, function(x)
 sapply(scfas, function(x) 
   write_csv(reg_important_vars[[x]], 
             paste("data/process/tables/", x, "imp_otus_regression_RF_summary.csv", sep = "")))
+
+
+
+sapply(scfas, function(x) 
+  write_csv(log_reg_summary_model_data[[x]], 
+            paste("data/process/tables/log_", x, "_regression_RF_summary.csv", sep = "")))
+
+sapply(scfas, function(x) 
+  write_csv(log_reg_important_vars[[x]], 
+            paste("data/process/tables/log_", x, "imp_otus_regression_RF_summary.csv", sep = "")))
+
 
 
