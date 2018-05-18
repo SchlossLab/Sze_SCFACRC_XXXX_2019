@@ -30,9 +30,6 @@ classification_summary <- classification_model_data %>%
   gather("groupings", "auc", median_train_auc:min_test_auc)
 
 
-
-
-
 classification_imp_otus <- read_csv("data/process/tables/acetateimp_otus_classification_RF_summary.csv") %>% 
   mutate(scfa = "acetate") %>% 
   bind_rows(
@@ -47,8 +44,18 @@ classification_imp_otus <- read_csv("data/process/tables/acetateimp_otus_classif
   arrange(desc(median_mda), .by_group = T) %>% 
   slice(1:10)
 
+# Read in taxnomic data
+tax <- read_tsv("data/process/final.taxonomy") %>% 
+  mutate(Taxonomy = str_replace_all(Taxonomy, "\\(\\d*\\)", "")) %>% 
+  separate(Taxonomy, c("domain", "phyla", "class", "order", "family", "genus", "species"), sep = ";") %>% 
+  mutate(genus = str_replace_all(genus, "_unclassified", ""), 
+         genus = str_replace_all(genus, "_", " "))
 
-### Plot the data ###
+combined_imp_class_summary <- classification_imp_otus %>% 
+  left_join(select(tax, OTU, genus), by = c("otu" = "OTU"))
+
+
+### Plot the classification AUC data###
 
 classification_summary %>% 
   select(scfa, groupings, auc) %>% 
@@ -62,13 +69,39 @@ classification_summary %>%
                        labels = c("Acetate", "Butyrate", "Propionate"))) %>% 
   ggplot(aes(scfa, median, color = groups, group = groups)) + 
   geom_pointrange(aes(ymin = min, ymax = max), position = position_dodge(width = 0.5), size = 1) + 
+  geom_vline(xintercept=seq(1.5, length(unique(classification_summary$scfa))-0.5, 1), 
+             lwd=1, colour="gray", alpha = 0.6) + 
   theme_bw() + coord_cartesian(ylim = c(0, 0.8)) + 
   labs(x = "", y = "AUC") + 
   scale_color_manual(name = "Group", 
-                     values = c("black", "gray"))
+                     values = c("black", "darkgray")) + 
+  theme(plot.title = element_text(face="bold", hjust = -0.07, size = 20), 
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(), 
+        axis.text.y = element_text(size = 10), 
+        axis.title = element_text(size = 12), 
+        axis.text.x = element_text(size = 10, face = "bold"))
 
 
-
+combined_imp_class_summary %>% 
+  ungroup() %>% 
+  mutate(scfa = factor(scfa, 
+                       levels = c("acetate", "butyrate", "propionate"), 
+                       labels = c("Acetate", "Butyrate", "Propionate"))) %>% 
+  ggplot(aes(scfa, median_mda, color = genus, group = otu)) + 
+  geom_pointrange(aes(ymin = min_mda, ymax = max_mda), position = position_dodge(width = 1), size = 1) + 
+  geom_vline(xintercept=seq(1.5, length(unique(classification_imp_otus$scfa))-0.5, 1), 
+             lwd=1, colour="gray", alpha = 0.6) + 
+  theme_bw() + labs(x = "", y = "Median MDA") + 
+  theme(plot.title = element_text(face="bold", hjust = -0.07, size = 20), 
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(), 
+        legend.position = "bottom", 
+        legend.title = element_blank(),
+        legend.text = element_text(face = "italic"), 
+        axis.text.y = element_text(size = 10), 
+        axis.title = element_text(size = 12), 
+        axis.text.x = element_text(size = 10, face = "bold"))
 
 
 
