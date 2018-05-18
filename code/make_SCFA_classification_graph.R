@@ -30,6 +30,12 @@ classification_summary <- classification_model_data %>%
   gather("groupings", "auc", median_train_auc:min_test_auc)
 
 
+test <- classification_model_data %>% 
+  gather("groupings", "auc", train_AUC:test_AUC) %>% 
+  separate(groupings, c("group", "metric"), sep = "_") %>% 
+  select(-metric)
+
+
 classification_imp_otus <- read_csv("data/process/tables/acetateimp_otus_classification_RF_summary.csv") %>% 
   mutate(scfa = "acetate") %>% 
   bind_rows(
@@ -57,24 +63,24 @@ combined_imp_class_summary <- classification_imp_otus %>%
 
 ### Plot the classification AUC data ###
 
-auc_classification <- classification_summary %>% 
-  select(scfa, groupings, auc) %>% 
-  separate(groupings, c("range_data", "groups"), sep = "_") %>% 
-  spread(range_data, auc) %>% 
-  mutate(groups = factor(groups, 
-                         levels = c("train", "test"), 
-                         labels = c("Train", "Test")), 
+auc_classification <- classification_model_data %>% 
+  gather("groupings", "auc", train_AUC:test_AUC) %>% 
+  separate(groupings, c("group", "metric"), sep = "_") %>% 
+  select(-metric) %>% 
+  mutate(group = factor(group, 
+                        levels = c("train", "test"), 
+                        labels = c("Train", "Test")), 
          scfa = factor(scfa, 
                        levels = c("acetate", "butyrate", "propionate"), 
                        labels = c("Acetate", "Butyrate", "Propionate"))) %>% 
-  ggplot(aes(scfa, median, color = groups, group = groups)) + 
-  geom_pointrange(aes(ymin = min, ymax = max), position = position_dodge(width = 0.5), size = 1) + 
+  ggplot(aes(scfa, auc, fill = group)) + 
+  geom_boxplot(position = position_dodge(width = 1)) + 
   geom_vline(xintercept=seq(1.5, length(unique(classification_summary$scfa))-0.5, 1), 
              lwd=1, colour="gray", alpha = 0.6) + 
   theme_bw() + coord_cartesian(ylim = c(0, 0.8)) + 
   labs(x = "", y = "AUC") + ggtitle("A") + 
-  scale_color_manual(name = "Group", 
-                     values = c("black", "darkgray")) + 
+  scale_fill_manual(name = "Group", 
+                    values = c("white", "darkgray")) + 
   theme(plot.title = element_text(face="bold", hjust = -0.07, size = 20), 
         panel.grid.major = element_blank(), 
         panel.grid.minor = element_blank(), 
