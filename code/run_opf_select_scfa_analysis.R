@@ -18,6 +18,8 @@ option_list = list(
   make_option(c("-md", "--metadata"), type="character", default="data/process/sra_meta_conversion.txt", 
               help="metadata of the samples [default= %default]", metavar="character"), 
   make_option(c("-o", "--output_file"), type="character", default="data/process/select_scfa_opf_kruskal_summary.csv", 
+              help="Output kruskal summary name [default= %default]", metavar="character"), 
+  make_option(c("-eo", "--extra_output"), type="character", default="data/process/select_scfa_opf_data.csv", 
               help="Output kruskal summary name [default= %default]", metavar="character"))
 
 opt_parser = OptionParser(option_list=option_list)
@@ -73,6 +75,7 @@ kruskal_test <- collapsed_df %>%
 
 # Write out the results
 write_csv(kruskal_test, command_line_input[["output_file"]])
+write_csv(collapsed_df, command_line_input[["extra_output"]])
 
 # Zip needed files
 system(paste("gzip ", command_line_input[["opf_file"]], sep = ""), intern = TRUE, ignore.stderr = TRUE)
