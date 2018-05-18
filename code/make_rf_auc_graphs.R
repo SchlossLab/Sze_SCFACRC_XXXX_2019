@@ -75,4 +75,4 @@ carcinoma <- crc_summary %>%
 combined_plot <- grid.arrange(adenoma, carcinoma, ncol = 2, nrow = 1)
 
 # Write out to specific directory
-ggsave("results/figures/auc_range_graph.tiff", combined_plot, width = 6, height = 6)
+ggsave("results/figures/rf_otu_and_scfa_aucs_graph.pdf", combined_plot, width = 6, height = 6)
