@@ -281,9 +281,9 @@ for(j in 1:100){
 # Write out the necessary data files
 sapply(scfas, function(x) 
   write_csv(class_summary_data[[x]], 
-            paste("data/process/tables/", x, "_classification_RF_summary.csv", sep = "")))
+            paste("data/process/tables/", x, "_imputed_classification_RF_summary.csv", sep = "")))
 
 sapply(scfas, function(x) 
   write_csv(class_important_vars[[x]], 
-            paste("data/process/tables/", x, "_imp_otus_classification_RF_summary.csv", sep = "")))
+            paste("data/process/tables/", x, "_imp_otus_imputed_classification_RF_summary.csv", sep = "")))
 
