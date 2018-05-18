@@ -78,7 +78,7 @@ kruskal_test <- selected_data %>%
 
 # Write out the results
 write_csv(kruskal_test, "data/process/specific_scfa_kruskal_picrust_summary.csv")
-
+write_csv(selected_data, "data/process/selected_scfa_gene_data.csv")
 
 
 
