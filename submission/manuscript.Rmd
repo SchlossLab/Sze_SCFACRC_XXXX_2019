@@ -21,6 +21,13 @@ loadLibs(c("tidyverse", "knitr", "rmarkdown"))
 
 ```{r rdata_tables, eval=TRUE, echo=FALSE, warning=FALSE, message=FALSE}
 
+# Read in meta data
+metaf <- read_csv("../data/raw/metadata/good_metaf_final.csv")
+metai <- read_csv("../data/raw/metadata/metaI_final.csv")
+geof_samples <- read_tsv("../data/raw/metadata/303030_subset/NexteraXT003Map.tsv", 
+                         col_names = F) %>% filter(X22 != "Negative")
+
+
 ```
 
 
@@ -71,6 +78,17 @@ $2$ Department of Family Medicine and Community Medicine, Penn State Hershey Med
 
 ## Materials and Methods
 
+**Study design and sampling.** The overall protocol has been described in detail previously [@normalization_sze2017; @crc_model_baxter2016]. In brief, this study used fecal samples obtained at either a single cross-sectional time point (n=`r length(metai$sample)`) or from before and after treatment for their tumor (n=`r length(metaf$initial)`). For patients undergoing treatment for their tumor the length of time between their initial and follow up sample ranged from `r min(metaf$time)` - `r max(metaf$time)` days. Our use of treatment has been previously defined as encompassing removal of a tumor with or without chemotherapy and radiation [@normalization_sze2017]. Diagnosis of tumor was made by colonoscopic examination and histopathological review of biopsies obtained [@normalization_sze2017; @crc_model_baxter2016]. The University of Michigan Institutional Review Board approved the study and informed consent was obtained from all participants in accordance to the guidelines set out by the Helsinki Decleration. 
+
+**Measuring specific SCFAs.** Our protocol for the measurement of acetate, butyrate, and propionate followed a previously published protocol [@scfa_measures_venkataraman2016]. The following changes to this protocol included the use of frozen fecal samples suspended in 1ml of PBS instead of fecal suspensions in DNA Genotek OmniGut tubes, and the use of the acutal weight of fecal samples instead of the average weight for SCFA concentration normalizations. These changes did not affect the overall median concentrations of these SCFAs between the two studies (see Table 1 [@scfa_measures_venkataraman2016] and Figure 1 in this report).    
+
+**16s rRNA gene sequencing.** The workflow and processing have been described previously [@Schloss2009; @Kozich2013; @normalization_sze2017]. The major differences from these previous reports include: the use of version 1.39.5 of the mothur software package and clustering Operational Taxonomic Units (OTUs) at 97% similarity used the OptClust algorithm [@opticlust_westcott2017].  
+
+**Generating imputed metagenomes.** The use of PICRUSt version 1.1.2 with the recommended standard operating protocol [@Langille2013] was used. Briefly, the mothur shared file and metadata was converted into a biom formated table using the biom convert function, the subsequent biom file was processed with the normalize_by_copy_number.py function, and subsequent imputed metagenomes created using the predict_metagenomes.py function. 
+
+**Obtaining OPFs from metagenomes.** A subset of the cross-sectional group (n=`r length(metai$sample)`) containing a total of `r length(geof_samples$X1)` individuals (normal n=`r filter(geof_samples, X30 == "Healthy") %>% pull(X30) %>% length()` normal, adenoma n=`r filter(geof_samples, X30 == "Adenoma") %>% pull(X30) %>% length()`, and carcinoma n=`r filter(geof_samples, X30 == "Cancer") %>% pull(X30) %>% length()`) was shotgun sequenced on an Illumina HiSeq with 125 bp paired end reads using a previously described method [@Hannigan2017]. Briefly, the sequences were quality filtered and sequences aligning to the human genome were removed prior to contig assembly with MEGAHIT [@Li2015]. Open Reading Frames (ORFs) were identified using Prodigal [@Hyatt2010], counts generated using Diamond [@Buchfink2014], subsequent clustering into Operational Protein Families (OPFs) used mmseq2 [@Steinegger2017], and OPF gene alignment used the KEGG database [@Kanehisa2015]. 
+
+**Statistical analysis workflow.**
 
 \newpage
 

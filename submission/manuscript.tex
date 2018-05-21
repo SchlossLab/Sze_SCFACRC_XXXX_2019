@@ -144,6 +144,57 @@ Hershey Medical Center, Hershey, PA
 
 \subsection{Materials and Methods}\label{materials-and-methods}
 
+\textbf{Study design and sampling.} The overall protocol has been
+described in detail previously (1, 2). In brief, this study used fecal
+samples obtained at either a single cross-sectional time point (n=490)
+or from before and after treatment for their tumor (n=67). For patients
+undergoing treatment for their tumor the length of time between their
+initial and follow up sample ranged from 188 - 546 days. Our use of
+treatment has been previously defined as encompassing removal of a tumor
+with or without chemotherapy and radiation (1). Diagnosis of tumor was
+made by colonoscopic examination and histopathological review of
+biopsies obtained (1, 2). The University of Michigan Institutional
+Review Board approved the study and informed consent was obtained from
+all participants in accordance to the guidelines set out by the Helsinki
+Decleration.
+
+\textbf{Measuring specific SCFAs.} Our protocol for the measurement of
+acetate, butyrate, and propionate followed a previously published
+protocol (3). The following changes to this protocol included the use of
+frozen fecal samples suspended in 1ml of PBS instead of fecal
+suspensions in DNA Genotek OmniGut tubes, and the use of the acutal
+weight of fecal samples instead of the average weight for SCFA
+concentration normalizations. These changes did not affect the overall
+median concentrations of these SCFAs between the two studies (see Table
+1 (3) and Figure 1 in this report).
+
+\textbf{16s rRNA gene sequencing.} The workflow and processing have been
+described previously (1, 4, 5). The major differences from these
+previous reports include: the use of version 1.39.5 of the mothur
+software package and clustering Operational Taxonomic Units (OTUs) at
+97\% similarity used the OptClust algorithm (6).
+
+\textbf{Generating imputed metagenomes.} The use of PICRUSt version
+1.1.2 with the recommended standard operating protocol (7) was used.
+Briefly, the mothur shared file and metadata was converted into a biom
+formated table using the biom convert function, the subsequent biom file
+was processed with the normalize\_by\_copy\_number.py function, and
+subsequent imputed metagenomes created using the predict\_metagenomes.py
+function.
+
+\textbf{Obtaining OPFs from metagenomes.} A subset of the
+cross-sectional group (n=490) containing a total of 85 individuals
+(normal n=29 normal, adenoma n=28, and carcinoma n=28) was shotgun
+sequenced on an Illumina HiSeq with 125 bp paired end reads using a
+previously described method (8). Briefly, the sequences were quality
+filtered and sequences aligning to the human genome were removed prior
+to contig assembly with MEGAHIT (9). Open Reading Frames (ORFs) were
+identified using Prodigal (10), counts generated using Diamond (11),
+subsequent clustering into Operational Protein Families (OPFs) used
+mmseq2 (12), and OPF gene alignment used the KEGG database (13).
+
+\textbf{Statistical analysis workflow.}
+
 \newpage
 
 \subsection{Acknowledgements}\label{acknowledgements}
@@ -162,6 +213,100 @@ Schloss came from NIH grants P30DK034933 and 1R01CA215574.
 \subsection{References}\label{references}
 
 \hypertarget{refs}{}
+\hypertarget{ref-normalization_sze2017}{}
+1. \textbf{Sze MA}, \textbf{Baxter NT}, \textbf{Ruffin MT},
+\textbf{Rogers MAM}, \textbf{Schloss PD}. 2017. Normalization of the
+microbiota in patients after treatment for colonic lesions. Microbiome
+\textbf{5}.
+doi:\href{https://doi.org/10.1186/s40168-017-0366-3}{10.1186/s40168-017-0366-3}.
+
+\hypertarget{ref-crc_model_baxter2016}{}
+2. \textbf{Baxter NT}, \textbf{Ruffin MT}, \textbf{Rogers MAM},
+\textbf{Schloss PD}. 2016. Microbiota-based model improves the
+sensitivity of fecal immunochemical test for detecting colonic lesions.
+Genome Medicine \textbf{8}.
+doi:\href{https://doi.org/10.1186/s13073-016-0290-3}{10.1186/s13073-016-0290-3}.
+
+\hypertarget{ref-scfa_measures_venkataraman2016}{}
+3. \textbf{Venkataraman A}, \textbf{Sieber JR}, \textbf{Schmidt AW},
+\textbf{Waldron C}, \textbf{Theis KR}, \textbf{Schmidt TM}. 2016.
+Variable responses of human microbiomes to dietary supplementation with
+resistant starch. Microbiome \textbf{4}.
+doi:\href{https://doi.org/10.1186/s40168-016-0178-x}{10.1186/s40168-016-0178-x}.
+
+\hypertarget{ref-Schloss2009}{}
+4. \textbf{Schloss PD}, \textbf{Westcott SL}, \textbf{Ryabin T},
+\textbf{Hall JR}, \textbf{Hartmann M}, \textbf{Hollister EB},
+\textbf{Lesniewski RA}, \textbf{Oakley BB}, \textbf{Parks DH},
+\textbf{Robinson CJ}, \textbf{Sahl JW}, \textbf{Stres B},
+\textbf{Thallinger GG}, \textbf{Horn DJV}, \textbf{Weber CF}. 2009.
+Introducing mothur: Open-source, platform-independent,
+community-supported software for describing and comparing microbial
+communities. Applied and Environmental Microbiology
+\textbf{75}:7537--7541.
+doi:\href{https://doi.org/10.1128/aem.01541-09}{10.1128/aem.01541-09}.
+
+\hypertarget{ref-Kozich2013}{}
+5. \textbf{Kozich JJ}, \textbf{Westcott SL}, \textbf{Baxter NT},
+\textbf{Highlander SK}, \textbf{Schloss PD}. 2013. Development of a
+dual-index sequencing strategy and curation pipeline for analyzing
+amplicon sequence data on the MiSeq illumina sequencing platform.
+Applied and Environmental Microbiology \textbf{79}:5112--5120.
+doi:\href{https://doi.org/10.1128/aem.01043-13}{10.1128/aem.01043-13}.
+
+\hypertarget{ref-opticlust_westcott2017}{}
+6. \textbf{Westcott SL}, \textbf{Schloss PD}. 2017. OptiClust, an
+improved method for assigning amplicon-based sequence data to
+operational taxonomic units. mSphere \textbf{2}:e00073--17.
+doi:\href{https://doi.org/10.1128/mspheredirect.00073-17}{10.1128/mspheredirect.00073-17}.
+
+\hypertarget{ref-Langille2013}{}
+7. \textbf{Langille MGI}, \textbf{Zaneveld J}, \textbf{Caporaso JG},
+\textbf{McDonald D}, \textbf{Knights D}, \textbf{Reyes JA},
+\textbf{Clemente JC}, \textbf{Burkepile DE}, \textbf{Thurber RLV},
+\textbf{Knight R}, \textbf{Beiko RG}, \textbf{Huttenhower C}. 2013.
+Predictive functional profiling of microbial communities using 16S rRNA
+marker gene sequences. Nature Biotechnology \textbf{31}:814--821.
+doi:\href{https://doi.org/10.1038/nbt.2676}{10.1038/nbt.2676}.
+
+\hypertarget{ref-Hannigan2017}{}
+8. \textbf{Hannigan GD}, \textbf{Duhaime MB}, \textbf{Ruffin MT},
+\textbf{Koumpouras CC}, \textbf{Schloss PD}. 2017. Diagnostic potential
+\& the interactive dynamics of the colorectal cancer virome.
+doi:\href{https://doi.org/10.1101/152868}{10.1101/152868}.
+
+\hypertarget{ref-Li2015}{}
+9. \textbf{Li D}, \textbf{Liu C-M}, \textbf{Luo R}, \textbf{Sadakane K},
+\textbf{Lam T-W}. 2015. MEGAHIT: An ultra-fast single-node solution for
+large and complex metagenomics assembly via succinct de bruijn graph.
+Bioinformatics \textbf{31}:1674--1676.
+doi:\href{https://doi.org/10.1093/bioinformatics/btv033}{10.1093/bioinformatics/btv033}.
+
+\hypertarget{ref-Hyatt2010}{}
+10. \textbf{Hyatt D}, \textbf{Chen G-L}, \textbf{LoCascio PF},
+\textbf{Land ML}, \textbf{Larimer FW}, \textbf{Hauser LJ}. 2010.
+Prodigal: Prokaryotic gene recognition and translation initiation site
+identification. BMC Bioinformatics \textbf{11}:119.
+doi:\href{https://doi.org/10.1186/1471-2105-11-119}{10.1186/1471-2105-11-119}.
+
+\hypertarget{ref-Buchfink2014}{}
+11. \textbf{Buchfink B}, \textbf{Xie C}, \textbf{Huson DH}. 2014. Fast
+and sensitive protein alignment using DIAMOND. Nature Methods
+\textbf{12}:59--60.
+doi:\href{https://doi.org/10.1038/nmeth.3176}{10.1038/nmeth.3176}.
+
+\hypertarget{ref-Steinegger2017}{}
+12. \textbf{Steinegger M}, \textbf{Söding J}. 2017. MMseqs2 enables
+sensitive protein sequence searching for the analysis of massive data
+sets. Nature Biotechnology.
+doi:\href{https://doi.org/10.1038/nbt.3988}{10.1038/nbt.3988}.
+
+\hypertarget{ref-Kanehisa2015}{}
+13. \textbf{Kanehisa M}, \textbf{Sato Y}, \textbf{Kawashima M},
+\textbf{Furumichi M}, \textbf{Tanabe M}. 2015. KEGG as a reference
+resource for gene and protein annotation. Nucleic Acids Research
+\textbf{44}:D457--D462.
+doi:\href{https://doi.org/10.1093/nar/gkv1070}{10.1093/nar/gkv1070}.
 
 \newpage
 
