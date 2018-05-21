@@ -193,7 +193,26 @@ identified using Prodigal (10), counts generated using Diamond (11),
 subsequent clustering into Operational Protein Families (OPFs) used
 mmseq2 (12), and OPF gene alignment used the KEGG database (13).
 
-\textbf{Statistical analysis workflow.}
+\textbf{Pulling genes involved with SCFA synthesis.} Specific genes
+located near the end of the pathways involved in the synthesis of
+acetate, butyrate, and propionate were analyzed for any differences
+between individuals with normal colons and those with tumors. These
+genes were based on pathways from KEGG and can be found in the
+supplemental material {[}Table S1{]}.
+
+\textbf{Statistical analysis workflow.} All analysis was performed using
+the statistical language R (14). Generally, differences between the
+different disease groups used a Kruskal-Walis rank sum test with a
+Dunn's post-hoc test. Models to classify high or low SCFA concentration
+based on 16S rRNA gene sequencing data were created using Random Forest
+(15). Regression models to classify the exact SCFA concentration based
+on 16S rRNA gene sequencing data also were built using the Random Forest
+algorithm. The measured SCFA concentrations were first tested for
+differences between groups. The ability of 16S rRNA gene sequencing to
+classify these concentrations were then assessed. Next, the imputed gene
+counts of important mediators of SCFA creation were tested. Finally, the
+counts generated for OPFs that matched important genes involved with
+SCFA creation were analyzed.
 
 \newpage
 
@@ -307,6 +326,15 @@ doi:\href{https://doi.org/10.1038/nbt.3988}{10.1038/nbt.3988}.
 resource for gene and protein annotation. Nucleic Acids Research
 \textbf{44}:D457--D462.
 doi:\href{https://doi.org/10.1093/nar/gkv1070}{10.1093/nar/gkv1070}.
+
+\hypertarget{ref-r_citation_2017}{}
+14. \textbf{R Core Team}. 2017. R: A language and environment for
+statistical computing. R Foundation for Statistical Computing, Vienna,
+Austria.
+
+\hypertarget{ref-randomforest_citation_2002}{}
+15. \textbf{Liaw A}, \textbf{Wiener M}. 2002. Classification and
+regression by randomForest. R News \textbf{2}:18--22.
 
 \newpage
 
