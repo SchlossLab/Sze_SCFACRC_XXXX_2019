@@ -1,62 +1,45 @@
 ---
-title: "**NAME OF THIS STUDY**"
+title: "Revisiting Short-Chain Fatty Acids and the Microbiota in Colorectal Cancer"
 bibliography: references.bib
 output:
   pdf_document:
     keep_tex: true
     includes:
       in_header: header.tex
-csl: mbio.csl #Get themes at https://github.com/citation-style-language/styles
+csl: mbio.csl 
 fontsize: 11pt
 geometry: margin=1.0in
 ---
 
 
-```{r knitr_settings, eval=TRUE, echo=FALSE, cache=FALSE}
-opts_chunk$set("tidy" = TRUE)
-opts_chunk$set("echo" = FALSE)
-opts_chunk$set("eval" = TRUE)
-opts_chunk$set("warning" = FALSE)
-opts_chunk$set("cache" = FALSE)
+```{r knitr_settings, eval=TRUE, echo=FALSE, cache=FALSE, message=FALSE, warning=FALSE}
+source('../code/functions.R')
 
-inline_hook <- function(x){
-	print(x)
-
-	if(is.list(x)){
-		x <- unlist(x)
-	}
-
-	if(is.numeric(x)){
-		if(abs(x - round(x)) < .Machine$double.eps^0.5){
-			paste(format(x,big.mark=',', digits=0, scientific=FALSE))
-		} else {
-			paste(format(x,big.mark=',', digits=1, nsmall=1, scientific=FALSE))
-		}
-	} else {
-    	paste(x)      
-	}
-}
-knitr::knit_hooks$set(inline=inline_hook)
+loadLibs(c("tidyverse", "knitr", "rmarkdown"))
 ```
 
 
+```{r rdata_tables, eval=TRUE, echo=FALSE, warning=FALSE, message=FALSE}
+
+```
+
 
 \vspace{35mm}
 
-Running title: INSERT RUNNING TITLE HERE
+Running title: SCFAs and Colorectal Cancer
 
 \vspace{35mm}
 
 
-Your Name Here^1, Joeseph P. Schmo^2, Sally J. Rivers^1, Patrick D. Schloss^1$\dagger$^
+Marc A Sze${^1}$, Nicholas A Lesniak${^1}$, Mack T Ruffin IV${^2}$, Patrick D. Schloss${^1}$${^\dagger}$
 
 \vspace{40mm}
 
 $\dagger$ To whom correspondence should be addressed: pschloss@umich.edu
 
-1\. Department of Microbiology and Immunology, University of Michigan, Ann Arbor, MI 48109
+$1$ Department of Microbiology and Immunology, University of Michigan, Ann Arbor, MI 48109
 
-2\. Other department contact information
+$2$ Department of Family Medicine and Community Medicine, Penn State Hershey Medical Center, Hershey, PA
 
 
 \newpage
@@ -71,14 +54,35 @@ $\dagger$ To whom correspondence should be addressed: pschloss@umich.edu
 ## Introduction
 
 
-## Results and Discussion
+\newpage
 
+
+## Results 
+
+\newpage
+
+## Discussion
+
+\newpage
 
 ## Conclusions
 
+\newpage
 
 ## Materials and Methods
 
+
+\newpage
+
+## Acknowledgements
+
+The authors thank the Great Lakes-New England Early Detection Research Network for providing the fecal samples that were used in this study. We would also like to thank Kwi Kim and Thomas M Schmidt for their help in running the short-chian fatty acid analysis on the High-Performace Liquid Chromatography machine at the University of Michigan. Salary support for Marc A. Sze came from the Canadian Institute of Health Research and NIH grant UL1TR002240. Salary support for Patrick D. Schloss came from NIH grants P30DK034933 and 1R01CA215574.   
+
+\newpage
+
+## References
+
+<div id="refs"></div>
 
 \newpage
 
@@ -88,5 +92,3 @@ Insert figure legends with the first sentence in bold, for example:
 
 
 \newpage
-
-## References

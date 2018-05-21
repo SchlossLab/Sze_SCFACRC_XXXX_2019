@@ -9,12 +9,10 @@
 \else % if luatex or xelatex
   \ifxetex
     \usepackage{mathspec}
-    \usepackage{xltxtra,xunicode}
   \else
     \usepackage{fontspec}
   \fi
-  \defaultfontfeatures{Mapping=tex-text,Scale=MatchLowercase}
-  \newcommand{\euro}{€}
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
 \fi
 % use upquote if available, for straight quotes in verbatim environments
 \IfFileExists{upquote.sty}{\usepackage{upquote}}{}
@@ -24,22 +22,11 @@
 \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
 }{}
 \usepackage[margin=1.0in]{geometry}
-\ifxetex
-  \usepackage[setpagesize=false, % page size defined by xetex
-              unicode=false, % unicode breaks when used with xetex
-              xetex]{hyperref}
-\else
-  \usepackage[unicode=true]{hyperref}
-\fi
-\hypersetup{breaklinks=true,
-            bookmarks=true,
-            pdfauthor={},
-            pdftitle={NAME OF THIS STUDY},
-            colorlinks=true,
-            citecolor=blue,
-            urlcolor=blue,
-            linkcolor=magenta,
-            pdfborder={0 0 0}}
+\usepackage{hyperref}
+\hypersetup{unicode=true,
+            pdftitle={Revisiting Short-Chain Fatty Acids and the Microbiota in Colorectal Cancer},
+            pdfborder={0 0 0},
+            breaklinks=true}
 \urlstyle{same}  % don't use monospace font for urls
 \usepackage{graphicx,grffile}
 \makeatletter
@@ -50,12 +37,25 @@
 % margins by default, and it is still possible to overwrite the defaults
 % using explicit options in \includegraphics[width, height, ...]{}
 \setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
 \setlength{\emergencystretch}{3em}  % prevent overfull lines
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 \setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
 
 %%% Use protect on footnotes to avoid problems with footnotes in titles
 \let\rmarkdownfootnote\footnote%
@@ -72,7 +72,8 @@
 }
 
 \setlength{\droptitle}{-2em}
-  \title{\textbf{NAME OF THIS STUDY}}
+  \title{Revisiting Short-Chain Fatty Acids and the Microbiota in Colorectal
+Cancer}
   \pretitle{\vspace{\droptitle}\centering\huge}
   \posttitle{\par}
   \author{}
@@ -94,37 +95,28 @@
 
 \usepackage{pdfpages}
 
-% Redefines (sub)paragraphs to behave more like sections
-\ifx\paragraph\undefined\else
-\let\oldparagraph\paragraph
-\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
-\fi
-\ifx\subparagraph\undefined\else
-\let\oldsubparagraph\subparagraph
-\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
-\fi
-
 \begin{document}
 \maketitle
 
 \vspace{35mm}
 
-Running title: INSERT RUNNING TITLE HERE
+Running title: SCFAs and Colorectal Cancer
 
 \vspace{35mm}
 
-Your Name Here\^{}1, Joeseph P. Schmo\^{}2, Sally J. Rivers\^{}1,
-Patrick D. Schloss\textsuperscript{1\(\dagger\)}
+Marc A Sze\({^1}\), Nicholas A Lesniak\({^1}\), Mack T Ruffin
+IV\({^2}\), Patrick D. Schloss\({^1}\)\({^\dagger}\)
 
 \vspace{40mm}
 
 \(\dagger\) To whom correspondence should be addressed:
 \href{mailto:pschloss@umich.edu}{\nolinkurl{pschloss@umich.edu}}
 
-1. Department of Microbiology and Immunology, University of Michigan,
+\(1\) Department of Microbiology and Immunology, University of Michigan,
 Ann Arbor, MI 48109
 
-2. Other department contact information
+\(2\) Department of Family Medicine and Community Medicine, Penn State
+Hershey Medical Center, Hershey, PA
 
 \newpage
 
@@ -136,11 +128,40 @@ Ann Arbor, MI 48109
 
 \subsection{Introduction}\label{introduction}
 
-\subsection{Results and Discussion}\label{results-and-discussion}
+\newpage
+
+\subsection{Results}\label{results}
+
+\newpage
+
+\subsection{Discussion}\label{discussion}
+
+\newpage
 
 \subsection{Conclusions}\label{conclusions}
 
+\newpage
+
 \subsection{Materials and Methods}\label{materials-and-methods}
+
+\newpage
+
+\subsection{Acknowledgements}\label{acknowledgements}
+
+The authors thank the Great Lakes-New England Early Detection Research
+Network for providing the fecal samples that were used in this study. We
+would also like to thank Kwi Kim and Thomas M Schmidt for their help in
+running the short-chian fatty acid analysis on the High-Performace
+Liquid Chromatography machine at the University of Michigan. Salary
+support for Marc A. Sze came from the Canadian Institute of Health
+Research and NIH grant UL1TR002240. Salary support for Patrick D.
+Schloss came from NIH grants P30DK034933 and 1R01CA215574.
+
+\newpage
+
+\subsection{References}\label{references}
+
+\hypertarget{refs}{}
 
 \newpage
 
@@ -154,9 +175,5 @@ environments in Table 1 for Bacteria (C) and Archaea (D).
 
 \newpage
 
-\subsection*{References}\label{references}
-\addcontentsline{toc}{subsection}{References}
-
-\hypertarget{refs}{}
 
 \end{document}
