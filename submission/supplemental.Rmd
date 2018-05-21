@@ -1,0 +1,52 @@
+---
+title: ''
+csl: mbio.csl
+fontsize: 11pt
+output:
+  pdf_document:
+    includes:
+      in_header: header.tex
+    keep_tex: yes
+geometry: margin=0.75in
+bibliography: null
+---
+\pagenumbering{gobble}
+```{r knitr_settings, eval=TRUE, echo=FALSE, warning=FALSE, message=FALSE}
+
+source('../code/functions.R')
+
+loadLibs(c("tidyverse", "scales", "knitr", "rmarkdown", "stringr"))
+
+```
+
+
+**Table S1: Breakdown of select genes and corresponding KEGG ID analyzed.**
+```{r supplemental_table1, echo=FALSE, message=FALSE, warning=FALSE}
+
+Kegg_ID <- c("K00929", "K01034", "K01035", "K01908", "K01895", "K00932", "K19697", 
+             "K18372", "K00467", "K00156", "K00925", "K01512", "K01067", "K18118", "K01026", 
+             "K01905", "K22224", "K01895", "K00128", "K14085", "K00149", "K00138")
+
+Gene_Name <- c("Butyrate Kinase", "Acetate CoA subnunit A", "Acetate CoA subunit B", "Propionyl-CoA Synthetase", 
+               "Acetyl-CoA Synthetase", "Propionate Kinase", "Propionate Kinase", "Methyl Acetate Hydrolase", 
+               "Lactate 2-Monooxygenase", "Pyruvate Dehydrogenase", "Acetate Kinase", "Acylphosphatase", 
+               "Acetyl-CoA Hydrolase", "Succinyl-CoA:Acetate", "Propionate CoA-Transferase", 
+               "Acetate---CoA Ligase subunit A", "Acetate---CoA Ligase subunit B", "Acetyl-CoA Synthetase", 
+               "Aldehyde Dehydrogenase", "Aldehyde Dehydrogenase Family 7", "Aldehyde Dehydrogenase Family 9", 
+               "Aldehyde Dehydrogenase")
+
+sup_table1 <- data_frame(Kegg_ID, Gene_Name)
+
+colnames(sup_table1) <-  c("KEGG IDs", "Gene Name")
+
+
+kable(sup_table1, format = "markdown", align = 'c', padding = 2)
+
+
+```
+
+
+
+
+
+
