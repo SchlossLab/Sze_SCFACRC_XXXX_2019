@@ -1,17 +1,19 @@
 #!python
 
-# This code does a diamond blast on a select set of sequences
-# Designed to be used after the opf_seq_picker.py program
-# It uses the the kegg database
+# Code inspired by:
+	# github repo https://github.com/ryjohnson09/bacteria_genome_pull.git
+
+# The main role for this code is to download full genomes from NCBI to be used to search 
+# subsequent OGUs for closest taxonomy
 
 
 ############## Internal parameters used by all functions is program ########################
 
 # Import needed libraries
-import os, sys, argparse
+import os, sys, argparse, subprocess, fnmatch
 
 # Import other code with useful functions that will be used
-from qual_trim import create_samples_to_download
+from ftplib import FTP
 
 # Set up working directory
 workdir = "data/raw/"
@@ -38,14 +40,87 @@ def make_bacterial_genome_directory(directory_name):
 
 
 
+# Function to find all genomes in the bacteria directory
+def find_genomes(data_base_to_use, output_dir):
+
+	#initialize FTP server 
+	ftp_site = 'ftp.ncbi.nlm.nih.gov'
+	ftp = FTP(ftp_site)
+
+	ftp.login()
+	ftp.cwd("genomes/%s/bacteria" % (data_base_to_use))
+	dirs = ftp.nlst()
+
+	for genome in dirs:
+
+		print(genome)
+
+	sys.exit()
 
 
+# Function to run the actual download
+def download_from_ncbi(bacteria_needed, data_base_to_use, file_needed, output_dir):
+
+	#initialize FTP server 
+	ftp_site = 'ftp.ncbi.nlm.nih.gov'
+	ftp = FTP(ftp_site)
+
+	# set up system calls for downloads of specific file types
+	if file_needed == "fasta":
+		file_type = "--exclude='*cds_from*' --exclude='*rna_from*' --include='*genomic.fna.gz' --exclude='*'"
+	elif file_needed == "genbank":
+		file_type = "--include='*genomic.gbff.gz' --exclude='*'"
+	elif file_needed == "gff":
+		file_type = "--include='*genomic.gff.gz' --exclude='*'"
+	elif args.type == "feature_table":
+		file_type = "--include='*feature_table.txt.gz' --exclude='*'"
+
+	if bacteria_needed == "ALL":
+
+		try:
+			subprocess.call("rsync -Lrtv %s rsync://ftp.ncbi.nlm.nih.gov/genomes/%s/bacteria/*/latest_assembly_versions/*/ %s" % 
+				(file_type, data_base_to_use, output_dir), shell=True)
+		except:
+			raise Exception("Failed to download files")
+
+	else:
+
+		try:
+			subprocess.call("rsync -Lrtv %s rsync://ftp.ncbi.nlm.nih.gov/genomes/%s/bacteria/%s/latest_assembly_versions/*/ %s" % 
+				(file_type, data_base_to_use, bacteria_needed, output_dir), shell=True)
+		except:
+			raise Exception("Failed to download files")
+
+# Need to implement this as a fail safe 
+#Check that bacterium is in NCBI genbank/refseq
+# if args.bacterium:
+# 	ftp.login()
+# 	ftp.cwd('genomes/%s/bacteria' % NCBI_database)
+# 	dirs = ftp.nlst()
+# 	pattern = args.bacterium
+# 	genome_match = fnmatch.filter(dirs, pattern)
+# 	if len(genome_match) == 0:
+# 		print("Bacterium %s not found in %s -----> Exiting program" % (args.bacterium, NCBI_database))
+# 		sys.exit(1)
+# else:
+# 	print("")
+# 	print("Please provide bacterium name '-b'")
+# 	print("Exiting program")
+# 	print("")
+# 	sys.exit(1)
+		
 
 
 # Run the actual program
 def main(bacteria, data_base, type_of_file, av_genomes, outputPath):
 
 	make_bacterial_genome_directory(outputPath)
+
+	if av_genomes != None:
+
+		find_genomes(data_base, av_genomes)
+
+	download_from_ncbi(bacteria, data_base, type_of_file, outputPath)
 
 
 
