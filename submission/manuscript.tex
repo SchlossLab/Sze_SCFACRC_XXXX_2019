@@ -132,6 +132,16 @@ Hershey Medical Center, Hershey, PA
 
 \subsection{Results}\label{results}
 
+\textbf{Decreased SCFA concentrations are not associated with tumors.}
+There was no difference between individuals with normal colons and
+patients with either an adenoma or carcinoma after multiple comparison
+correction for any of the SCFAs measured (P-value \textgreater{} 0.15)
+{[}Figure 1A - 1C{]}. Although there was a trend for increasing acetate,
+butyrate, and propionate concentrations after treatment for tumors,
+there was no significant difference pre- and post-treatment for
+individuals with adenoma (P-value \textgreater{} 0.20) or carcinoma
+(P-value \textgreater{} 0.80) {[}Figure 1D - 1F{]}.
+
 \newpage
 
 \subsection{Discussion}\label{discussion}
@@ -147,16 +157,16 @@ Hershey Medical Center, Hershey, PA
 \textbf{Study design and sampling.} The overall protocol has been
 described in detail previously (1, 2). In brief, this study used fecal
 samples obtained at either a single cross-sectional time point (n=490)
-or from before and after treatment for their tumor (n=67). For patients
-undergoing treatment for their tumor the length of time between their
-initial and follow up sample ranged from 188 - 546 days. Our use of
-treatment has been previously defined as encompassing removal of a tumor
-with or without chemotherapy and radiation (1). Diagnosis of tumor was
-made by colonoscopic examination and histopathological review of
-biopsies obtained (1, 2). The University of Michigan Institutional
-Review Board approved the study and informed consent was obtained from
-all participants in accordance to the guidelines set out by the Helsinki
-Decleration.
+or from before (pre-) and after (post-) treatment for their tumor
+(n=67). For patients undergoing treatment for their tumor the length of
+time between their initial and follow up sample ranged from 188 - 546
+days. Our use of treatment has been previously defined as encompassing
+removal of a tumor with or without chemotherapy and radiation (1).
+Diagnosis of tumor was made by colonoscopic examination and
+histopathological review of biopsies obtained (1, 2). The University of
+Michigan Institutional Review Board approved the study and informed
+consent was obtained from all participants in accordance to the
+guidelines set out by the Helsinki Decleration.
 
 \textbf{Measuring specific SCFAs.} Our protocol for the measurement of
 acetate, butyrate, and propionate followed a previously published
@@ -185,13 +195,13 @@ function.
 \textbf{Obtaining OPFs from metagenomes.} A subset of the
 cross-sectional group (n=490) containing a total of 85 individuals
 (normal n=29 normal, adenoma n=28, and carcinoma n=28) was shotgun
-sequenced on an Illumina HiSeq with 125 bp paired end reads using a
+sequenced on an Illumina HiSeq using 125 bp paired end reads and a
 previously described method (8). Briefly, the sequences were quality
 filtered and sequences aligning to the human genome were removed prior
 to contig assembly with MEGAHIT (9). Open Reading Frames (ORFs) were
 identified using Prodigal (10), counts generated using Diamond (11),
 subsequent clustering into Operational Protein Families (OPFs) used
-mmseq2 (12), and OPF gene alignment used the KEGG database (13).
+mmseq2 (12), and OPF alignment used the KEGG database (13).
 
 \textbf{Pulling genes involved with SCFA synthesis.} Specific genes
 located near the end of the pathways involved in the synthesis of
@@ -214,7 +224,8 @@ differences between groups. The ability of 16S rRNA gene sequencing to
 classify these concentrations were then assessed. Next, the imputed gene
 counts of important mediators of SCFA creation were tested. Finally, the
 counts generated for OPFs that matched important genes involved with
-SCFA creation were analyzed.
+SCFA creation were analyzed. Where appropriate Benjamini-Hochberg was
+used to correct for multiple comparisons {[}(17).
 
 \newpage
 
@@ -344,6 +355,12 @@ Austria.
 \hypertarget{ref-randomforest_citation_2002}{}
 16. \textbf{Liaw A}, \textbf{Wiener M}. 2002. Classification and
 regression by randomForest. R News \textbf{2}:18--22.
+
+\hypertarget{ref-benjamini_controlling_1995}{}
+17. \textbf{Benjamini Y}, \textbf{Hochberg Y}. 1995. Controlling the
+false discovery rate: A practical and powerful approach to multiple
+testing. Journal of the Royal Statistical Society Series B
+(Methodological) \textbf{57}:289--300.
 
 \newpage
 
