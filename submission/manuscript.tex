@@ -151,7 +151,7 @@ tumors, this information could still be important to help classify
 disease.
 
 \textbf{Random Forest models with SCFA concentrations do not classify
-tumor better.} Using the Random Forest algorithm we built models to
+tumors better.} Using the Random Forest algorithm we built models to
 classify normal versus adenoma and normal versus carcinoma with OTUs or
 OTUs and SCFA concentrations. For both adenoma and carcinoma models,
 there was no difference between the median AUC of models with or without
@@ -161,6 +161,27 @@ disease by including SCFAs to Random Forest models, it is possible that
 the genes for enzymes involved in SCFA pathways may change due to
 disease status; where a smaller number of microbes are responsible for
 the observed SCFA concentrations.
+
+\textbf{Changes in genes for enzymes involved in SCFA synthesis are not
+associated with tumors.} Using a list of specific genes that are
+important for the synthesis of SCFAs {[}Table S1{]}, we looked for
+differences in gene abundance based on individuals having normal colons,
+adenomas, or carcinomas. First, using imputed gene relative abundance
+based on 16S rRNA gene sequencing we found no difference in any of the
+genes inolved with acetate, butyrate, or propionate synthesis (P-value
+\textgreater{} 0.90) {[}Table S2{]}. This similarity between groups is
+highlighted by visualizing genes important in butyrate synthesis
+{[}Figure 3A{]}. We next took a subset of these 490 fecal samples and
+performed metagenomic sequencing to confirm these results. Like the
+imputed gene results, metagenomic analysis found that there was no
+difference in any of the genes involved in SCFA synthesis between
+individuals with normal colons and patients with adenoma or carcinoma
+(P-value \textgreater{} 0.70) {[}Table S3{]}. This lack of difference
+can be highlighted when we visualize the results for butyrate kinase
+{[}Figure 3B{]}. These observations provide evidence that the gene
+content does not change due to tumors. Overall, there may be some
+systematic bias present within our results that may account for the lack
+of associations.
 
 \newpage
 
