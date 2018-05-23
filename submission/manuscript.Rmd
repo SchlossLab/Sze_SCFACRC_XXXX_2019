@@ -106,15 +106,12 @@ One limitation of ours and others research into the effect of SCFAs in colorecta
 The potential protection against colorectal cancers may not be from SCFAs even though taxa associated with their production are higher in individuals with normal colons versus patients with carcinomas [@Shah2017; @normalization_Sze2017; @meta_analysis_crc_Sze2018]. Protection could be via a different pathway and other metabolites that have not been extensively studied. Alternatively, protection may not occur via a metabolite but instead occur through niche exclusion of mouth-associated microbes (e.g. *Fusobacterium*, *Porphyromonas*, *Parvimonas*, *Peptostreptococcus* [@Zeller2014; @Baxter2016]). The idea of niche exclusion is similar to how the community protects against *Clostridium difficile* infection with chronic inflammation replacing the role of antibiotics. Although we did not find lower concentrations of SCFAs associated with colorectal tumors, we think that there are many exciting new avenues to explore because of these observations.       
 
 
-
-
-
-
-
-
 \newpage
 
 ## Conclusions
+
+Our observations conssitently found no difference in SCFA concentration between individuals with normal colons and patients with either adenoma or carcinoma tumors. Although these results are different than other reports in the literature, they do align with the randomized controlled trials that have tested fiber use in preventing colorectal tumor recurrence. Overall, these results suggest that the SCFAs produced by resident microbes do not protect against tumor. By focusing on other types of metabolites, the identification of more promising therapeutic options for use in treating colorectal cancer may be found.
+
 
 \newpage
 
