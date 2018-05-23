@@ -77,6 +77,9 @@ def download_from_ncbi(bacteria_needed, data_base_to_use, file_needed, output_di
 
 	if bacteria_needed == "ALL":
 
+		print("Downloading all bacterial genomes from %s database..." % 
+			(data_base_to_use))
+
 		try:
 			subprocess.call("rsync -Lrtv %s rsync://ftp.ncbi.nlm.nih.gov/genomes/%s/bacteria/*/latest_assembly_versions/*/ %s" % 
 				(file_type, data_base_to_use, output_dir), shell=True)
@@ -85,30 +88,28 @@ def download_from_ncbi(bacteria_needed, data_base_to_use, file_needed, output_di
 
 	else:
 
+		ftp.login()
+		ftp.cwd('genomes/%s/bacteria' % (data_base_to_use))
+		dirs_list = ftp.nlist()
+
+		genome_matches = fnmatch.filter(dirs_list, bacteria_needed)
+
+		if len(genome_matches) == 0:
+
+			print("%s not found in %s database. Exiting." % 
+				(bacteria_needed, data_base_to_use))
+
+			sys.exit(1)
+
+		print("Downloading %s genome from %s database..." % 
+			(bacteria_needed, data_base_to_use))
+
 		try:
 			subprocess.call("rsync -Lrtv %s rsync://ftp.ncbi.nlm.nih.gov/genomes/%s/bacteria/%s/latest_assembly_versions/*/ %s" % 
 				(file_type, data_base_to_use, bacteria_needed, output_dir), shell=True)
 		except:
 			raise Exception("Failed to download files")
-
-# Need to implement this as a fail safe 
-#Check that bacterium is in NCBI genbank/refseq
-# if args.bacterium:
-# 	ftp.login()
-# 	ftp.cwd('genomes/%s/bacteria' % NCBI_database)
-# 	dirs = ftp.nlst()
-# 	pattern = args.bacterium
-# 	genome_match = fnmatch.filter(dirs, pattern)
-# 	if len(genome_match) == 0:
-# 		print("Bacterium %s not found in %s -----> Exiting program" % (args.bacterium, NCBI_database))
-# 		sys.exit(1)
-# else:
-# 	print("")
-# 	print("Please provide bacterium name '-b'")
-# 	print("Exiting program")
-# 	print("")
-# 	sys.exit(1)
-		
+	
 
 
 # Run the actual program
