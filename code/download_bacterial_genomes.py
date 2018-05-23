@@ -72,13 +72,13 @@ def download_from_ncbi(bacteria_needed, data_base_to_use, file_needed, output_di
 
 	# set up system calls for downloads of specific file types
 	if file_needed == "fasta":
-		file_type = "--exclude='*cds_from*' --exclude='*rna_from*' --include='*genomic.fna.gz' --exclude='*'"
+		file_type = "--reject-regex='*cds_from*' --reject-regex='*rna_from*' --accept-regex='*genomic.fna.gz'"
 	elif file_needed == "genbank":
-		file_type = "--include='*genomic.gbff.gz' --exclude='*'"
+		file_type = "--accept-regex='*genomic.gbff.gz'"
 	elif file_needed == "gff":
-		file_type = "--include='*genomic.gff.gz' --exclude='*'"
+		file_type = "--accept-regex='*genomic.gff.gz'"
 	elif args.type == "feature_table":
-		file_type = "--include='*feature_table.txt.gz' --exclude='*'"
+		file_type = "--accept-regex='*feature_table.txt.gz'"
 	# Checks if the default to download all bacterial genomes is set
 	if bacteria_needed == "ALL":
 
@@ -86,8 +86,8 @@ def download_from_ncbi(bacteria_needed, data_base_to_use, file_needed, output_di
 			(data_base_to_use))
 		# Attempts to dowload all bacterial genomes and throws exception if it fails
 		try:
-			subprocess.call("rsync -Lrtv %s rsync://ftp.ncbi.nlm.nih.gov/genomes/%s/bacteria/*/latest_assembly_versions/*/ %s" % 
-				(file_type, data_base_to_use, output_dir), shell=True)
+			os.system("wget -r -np %s ftp://ftp.ncbi.nlm.nih.gov/genomes/%s/bacteria/*/latest_assembly_versions/*/ %s" % 
+				(file_type, data_base_to_use, output_dir))
 		except:
 			raise Exception("Failed to download files")
 	# If a specific bacterium is needed downloads this from given database
@@ -110,7 +110,7 @@ def download_from_ncbi(bacteria_needed, data_base_to_use, file_needed, output_di
 			(bacteria_needed, data_base_to_use))
 		# If there is a match then trys to downloads genome from desired database or throws an error
 		try:
-			subprocess.call("rsync -Lrtv %s rsync://ftp.ncbi.nlm.nih.gov/genomes/%s/bacteria/%s/latest_assembly_versions/*/ %s" % 
+			subprocess.call("wget -r -np %s ftp://ftp.ncbi.nlm.nih.gov/genomes/%s/bacteria/%s/latest_assembly_versions/*/ %s" % 
 				(file_type, data_base_to_use, bacteria_needed, output_dir), shell=True)
 		except:
 			raise Exception("Failed to download files")
