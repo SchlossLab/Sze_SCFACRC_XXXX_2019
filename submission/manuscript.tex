@@ -231,26 +231,26 @@ instances where SCFAs may be beneficial.
 One limitation of ours and others research into the effect of SCFAs in
 colorectal cancer has been that all tumors are treated as the same type.
 However, there are known differences in the types of mutations that
-occur {[}{]} and treating all tumors as equal may actually hide any
-benefit that could be found in specific subsets of individuals. Similar
-to the idea of specific immunotherapy for specific tumors {[}{]}, SCFAs
-may have beneficial effects for specific types of colorectal cancers.
-Future research will need to test if this is a valid hypothesis.
-Although there are limitations with the current research on SCFAs and
-colorectal tumors, evidence is building that these specific metabolites
-may not be protective. Yet, taxa that are associated with SCFA
-production are consistently higher in normal colons than those with
-carcinomas {[}{]}.
+occur (8) and treating all tumors as equal may actually hide any benefit
+that could be found in specific subsets of individuals. Similar to the
+idea of specific immunotherapy for specific tumors (9), SCFAs may have
+beneficial effects for specific types of colorectal cancers. Future
+research will need to test if this is a valid hypothesis. Although there
+are limitations with the current research on SCFAs and colorectal
+tumors, evidence is building that these specific metabolites may not be
+protective. Yet, taxa that are associated with SCFA production are
+consistently higher in normal colons than those with carcinomas
+(10--12).
 
 The potential protection against colorectal cancers may not be from
 SCFAs even though taxa associated with their production are higher in
-individuals with normal colons versus patients with carcinomas {[}{]}.
+individuals with normal colons versus patients with carcinomas (10--12).
 Protection could be via a different pathway and other metabolites that
 have not been extensively studied. Alternatively, protection may not
 occur via a metabolite but instead occur through niche exclusion of
 mouth-associated microbes (e.g. \emph{Fusobacterium},
-\emph{Porphyromonas}, \emph{Parvimonas}, \emph{Peptostreptococcus}
-{[}{]}). The idea of niche exclusion is similar to how the community
+\emph{Porphyromonas}, \emph{Parvimonas}, \emph{Peptostreptococcus} (13,
+14)). The idea of niche exclusion is similar to how the community
 protects against \emph{Clostridium difficile} infection with chronic
 inflammation replacing the role of antibiotics. Although we did not find
 lower concentrations of SCFAs associated with colorectal tumors, we
@@ -266,37 +266,37 @@ these observations.
 \subsection{Materials and Methods}\label{materials-and-methods}
 
 \textbf{Study design and sampling.} The overall protocol has been
-described in detail previously (8, 9). In brief, this study used fecal
+described in detail previously (15, 16). In brief, this study used fecal
 samples obtained at either a single cross-sectional time point (n=490)
 or from before (pre-) and after (post-) treatment for their tumor
 (n=67). For patients undergoing treatment for their tumor the length of
 time between their initial and follow up sample ranged from 188 - 546
 days. Our use of treatment has been previously defined as encompassing
-removal of a tumor with or without chemotherapy and radiation (8).
+removal of a tumor with or without chemotherapy and radiation (15).
 Diagnosis of tumor was made by colonoscopic examination and
-histopathological review of biopsies obtained (8, 9). The University of
-Michigan Institutional Review Board approved the study and informed
+histopathological review of biopsies obtained (15, 16). The University
+of Michigan Institutional Review Board approved the study and informed
 consent was obtained from all participants in accordance to the
 guidelines set out by the Helsinki Decleration.
 
 \textbf{Measuring specific SCFAs.} Our protocol for the measurement of
 acetate, butyrate, and propionate followed a previously published
-protocol (10). The following changes to this protocol included the use
+protocol (17). The following changes to this protocol included the use
 of frozen fecal samples suspended in 1ml of PBS instead of fecal
 suspensions in DNA Genotek OmniGut tubes, and the use of the acutal
 weight of fecal samples instead of the average weight for SCFA
 concentration normalizations. These changes did not affect the overall
 median concentrations of these SCFAs between the two studies (see Table
-1 (10) and Figure 1 in this report).
+1 (17) and Figure 1 in this report).
 
 \textbf{16s rRNA gene sequencing.} The workflow and processing have been
-described previously (8, 11, 12). The major differences from these
+described previously (15, 18, 19). The major differences from these
 previous reports include: the use of version 1.39.5 of the mothur
 software package and clustering Operational Taxonomic Units (OTUs) at
-97\% similarity used the OptClust algorithm (13).
+97\% similarity used the OptClust algorithm (20).
 
 \textbf{Generating imputed metagenomes.} The use of PICRUSt version
-1.1.2 with the recommended standard operating protocol (14) was used.
+1.1.2 with the recommended standard operating protocol (21) was used.
 Briefly, the mothur shared file and metadata was converted into a biom
 formated table using the biom convert function, the subsequent biom file
 was processed with the normalize\_by\_copy\_number.py function, and
@@ -307,34 +307,34 @@ function.
 cross-sectional group (n=490) containing a total of 85 individuals
 (normal n=29 normal, adenoma n=28, and carcinoma n=28) was shotgun
 sequenced on an Illumina HiSeq using 125 bp paired end reads and a
-previously described method (15). Briefly, the sequences were quality
+previously described method (22). Briefly, the sequences were quality
 filtered and sequences aligning to the human genome were removed prior
-to contig assembly with MEGAHIT (16). Open Reading Frames (ORFs) were
-identified using Prodigal (17), counts generated using Diamond (18),
+to contig assembly with MEGAHIT (23). Open Reading Frames (ORFs) were
+identified using Prodigal (24), counts generated using Diamond (25),
 subsequent clustering into Operational Protein Families (OPFs) used
-mmseq2 (19), and OPF alignment used the KEGG database (20).
+mmseq2 (26), and OPF alignment used the KEGG database (27).
 
 \textbf{Pulling genes involved with SCFA synthesis.} Specific genes
 located near the end of the pathways involved in the synthesis of
 acetate, butyrate, and propionate were analyzed for any differences
 between individuals with normal colons and those with tumors. These
-genes were based on pathways from KEGG as well as previous research (20,
-21) and a list can be found in the supplemental material {[}Table S1{]}.
+genes were based on pathways from KEGG as well as previous research (27,
+28) and a list can be found in the supplemental material {[}Table S1{]}.
 
 \textbf{Random Forest Models.} The model was first trained on 80\% of
 the data and then tested on the held out 20\% (80/20 split) using the
 Random Forest algorithm for both classification and regression models
-(22). This was repeated on 100 differen 80/20 splits of the data to
+(29). This was repeated on 100 differen 80/20 splits of the data to
 generate a reasonable range for the AUC of the model. The reported AUCs,
 unless otherwise specified, are for the test sets. Classification models
 were built to group normal versus adenoma and normal versus carcinoma or
 high versus low SCFA concentrations.
 
 \textbf{Statistical analysis workflow.} All analysis was performed using
-the statistical language R (23). Generally, differences between the
+the statistical language R (30). Generally, differences between the
 different disease groups used a Kruskal-Walis rank sum test with a
 Dunn's post-hoc test. Where appropriate Benjamini-Hochberg was used to
-correct for multiple comparisons (24). First, we assessed differences in
+correct for multiple comparisons (31). First, we assessed differences in
 SCFA concentrations measured by HPLC between individuals with normal
 colons and patients with tumors (adenoma or carcinoma). We then analyzed
 whether SCFA concentrations changed in patients with an adenoma or
@@ -421,29 +421,83 @@ the prevention of recurrent colorectal adenomas and carcinomas. Cochrane
 Database of Systematic Reviews.
 doi:\href{https://doi.org/10.1002/14651858.cd003430.pub2}{10.1002/14651858.cd003430.pub2}.
 
+\hypertarget{ref-Fearon1990}{}
+8. \textbf{Fearon ER}, \textbf{Vogelstein B}. 1990. A genetic model for
+colorectal tumorigenesis. Cell \textbf{61}:759--767.
+doi:\href{https://doi.org/10.1016/0092-8674(90)90186-i}{10.1016/0092-8674(90)90186-i}.
+
+\hypertarget{ref-Thomas2016}{}
+9. \textbf{Thomas X}, \textbf{Heiblig M}. 2016. The development of
+agents targeting the BCR-ABL tyrosine kinase as philadelphia
+chromosome-positive acute lymphoblastic leukemia treatment. Expert
+Opinion on Drug Discovery \textbf{11}:1061--1070.
+doi:\href{https://doi.org/10.1080/17460441.2016.1227318}{10.1080/17460441.2016.1227318}.
+
+\hypertarget{ref-Shah2017}{}
+10. \textbf{Shah MS}, \textbf{DeSantis TZ}, \textbf{Weinmaier T},
+\textbf{McMurdie PJ}, \textbf{Cope JL}, \textbf{Altrichter A},
+\textbf{Yamal J-M}, \textbf{Hollister EB}. 2017. Leveraging
+sequence-based faecal microbial community survey data to identify a
+composite biomarker for colorectal cancer. Gut \textbf{67}:882--891.
+doi:\href{https://doi.org/10.1136/gutjnl-2016-313189}{10.1136/gutjnl-2016-313189}.
+
+\hypertarget{ref-normalization_Sze2017}{}
+11. \textbf{Sze MA}, \textbf{Baxter NT}, \textbf{Ruffin MT},
+\textbf{Rogers MAM}, \textbf{Schloss PD}. 2017. Normalization of the
+microbiota in patients after treatment for colonic lesions. Microbiome
+\textbf{5}.
+doi:\href{https://doi.org/10.1186/s40168-017-0366-3}{10.1186/s40168-017-0366-3}.
+
+\hypertarget{ref-meta_analysis_crc_Sze2018}{}
+12. \textbf{Sze MA}, \textbf{Schloss PD}. 2018. Leveraging existing 16S
+rRNA gene surveys to identify reproducible biomarkers in individuals
+with colorectal tumors.
+doi:\href{https://doi.org/10.1101/285486}{10.1101/285486}.
+
+\hypertarget{ref-Zeller2014}{}
+13. \textbf{Zeller G}, \textbf{Tap J}, \textbf{Voigt AY},
+\textbf{Sunagawa S}, \textbf{Kultima JR}, \textbf{Costea PI},
+\textbf{Amiot A}, \textbf{Bohm J}, \textbf{Brunetti F},
+\textbf{Habermann N}, \textbf{Hercog R}, \textbf{Koch M},
+\textbf{Luciani A}, \textbf{Mende DR}, \textbf{Schneider MA},
+\textbf{Schrotz-King P}, \textbf{Tournigand C}, \textbf{Nhieu JTV},
+\textbf{Yamada T}, \textbf{Zimmermann J}, \textbf{Benes V},
+\textbf{Kloor M}, \textbf{Ulrich CM}, \textbf{Knebel Doeberitz M von},
+\textbf{Sobhani I}, \textbf{Bork P}. 2014. Potential of fecal microbiota
+for early-stage detection of colorectal cancer. Molecular Systems
+Biology \textbf{10}:766--766.
+doi:\href{https://doi.org/10.15252/msb.20145645}{10.15252/msb.20145645}.
+
+\hypertarget{ref-Baxter2016}{}
+14. \textbf{Baxter NT}, \textbf{Ruffin MT}, \textbf{Rogers MAM},
+\textbf{Schloss PD}. 2016. Microbiota-based model improves the
+sensitivity of fecal immunochemical test for detecting colonic lesions.
+Genome Medicine \textbf{8}.
+doi:\href{https://doi.org/10.1186/s13073-016-0290-3}{10.1186/s13073-016-0290-3}.
+
 \hypertarget{ref-normalization_sze2017}{}
-8. \textbf{Sze MA}, \textbf{Baxter NT}, \textbf{Ruffin MT},
+15. \textbf{Sze MA}, \textbf{Baxter NT}, \textbf{Ruffin MT},
 \textbf{Rogers MAM}, \textbf{Schloss PD}. 2017. Normalization of the
 microbiota in patients after treatment for colonic lesions. Microbiome
 \textbf{5}.
 doi:\href{https://doi.org/10.1186/s40168-017-0366-3}{10.1186/s40168-017-0366-3}.
 
 \hypertarget{ref-crc_model_baxter2016}{}
-9. \textbf{Baxter NT}, \textbf{Ruffin MT}, \textbf{Rogers MAM},
+16. \textbf{Baxter NT}, \textbf{Ruffin MT}, \textbf{Rogers MAM},
 \textbf{Schloss PD}. 2016. Microbiota-based model improves the
 sensitivity of fecal immunochemical test for detecting colonic lesions.
 Genome Medicine \textbf{8}.
 doi:\href{https://doi.org/10.1186/s13073-016-0290-3}{10.1186/s13073-016-0290-3}.
 
 \hypertarget{ref-scfa_measures_venkataraman2016}{}
-10. \textbf{Venkataraman A}, \textbf{Sieber JR}, \textbf{Schmidt AW},
+17. \textbf{Venkataraman A}, \textbf{Sieber JR}, \textbf{Schmidt AW},
 \textbf{Waldron C}, \textbf{Theis KR}, \textbf{Schmidt TM}. 2016.
 Variable responses of human microbiomes to dietary supplementation with
 resistant starch. Microbiome \textbf{4}.
 doi:\href{https://doi.org/10.1186/s40168-016-0178-x}{10.1186/s40168-016-0178-x}.
 
 \hypertarget{ref-Schloss2009}{}
-11. \textbf{Schloss PD}, \textbf{Westcott SL}, \textbf{Ryabin T},
+18. \textbf{Schloss PD}, \textbf{Westcott SL}, \textbf{Ryabin T},
 \textbf{Hall JR}, \textbf{Hartmann M}, \textbf{Hollister EB},
 \textbf{Lesniewski RA}, \textbf{Oakley BB}, \textbf{Parks DH},
 \textbf{Robinson CJ}, \textbf{Sahl JW}, \textbf{Stres B},
@@ -455,7 +509,7 @@ communities. Applied and Environmental Microbiology
 doi:\href{https://doi.org/10.1128/aem.01541-09}{10.1128/aem.01541-09}.
 
 \hypertarget{ref-Kozich2013}{}
-12. \textbf{Kozich JJ}, \textbf{Westcott SL}, \textbf{Baxter NT},
+19. \textbf{Kozich JJ}, \textbf{Westcott SL}, \textbf{Baxter NT},
 \textbf{Highlander SK}, \textbf{Schloss PD}. 2013. Development of a
 dual-index sequencing strategy and curation pipeline for analyzing
 amplicon sequence data on the MiSeq illumina sequencing platform.
@@ -463,13 +517,13 @@ Applied and Environmental Microbiology \textbf{79}:5112--5120.
 doi:\href{https://doi.org/10.1128/aem.01043-13}{10.1128/aem.01043-13}.
 
 \hypertarget{ref-opticlust_westcott2017}{}
-13. \textbf{Westcott SL}, \textbf{Schloss PD}. 2017. OptiClust, an
+20. \textbf{Westcott SL}, \textbf{Schloss PD}. 2017. OptiClust, an
 improved method for assigning amplicon-based sequence data to
 operational taxonomic units. mSphere \textbf{2}:e00073--17.
 doi:\href{https://doi.org/10.1128/mspheredirect.00073-17}{10.1128/mspheredirect.00073-17}.
 
 \hypertarget{ref-Langille2013}{}
-14. \textbf{Langille MGI}, \textbf{Zaneveld J}, \textbf{Caporaso JG},
+21. \textbf{Langille MGI}, \textbf{Zaneveld J}, \textbf{Caporaso JG},
 \textbf{McDonald D}, \textbf{Knights D}, \textbf{Reyes JA},
 \textbf{Clemente JC}, \textbf{Burkepile DE}, \textbf{Thurber RLV},
 \textbf{Knight R}, \textbf{Beiko RG}, \textbf{Huttenhower C}. 2013.
@@ -478,62 +532,62 @@ marker gene sequences. Nature Biotechnology \textbf{31}:814--821.
 doi:\href{https://doi.org/10.1038/nbt.2676}{10.1038/nbt.2676}.
 
 \hypertarget{ref-Hannigan2017}{}
-15. \textbf{Hannigan GD}, \textbf{Duhaime MB}, \textbf{Ruffin MT},
+22. \textbf{Hannigan GD}, \textbf{Duhaime MB}, \textbf{Ruffin MT},
 \textbf{Koumpouras CC}, \textbf{Schloss PD}. 2017. Diagnostic potential
 \& the interactive dynamics of the colorectal cancer virome.
 doi:\href{https://doi.org/10.1101/152868}{10.1101/152868}.
 
 \hypertarget{ref-Li2015}{}
-16. \textbf{Li D}, \textbf{Liu C-M}, \textbf{Luo R}, \textbf{Sadakane
+23. \textbf{Li D}, \textbf{Liu C-M}, \textbf{Luo R}, \textbf{Sadakane
 K}, \textbf{Lam T-W}. 2015. MEGAHIT: An ultra-fast single-node solution
 for large and complex metagenomics assembly via succinct de bruijn
 graph. Bioinformatics \textbf{31}:1674--1676.
 doi:\href{https://doi.org/10.1093/bioinformatics/btv033}{10.1093/bioinformatics/btv033}.
 
 \hypertarget{ref-Hyatt2010}{}
-17. \textbf{Hyatt D}, \textbf{Chen G-L}, \textbf{LoCascio PF},
+24. \textbf{Hyatt D}, \textbf{Chen G-L}, \textbf{LoCascio PF},
 \textbf{Land ML}, \textbf{Larimer FW}, \textbf{Hauser LJ}. 2010.
 Prodigal: Prokaryotic gene recognition and translation initiation site
 identification. BMC Bioinformatics \textbf{11}:119.
 doi:\href{https://doi.org/10.1186/1471-2105-11-119}{10.1186/1471-2105-11-119}.
 
 \hypertarget{ref-Buchfink2014}{}
-18. \textbf{Buchfink B}, \textbf{Xie C}, \textbf{Huson DH}. 2014. Fast
+25. \textbf{Buchfink B}, \textbf{Xie C}, \textbf{Huson DH}. 2014. Fast
 and sensitive protein alignment using DIAMOND. Nature Methods
 \textbf{12}:59--60.
 doi:\href{https://doi.org/10.1038/nmeth.3176}{10.1038/nmeth.3176}.
 
 \hypertarget{ref-Steinegger2017}{}
-19. \textbf{Steinegger M}, \textbf{Söding J}. 2017. MMseqs2 enables
+26. \textbf{Steinegger M}, \textbf{Söding J}. 2017. MMseqs2 enables
 sensitive protein sequence searching for the analysis of massive data
 sets. Nature Biotechnology.
 doi:\href{https://doi.org/10.1038/nbt.3988}{10.1038/nbt.3988}.
 
 \hypertarget{ref-Kanehisa2015}{}
-20. \textbf{Kanehisa M}, \textbf{Sato Y}, \textbf{Kawashima M},
+27. \textbf{Kanehisa M}, \textbf{Sato Y}, \textbf{Kawashima M},
 \textbf{Furumichi M}, \textbf{Tanabe M}. 2015. KEGG as a reference
 resource for gene and protein annotation. Nucleic Acids Research
 \textbf{44}:D457--D462.
 doi:\href{https://doi.org/10.1093/nar/gkv1070}{10.1093/nar/gkv1070}.
 
 \hypertarget{ref-scfa_baxter2014}{}
-21. \textbf{Baxter NT}, \textbf{Zackular JP}, \textbf{Chen GY},
+28. \textbf{Baxter NT}, \textbf{Zackular JP}, \textbf{Chen GY},
 \textbf{Schloss PD}. 2014. Structure of the gut microbiome following
 colonization with human feces determines colonic tumor burden.
 Microbiome \textbf{2}:20.
 doi:\href{https://doi.org/10.1186/2049-2618-2-20}{10.1186/2049-2618-2-20}.
 
 \hypertarget{ref-randomforest_citation_2002}{}
-22. \textbf{Liaw A}, \textbf{Wiener M}. 2002. Classification and
+29. \textbf{Liaw A}, \textbf{Wiener M}. 2002. Classification and
 regression by randomForest. R News \textbf{2}:18--22.
 
 \hypertarget{ref-r_citation_2017}{}
-23. \textbf{R Core Team}. 2017. R: A language and environment for
+30. \textbf{R Core Team}. 2017. R: A language and environment for
 statistical computing. R Foundation for Statistical Computing, Vienna,
 Austria.
 
 \hypertarget{ref-benjamini_controlling_1995}{}
-24. \textbf{Benjamini Y}, \textbf{Hochberg Y}. 1995. Controlling the
+31. \textbf{Benjamini Y}, \textbf{Hochberg Y}. 1995. Controlling the
 false discovery rate: A practical and powerful approach to multiple
 testing. Journal of the Royal Statistical Society Series B
 (Methodological) \textbf{57}:289--300.
