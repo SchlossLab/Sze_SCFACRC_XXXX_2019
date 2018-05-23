@@ -97,6 +97,21 @@ $2$ Department of Family Medicine and Community Medicine, Penn State Hershey Med
 
 ## Discussion
 
+The observations from this study do not support the hypothesis that SCFA concentrations are lower in individuals with tumors. Whether we directly measured the SCFA concentration or investigate genes associated with their production no difference could be identified [Figure 1 & 3]. Further, no benefit could be found in using the concentrations to help classify individuals with and without tumors [Figure 2]. These observations are in stark contrast to some of the previous literature.
+
+Much of the previous literature on SCFA benefit to human colorectal cancer has been illustrated in model systems [@test_OKeefe2016]. Many SCFAs are produced through the breakdown of fiber [@Holscher2017]. A recent study in mice found that fiber supplementation increased SCFA concentration and decreased tumor burden [@Bishehsari2018]. Additionally, SCFAs such as butyrate have been found to inhibit tumor growth in *in vitro* experiments [@Encarnao2018]. Yet, observations in humans has been mixed. Previous case/control studies have suggested that SCFAs are lower in individuals with carcinoma tumors [@Ohigashi2013]. However, individual studies and meta-analysis on fiber supplementation to prevent tumor recurrence have found no benefit [@Schatzkin2000; @Yao2017]. Our results align with what has been reported in randomized-controlled trials that SCFAs do not protect against all types of colorectal tumors. It is possible though that there are specific instances where SCFAs may be beneficial. 
+
+One limitation of ours and others research into the effect of SCFAs in colorectal cancer has been that all tumors are treated as the same type. However, there are known differences in the types of mutations that occur [] and treating all tumors as equal may actually hide any benefit that could be found in specific subsets of individuals. Similar to the idea of specific immunotherapy for specific tumors [], SCFAs may have beneficial effects for specific types of colorectal cancers. Future research will need to test if this is a valid hypothesis. Although there are limitations with the current research on SCFAs and colorectal tumors, evidence is building that these specific metabolites may not be protective. Yet, taxa that are associated with SCFA production are consistently higher in normal colons than those with carcinomas [].      
+
+The potential protection against colorectal cancers may not be from SCFAs even though taxa associated with their production are higher in individuals with normal colons versus patients with carcinomas []. Protection could be via a different pathway and other metabolites that have not been extensively studied. Alternatively, protection may not occur via a metabolite but instead occur through niche exclusion of mouth-associated microbes (e.g. *Fusobacterium*, *Porphyromonas*, *Parvimonas*, *Peptostreptococcus* []). The idea of niche exclusion is similar to how the community protects against *Clostridium difficile* infection with chronic inflammation replacing the role of antibiotics. Although we did not find lower concentrations of SCFAs associated with colorectal tumors, we think that there are many exciting new avenues to explore because of these observations.       
+
+
+
+
+
+
+
+
 \newpage
 
 ## Conclusions
