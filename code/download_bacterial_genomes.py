@@ -46,14 +46,19 @@ def find_genomes(data_base_to_use, output_dir):
 	#initialize FTP server 
 	ftp_site = 'ftp.ncbi.nlm.nih.gov'
 	ftp = FTP(ftp_site)
-
+	# gets all bacteria that are contained in the current database
 	ftp.login()
 	ftp.cwd("genomes/%s/bacteria" % (data_base_to_use))
 	dirs = ftp.nlst()
-
+	# Open txt file to write to
+	temp_file = open("%sbacteria_in_database.txt" % (output_dir), 'w')
+	# Output message to stdout
+	print("Identifying all bacterial genomes in %s database..." % 
+		(data_base_to_use))
+	# Create the needed list of all bacteria present
 	for genome in dirs:
 
-		print(genome)
+		temp_file.write(genome+'\n')
 
 	sys.exit()
 
@@ -74,26 +79,26 @@ def download_from_ncbi(bacteria_needed, data_base_to_use, file_needed, output_di
 		file_type = "--include='*genomic.gff.gz' --exclude='*'"
 	elif args.type == "feature_table":
 		file_type = "--include='*feature_table.txt.gz' --exclude='*'"
-
+	# Checks if the default to download all bacterial genomes is set
 	if bacteria_needed == "ALL":
 
 		print("Downloading all bacterial genomes from %s database..." % 
 			(data_base_to_use))
-
+		# Attempts to dowload all bacterial genomes and throws exception if it fails
 		try:
 			subprocess.call("rsync -Lrtv %s rsync://ftp.ncbi.nlm.nih.gov/genomes/%s/bacteria/*/latest_assembly_versions/*/ %s" % 
 				(file_type, data_base_to_use, output_dir), shell=True)
 		except:
 			raise Exception("Failed to download files")
-
+	# If a specific bacterium is needed downloads this from given database
 	else:
-
+		# login into the ftp server
 		ftp.login()
 		ftp.cwd('genomes/%s/bacteria' % (data_base_to_use))
 		dirs_list = ftp.nlist()
-
+		# finds any matches within the given database
 		genome_matches = fnmatch.filter(dirs_list, bacteria_needed)
-
+		# Exits program if there is no matches found
 		if len(genome_matches) == 0:
 
 			print("%s not found in %s database. Exiting." % 
@@ -103,7 +108,7 @@ def download_from_ncbi(bacteria_needed, data_base_to_use, file_needed, output_di
 
 		print("Downloading %s genome from %s database..." % 
 			(bacteria_needed, data_base_to_use))
-
+		# If there is a match then trys to downloads genome from desired database or throws an error
 		try:
 			subprocess.call("rsync -Lrtv %s rsync://ftp.ncbi.nlm.nih.gov/genomes/%s/bacteria/%s/latest_assembly_versions/*/ %s" % 
 				(file_type, data_base_to_use, bacteria_needed, output_dir), shell=True)
@@ -114,13 +119,15 @@ def download_from_ncbi(bacteria_needed, data_base_to_use, file_needed, output_di
 
 # Run the actual program
 def main(bacteria, data_base, type_of_file, av_genomes, outputPath):
-
+	# Creates a download directory if it doesn't exist
 	make_bacterial_genome_directory(outputPath)
-
+	# Runs a search of all bacterial genomes and returns a txt file of them if 
+	# argument is not blank
 	if av_genomes != None:
 
 		find_genomes(data_base, av_genomes)
 
+	# Runs the download from the NCBI database
 	download_from_ncbi(bacteria, data_base, type_of_file, outputPath)
 
 
