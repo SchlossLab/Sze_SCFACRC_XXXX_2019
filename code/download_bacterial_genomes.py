@@ -43,92 +43,93 @@ def make_bacterial_genome_directory(directory_name):
 # Function to find all genomes in the bacteria directory
 def find_genomes(data_base_to_use, output_dir):
 
-	#initialize FTP server 
-	ftp_site = 'ftp.ncbi.nlm.nih.gov'
-	ftp = FTP(ftp_site)
-	# gets all bacteria that are contained in the current database
-	ftp.login()
-	ftp.cwd("genomes/%s/bacteria" % (data_base_to_use))
-	dirs = ftp.nlst()
-	# Open txt file to write to
-	temp_file = open("%sbacteria_in_database.txt" % (output_dir), 'w')
-	# Output message to stdout
-	print("Identifying all bacterial genomes in %s database..." % 
-		(data_base_to_use))
-	# Create the needed list of all bacteria present
-	for genome in dirs:
+	os.system("wget ftp://ftp.ncbi.nlm.nih.gov/genomes/%s/bacteria/assembly_summary.txt -P %s" % 
+		(data_base_to_use, output_dir))
 
-		temp_file.write(genome+'\n')
+	temp_file = open("%sassembly_summary.txt" % (output_dir), 'r')
 
-	sys.exit()
+	temp_link_list = {}
+
+	x = 1
+
+	print("Creating dictionary of %s database to download..." % (data_base_to_use))
+
+	for line in temp_file:
+
+		temp_list = line.split('\t')
+
+		for value in temp_list:
+
+			if "ftp" in value and x > 2:
+
+				temp_link_list[temp_list[7]] = value
+
+		x += 1
+
+	temp_file.close()
+
+	# Write the file paths out to at txt file
+	temp_path_file = open("%scomplete_genomes.txt" % (output_dir), 'w')
+
+	print("Creating a key txt file...")
+
+	for bacterium in temp_link_list:
+
+		temp_path_file.write(bacterium+'\t'+temp_link_list[bacterium])
+
+	temp_path_file.close()
+
+
+	return(temp_link_list)
+
+
+
+
+
 
 
 # Function to run the actual download
-def download_from_ncbi(bacteria_needed, data_base_to_use, file_needed, output_dir):
-
-	#initialize FTP server 
-	ftp_site = 'ftp.ncbi.nlm.nih.gov'
-	ftp = FTP(ftp_site)
-
-	# set up system calls for downloads of specific file types
-	if file_needed == "fasta":
-		file_type = "--reject-regex='*cds_from*' --reject-regex='*rna_from*' --accept-regex='*genomic.fna.gz'"
-	elif file_needed == "genbank":
-		file_type = "--accept-regex='*genomic.gbff.gz'"
-	elif file_needed == "gff":
-		file_type = "--accept-regex='*genomic.gff.gz'"
-	elif args.type == "feature_table":
-		file_type = "--accept-regex='*feature_table.txt.gz'"
-	# Checks if the default to download all bacterial genomes is set
-	if bacteria_needed == "ALL":
-
-		print("Downloading all bacterial genomes from %s database..." % 
-			(data_base_to_use))
-		# Attempts to dowload all bacterial genomes and throws exception if it fails
-		try:
-			os.system("wget -r -np %s ftp://ftp.ncbi.nlm.nih.gov/genomes/%s/bacteria/*/latest_assembly_versions/*/ %s" % 
-				(file_type, data_base_to_use, output_dir))
-		except:
-			raise Exception("Failed to download files")
-	# If a specific bacterium is needed downloads this from given database
-	else:
-		# login into the ftp server
-		ftp.login()
-		ftp.cwd('genomes/%s/bacteria' % (data_base_to_use))
-		dirs_list = ftp.nlist()
-		# finds any matches within the given database
-		genome_matches = fnmatch.filter(dirs_list, bacteria_needed)
-		# Exits program if there is no matches found
-		if len(genome_matches) == 0:
-
-			print("%s not found in %s database. Exiting." % 
-				(bacteria_needed, data_base_to_use))
-
-			sys.exit(1)
-
-		print("Downloading %s genome from %s database..." % 
-			(bacteria_needed, data_base_to_use))
-		# If there is a match then trys to downloads genome from desired database or throws an error
-		try:
-			subprocess.call("wget -r -np %s ftp://ftp.ncbi.nlm.nih.gov/genomes/%s/bacteria/%s/latest_assembly_versions/*/ %s" % 
-				(file_type, data_base_to_use, bacteria_needed, output_dir), shell=True)
-		except:
-			raise Exception("Failed to download files")
+def download_from_ncbi(bacteria_needed, data_base_to_use, bacterial_list, output_dir):
 	
+		if bacteria_needed == "ALL":
+
+			# Execute the download
+			for link in bacterial_list:
+
+				os.system("wget -P %s --reject='*cds_from_genomic.fna.gz' \
+--reject='rna_from_genomic.fna.gz' \
+--accept='*genomic.fna.gz' %s/*genomic.fna.gz" % 
+			(output_dir, bacterial_list[link]))
+
+
+		else:
+
+			try:
+
+				os.system("wget -P %s --reject='*cds_from_genomic.fna.gz' \
+--reject='rna_from_genomic.fna.gz' \
+--accept='*genomic.fna.gz' %s/*genomic.fna.gz" % 
+			(output_dir, bacterial_list[bacteria_needed]))
+
+			except:
+
+				print("Bacterium not in database. Cannot download...")
+
+
+
 
 
 # Run the actual program
-def main(bacteria, data_base, type_of_file, av_genomes, outputPath):
+def main(bacteria, data_base, outputPath):
 	# Creates a download directory if it doesn't exist
 	make_bacterial_genome_directory(outputPath)
-	# Runs a search of all bacterial genomes and returns a txt file of them if 
-	# argument is not blank
-	if av_genomes != None:
-
-		find_genomes(data_base, av_genomes)
+	
+	# Runs a search of all bacterial genomes and returns a txt file of them
+	# based on database selected
+	genome_list = find_genomes(data_base, outputPath)
 
 	# Runs the download from the NCBI database
-	download_from_ncbi(bacteria, data_base, type_of_file, outputPath)
+	download_from_ncbi(bacteria, data_base, genome_list, outputPath)
 
 
 
@@ -149,15 +150,6 @@ if __name__ == '__main__':
 		type=str, help="The database to download the genome(s) from. \
 		The default database that is used is set to 'genbank'. \
 		The input must be one of 'genbank' or 'refseq'.")
-	parser.add_argument("-t", "--file_type", 
-		default="fasta",choices = ["genbank", "fasta", "gff", "feature_table"], type=str, 
-		help="The file type that will be downloaded from the database. \
-		The default is set to fasta. There are total of 4 options: \
-		'genbank', 'fasta', 'gff', and 'feature_table'.")
-	parser.add_argument("-g", "--genomes", 
-		choices=["genbank", "refseq"], type=str, 
-		help="This will list all available genomes in specified database. \
-		The argument is used in isolation (alone).")
 	parser.add_argument("-o", "--output_path", 
 		default="%sbacterial_genomes/" % (workdir), type=str, 
 		help="output directory")
@@ -165,5 +157,4 @@ if __name__ == '__main__':
 
 	args = parser.parse_args()
 	# Runs the main function with the following cmd line arguments ported into it
-	main(args.bacterium, args.database_used, args.file_type, 
-		args.genomes, args.output_path)
+	main(args.bacterium, args.database_used, args.output_path)
