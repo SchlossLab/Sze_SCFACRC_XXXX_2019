@@ -42,55 +42,51 @@ def make_bacterial_genome_directory(directory_name):
 
 # Function to find all genomes in the bacteria directory
 def find_genomes(data_base_to_use, output_dir):
-
+	# Download data on all genomes in database
 	os.system("wget ftp://ftp.ncbi.nlm.nih.gov/genomes/%s/bacteria/assembly_summary.txt -P %s" % 
 		(data_base_to_use, output_dir))
-
+	# Read in the downloaded file
 	temp_file = open("%sassembly_summary.txt" % (output_dir), 'r')
-
+	# Create an empty storage dictionary
 	temp_link_list = {}
-
+	# Create a counter
 	x = 1
 
 	print("Creating dictionary of %s database to download..." % (data_base_to_use))
-
+	# Parse the text file and populate the dictionary
 	for line in temp_file:
-
+		# separate the line by tab
 		temp_list = line.split('\t')
-
+		# iterate through each part of the list
 		for value in temp_list:
-
+			# Find values that are ftp and not in the first two lines
 			if "ftp" in value and x > 2:
-
+				# Add to dictionary key = bacterium, value = link
 				temp_link_list[temp_list[7]] = value
-
+		# Increase the counter
 		x += 1
-
+	# close the file
 	temp_file.close()
 
 	# Write the file paths out to at txt file
 	temp_path_file = open("%scomplete_genomes.txt" % (output_dir), 'w')
 
 	print("Creating a key txt file...")
-
+	# Create a master txt file of the key value pairs
 	for bacterium in temp_link_list:
 
 		temp_path_file.write(bacterium+'\t'+temp_link_list[bacterium])
-
+	# close the writing to file
 	temp_path_file.close()
 
-
+	# return the dictionary for later use
 	return(temp_link_list)
-
-
-
-
 
 
 
 # Function to run the actual download
 def download_from_ncbi(bacteria_needed, data_base_to_use, bacterial_list, output_dir):
-	
+		# Execute full download if default ALL is used
 		if bacteria_needed == "ALL":
 
 			# Execute the download
@@ -101,7 +97,7 @@ def download_from_ncbi(bacteria_needed, data_base_to_use, bacterial_list, output
 --accept='*genomic.fna.gz' %s/*genomic.fna.gz" % 
 			(output_dir, bacterial_list[link]))
 
-
+		# If it is not ALL try to download specific fasta
 		else:
 
 			try:
@@ -110,7 +106,7 @@ def download_from_ncbi(bacteria_needed, data_base_to_use, bacterial_list, output
 --reject='rna_from_genomic.fna.gz' \
 --accept='*genomic.fna.gz' %s/*genomic.fna.gz" % 
 			(output_dir, bacterial_list[bacteria_needed]))
-
+			# If it fails pump out this error
 			except:
 
 				print("Bacterium not in database. Cannot download...")
