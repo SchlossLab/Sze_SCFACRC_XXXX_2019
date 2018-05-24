@@ -62,15 +62,33 @@ kable(table_s2, format = "markdown", align = 'c', padding = 2)
 
 \newpage
 
-**Table S3: Breakdown of Kruskal-Wallis tests using counts per million from metagenomic sequencing of select genes in SCFA pathways.**
+
+
+**Table S3: Breakdown of Wilcoxson rank-sum tests for pre- versus post-treatment of tumor using PICRUSt imputed relative abundance of select genes in SCFA pathways.**
 ```{r supplemental_table3, echo=FALSE, message=FALSE, warning=FALSE}
-table_s3 <- read_csv("../data/process/select_scfa_opf_kruskal_summary.csv") %>% 
+
+table_s3 <- read_csv("../data/process/tables/specific_scfa_wilcox_picrust_treatment_summary.csv") %>% 
+  select(kegg_ortholog, group, statistic, p.value, bh) %>% 
+   mutate_at(vars(p.value:bh), function(x) round(x, digits = 3)) 
+ 
+
+colnames(table_s3) <-  c("KEGG IDs", "Disease Group", "Test Statistic", "P-value", "BH")
+
+kable(table_s3, format = "markdown", align = 'c', padding = 2)
+```
+
+
+\newpage
+
+**Table S4: Breakdown of Kruskal-Wallis tests using counts per million from metagenomic sequencing of select genes in SCFA pathways.**
+```{r supplemental_table4, echo=FALSE, message=FALSE, warning=FALSE}
+table_s4 <- read_csv("../data/process/select_scfa_opf_kruskal_summary.csv") %>% 
   select(kegg_id, statistic, p.value, bh) %>% 
   mutate_at(vars(statistic:bh), function(x) round(x, digits = 3))
 
-colnames(table_s3) <-  c("KEGG IDs", "Rank Sum Statistic", "P-value", "BH")
+colnames(table_s4) <-  c("KEGG IDs", "Rank Sum Statistic", "P-value", "BH")
 
-kable(table_s3, format = "markdown", align = 'c', padding = 2)
+kable(table_s4, format = "markdown", align = 'c', padding = 2)
 ```
 
 
