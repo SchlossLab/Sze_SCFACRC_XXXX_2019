@@ -48,6 +48,16 @@ cross_sectional_data <- nzv_full_pi_data %>%
   select(-fit_result) %>% 
   gather("kegg_ortholog", "rel_abund", 4:length(colnames(.)))
 
+
+# Treatment data
+treatment_data <- nzv_full_pi_data %>% 
+  filter(sample_id %in% c(metaF$initial, metaF$followUp)) %>% 
+  left_join(picrust_meta, by = c("sample_id" = "Group")) %>% 
+  select(sample_id, Dx_Bin, dx, everything()) %>% 
+  select(-fit_result) %>% 
+  gather("kegg_ortholog", "rel_abund", 4:length(colnames(.)))
+
+
 # Pull specific KEGG IDs based on pathway and literature search
 # Target Butyrate, Propionate, and Acetate pathway genes 
 # Enzymes at the very end of the pathways
@@ -60,6 +70,13 @@ acetate_genes <- c("K18372", "K00467", "K00156", "K00925", "K01512", "K01067", "
 # Select the specific data from the cleaned data set
 selected_data <- cross_sectional_data %>% 
   filter(kegg_ortholog %in% c(butyrate_genes, propionate_genes, acetate_genes))
+
+treat_selected_data <- treatment_data %>% 
+  filter(kegg_ortholog %in% c(butyrate_genes, propionate_genes, acetate_genes)) %>% 
+  mutate(time_point = ifelse(sample_id %in% metaF$initial, invisible("initial"), invisible("follow"))) %>% 
+  group_by(kegg_ortholog) %>% 
+  slice(match(c(metaF$initial, metaF$followUp), sample_id)) %>% 
+  ungroup()
 
 # Run the Kruskal-wallis analysis
 kruskal_test <- selected_data %>% 
@@ -76,9 +93,28 @@ kruskal_test <- selected_data %>%
   mutate(bh = p.adjust(p.value, method = "BH")) %>% 
   arrange(p.value)
 
-# Write out the results
-write_csv(kruskal_test, "data/process/specific_scfa_kruskal_picrust_summary.csv")
-write_csv(selected_data, "data/process/selected_scfa_gene_data.csv")
 
+# Run the Kruskal-wallis analysis for treatment
+treat_wilcox_test <- treat_selected_data %>% 
+  group_by(kegg_ortholog, dx) %>% 
+  mutate(time_point = factor(time_point, 
+                     levels = c("initial", "follow"), 
+                     labels = c("Pre-Treatment", "Post-Treatment"))) %>% 
+  nest() %>% 
+  mutate(wilcox_analysis = map(data, ~wilcox.test(rel_abund ~ time_point, paired = TRUE, data = .x)), 
+         summary_data = map(wilcox_analysis, broom::tidy)) %>% 
+  select(kegg_ortholog, summary_data) %>% 
+  unnest(summary_data) %>% 
+  select(kegg_ortholog, method, statistic, p.value) %>% 
+  mutate(bh = p.adjust(p.value, method = "BH"), 
+         group = rep(c("Adenoma", "Carcinoma"), length(rownames(.))/2)) %>% 
+  arrange(p.value)
+
+
+# Write out the results
+write_csv(kruskal_test, "data/process/tables/specific_scfa_kruskal_picrust_summary.csv")
+write_csv(selected_data, "data/process/tables/selected_scfa_gene_data.csv")
+write_csv(treat_wilcox_test, "data/process/tables/specific_scfa_wilcox_picrust_treatment_summary.csv")
+write_csv(treat_selected_data, "data/process/tables/selected_scfa_treatment_picrust_gene_data.csv")
 
 

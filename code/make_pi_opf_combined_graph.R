@@ -22,10 +22,10 @@ acetate_genes <- c("K18372", "K00467", "K00156", "K00925", "K01512", "K01067", "
   # K01035 - acetate CoA (beta)
 
 # Load in needed metadata and rename sample column
-picrust_data <- read_csv("data/process/selected_scfa_gene_data.csv") %>% 
+picrust_data <- read_csv("data/process/tables/selected_scfa_gene_data.csv") %>% 
   filter(kegg_ortholog %in% butyrate_genes)
 
-opf_data <- read_csv("data/process/select_scfa_opf_data.csv") %>% 
+opf_data <- read_csv("data/process/tables/select_scfa_opf_data.csv") %>% 
   filter(kegg_id %in% butyrate_genes)
 
 imputed_fig <- picrust_data %>% 
