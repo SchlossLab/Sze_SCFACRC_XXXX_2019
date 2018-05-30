@@ -10,7 +10,7 @@
 ############## Internal parameters used by all functions is program ########################
 
 # Import needed libraries
-import os, sys, argparse, subprocess, fnmatch
+import os, sys, argparse, subprocess, fnmatch, glob
 
 # Import other code with useful functions that will be used
 from ftplib import FTP
@@ -84,6 +84,44 @@ def find_genomes(data_base_to_use, output_dir):
 
 
 
+# Function to search output directory for current genomes and remove those that 
+# do not need updating
+def get_current_files(data_base_to_use, output_dir):
+
+	print("Getting existing files in %s." %(output_dir))
+
+	current_files = []
+
+	temp_dict = dict(data_base_to_use)
+
+	all_files_in_dir = glob.glob("%s*.gz" % (output_dir))
+
+	print("Generating query list...")
+
+	for file in all_files_in_dir:
+
+		current_files.append(file)
+
+	print("Comparing and removing already downloaded files from list.")
+
+	for link in data_base_to_use:
+
+		temp_string = data_base_to_use[link]
+
+		if temp_string.startswith('ftp'):
+
+			temp_string = temp_string[55:]
+
+		for file in current_files:
+
+			if temp_string in file:
+
+				del temp_dict[link]
+
+	return(temp_dict)
+
+
+
 # Function to run the actual download
 def download_from_ncbi(bacteria_needed, data_base_to_use, bacterial_list, output_dir):
 		# Execute full download if default ALL is used
@@ -124,8 +162,13 @@ def main(bacteria, data_base, outputPath):
 	# based on database selected
 	genome_list = find_genomes(data_base, outputPath)
 
+	
+	final_database = get_current_files(genome_list, outputPath)
+
+	# print(final_database)
+
 	# Runs the download from the NCBI database
-	download_from_ncbi(bacteria, data_base, genome_list, outputPath)
+	# download_from_ncbi(bacteria, data_base, genome_list, outputPath)
 
 
 
