@@ -164,10 +164,8 @@ def main(bacteria, data_base, outputPath):
 
 		genome_list = get_current_files(genome_list, outputPath)
 
-	print(len(genome_list))
-
 	# Runs the download from the NCBI database
-	# download_from_ncbi(bacteria, data_base, genome_list, outputPath)
+	download_from_ncbi(bacteria, data_base, genome_list, outputPath)
 
 
 
