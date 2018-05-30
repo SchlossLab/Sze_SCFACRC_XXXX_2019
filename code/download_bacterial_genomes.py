@@ -89,35 +89,28 @@ def find_genomes(data_base_to_use, output_dir):
 def get_current_files(data_base_to_use, output_dir):
 
 	print("Getting existing files in %s." %(output_dir))
-
-	current_files = []
-
+	# Copy the existing stored dictionary -- to delete from later
 	temp_dict = dict(data_base_to_use)
-
+	# create a list of all the files with gz in the output directory
+	print("Generating query list...")
 	all_files_in_dir = glob.glob("%s*.gz" % (output_dir))
 
-	print("Generating query list...")
-
-	for file in all_files_in_dir:
-
-		current_files.append(file)
-
 	print("Comparing and removing already downloaded files from list.")
-
+	# loop through the current bacterial database and get the link
 	for link in data_base_to_use:
 
 		temp_string = data_base_to_use[link]
-
+		# find and remove the ftp link from string
 		if temp_string.startswith('ftp'):
 
 			temp_string = temp_string[55:]
-
-		for file in current_files:
-
+		# loop through all gz files in directory
+		for file in all_files_in_dir:
+			# remove from the temp dictionary if their is a match
 			if temp_string in file:
 
 				del temp_dict[link]
-
+	# return the reduced dictionary
 	return(temp_dict)
 
 
@@ -162,10 +155,16 @@ def main(bacteria, data_base, outputPath):
 	# based on database selected
 	genome_list = find_genomes(data_base, outputPath)
 
-	
-	final_database = get_current_files(genome_list, outputPath)
+	# Check to find previously downloaded files and ouput a new genome_list
+	temp_file = os.listdir(outputPath)
 
-	# print(final_database)
+	if any("gz" in s for s in os.listdir(outputPath)):
+
+		print("Zipped files already exist. Checking downloaded files...")
+
+		genome_list = get_current_files(genome_list, outputPath)
+
+	print(len(genome_list))
 
 	# Runs the download from the NCBI database
 	# download_from_ncbi(bacteria, data_base, genome_list, outputPath)
