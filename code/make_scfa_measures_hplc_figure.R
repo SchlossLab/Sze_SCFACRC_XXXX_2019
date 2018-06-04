@@ -232,7 +232,7 @@ scfa_plot <- grid.arrange(cross_figs[["acetate"]], cross_figs[["butyrate"]], cro
                                 layout_matrix = rbind(c(1, 2, 3), c(4, 5, 6)))
 
 # Write out to specific directory
-ggsave("results/figures/full_scfa_graph.pdf", scfa_plot, width = 9.5, height = 9)
+ggsave("results/figures/Figure1.pdf", scfa_plot, width = 9.5, height = 9)
 
 
 

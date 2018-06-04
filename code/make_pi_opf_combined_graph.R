@@ -77,5 +77,5 @@ metagenome_fig <- opf_data %>%
 gene_plot <- grid.arrange(imputed_fig, metagenome_fig, 
                           layout_matrix = rbind(c(1, 1, 2)))
 # Write out to specific directory
-ggsave("results/figures/butyrate_specific_genes_graph.pdf", gene_plot, width = 9, height = 5)
+ggsave("results/figures/Figure3.pdf", gene_plot, width = 9, height = 5)
 
