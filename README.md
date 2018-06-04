@@ -1,13 +1,18 @@
-## Effects of Short Chain Fatty Acid Production on the Microbiota and Colorectal Cancer
+## Revisiting short-chain fatty acids and the microbiota in colorectal tumors
 
-The abstract will be updated once analysis is completed. The general overall analysis workflow is as follows:
+**Background.** Colorectal cancer (CRC) is a growing health concern with a large percentage of
+the risk of developing disease being due to environmental factors. Certain bacterial community
+members have been associated to increase CRC while other taxa have been associated with normal
+colons. Some of the taxa associated with normal colons can use fiber to produce short-chain
+fatty acids (SCFAs) that can inhibit tumor growth in model systems. However, the data supporting the importance of SCFAs in human CRC is less certain. Here, we test the hypothesis that SCFA concentration changes in individuals with colorectal tumors.
 
-* Analyze differences in SCFA between those with and without colorectal cancer (CRC)
-* Assess which bacterial communities are associated with SCFA reduction
-* Determine if any of these communities are higher in those with CRC
+**Methods.** We analyzed a cross-sectional (n=490) and pre- and post-treatment (n=67) group for
+their concentrations of acetate, butyrate, and propionate. Analysis also included tumor classification models using Random Forest, imputed gene relative abundance with PICRUSt, and metagenomic sequencing on a subset (n=85) of the total cross-sectional group.
 
-Overall goal is to develop a potential framework by which the microbiota can affect CRC disease course through SCFAs
+**Results.** No difference in SCFA concentration was found between normal individuals and patients with adenoma or carcinoma (P-value > 0.15). There was no difference in classification models with or without SCFAs in their ability to predict adenoma or carcinoma (P-value > 0.05). Using metagenomic sequencing, there was also no difference in genes involved with SCFA synthesis (P-value > 0.70).
 
+**Conclusions.** Although our data does not support the hypothesis that SCFAs decrease in
+individuals that have colorectal tumors, there may be specific scenarios where SCFAs may still be beneficial for treatment of CRC. Alternatively, there may be other metabolites that have not been thoroughly investigated that are more important to the development of human CRC.
 
 
 
@@ -52,14 +57,14 @@ Overall goal is to develop a potential framework by which the microbiota can aff
 
 #### Dependencies and locations
 * Gnu Make should be located in the user's PATH
-* mothur (v1.XX.0) should be located in the user's PATH
-* R (v. 3.X.X) should be located in the user's PATH
+* mothur (v1.39.5) should be located in the user's PATH
+* R (v. 3.4.4) should be located in the user's PATH
 * etc.
 
 
 #### Running analysis
 
 ```
-git clone https://github.com/SchlossLab/LastName_BriefDescription_Journal_Year.git
+git clone https://github.com/SchlossLab/Sze_scfa_crc_XXXX_2017.git
 make write.paper
 ```
