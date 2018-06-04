@@ -59,7 +59,6 @@ individuals that have colorectal tumors, there may be specific scenarios where S
 * Gnu Make should be located in the user's PATH
 * mothur (v1.39.5) should be located in the user's PATH
 * R (v. 3.4.4) should be located in the user's PATH
-* etc.
 
 
 #### Running analysis
