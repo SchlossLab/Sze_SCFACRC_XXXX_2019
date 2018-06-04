@@ -342,9 +342,25 @@ $(SCFA_RF_IMP) : $(PROC)/picrust_metadata $(RAW)/metadata/good_metaf_final.csv\
 #
 ################################################################################
 
+$(FIGS)/Figure1.pdf : $(RAW)/metadata/good_metaf_final.csv\
+		$(RAW)/metadata/metaI_final.csv $(FINAL_SCFA_DATA)
+	Rscript code/make_scfa_measures_hplc_figure.R
 
 
+$(FIGS)/Figure2.pdf : $(TABLES)/adn_full_AUC_model_summary.csv\
+		$(TABLES)/adn_otu_only_AUC_model_summary.csv\
+		$(TABLES)/crc_full_AUC_model_summary.csv\
+		$(TABLES)/crc_otu_only_AUC_model_summary.csv\
+		code/make_rf_auc_graphs.R
+	Rscript code/make_rf_auc_graphs.R
 
+$(FIGS)/Figure3.pdf : $(TABLES)/selected_scfa_gene_data.csv\
+		$(TABLES)/select_scfa_opf_data.csv code/make_pi_opf_combined_graph.R
+	Rscript code/make_pi_opf_combined_graph.R
+
+$(FIGS)/FigureS1.pdf : $(SCFA_RF_DATA) $(SCFA_RF_IMP)\
+		code/make_SCFA_classification_graph.R
+	Rscript code/make_SCFA_classification_graph.R
 
 
 
@@ -356,17 +372,8 @@ $(SCFA_RF_IMP) : $(PROC)/picrust_metadata $(RAW)/metadata/good_metaf_final.csv\
 #
 ################################################################################
 
-
-$(FINAL)/study.% : 			\ #include data files that are needed for paper
-						$(FINAL)/peerj.csl\
-						$(FINAL)/references.bib\
-						$(FINAL)/study.Rmd
-	R -e 'render("$(FINAL)/study.Rmd", clean=FALSE)'
-	mv $(FINAL)/study.knit.md $@
-	rm $(FINAL)/study.utf8.md
-
-write.paper : $(TABLES)/table_1.pdf $(TABLES)/table_2.pdf\ #customize to include
-				$(FIGS)/figure_1.pdf $(FIGS)/figure_2.pdf\	# appropriate tables and
-				$(FIGS)/figure_3.pdf $(FIGS)/figure_4.pdf\	# figures
-				$(FINAL)/study.Rmd $(FINAL)/study.md\
-				$(FINAL)/study.tex $(FINAL)/study.pdf
+write.paper : $(FINAL)/manuscript.Rmd $(FINAL)/supplement.Rmd\
+		$(FINAL)/references.bib $(FINAL)/mbio.csl $(FINAL)/header.tex\
+		$(FIGS)/Figure1.pdf $(FIGS)/Figure2.pdf\
+		$(FIGS)/Figure3.pdf $(FIGS)/FigureS1.pdf code/Run_render_paper.R
+	R -e "source('code/Run_render_paper.R')"
