@@ -1,5 +1,5 @@
 ---
-title: "Revisiting Short-Chain Fatty Acids and the Microbiota in Colorectal Cancer"
+title: "Revisiting Short-Chain Fatty Acids and the Microbiota in Colorectal Tumors"
 bibliography: references.bib
 output:
   pdf_document:
@@ -53,7 +53,7 @@ opf_select <- read_csv("../data/process/tables/select_scfa_opf_kruskal_summary.c
 
 \vspace{35mm}
 
-Running title: SCFAs and Colorectal Cancer
+Running title: SCFAs and colorectal tumors
 
 \vspace{35mm}
 
