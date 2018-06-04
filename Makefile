@@ -3,6 +3,7 @@ FIGS = results/figures
 TABLES = results/tables
 PROC = data/process
 FINAL = submission/
+RAW = data/raw
 
 # utility function to print various variables. For example, running the
 # following at the command line:
@@ -141,6 +142,42 @@ $(PROC)/gg_corr_OTU_table.biom\
 $(PROC)/gg_corr_normalized_otus.biom\
 $(PROC)/predicted_metagenomes.biom : code/run_picrust.sh
 	bash code/run_picrust.sh
+
+
+# Create the needed contig fasta file
+$(RAW)/all_contigs.fasta : code/module.sh\
+		code/qual_trim.py code/rm_human_seqs.py code/create_contigs.py\
+		code/create_master_contig_file.py code/create_contig_length_table.py
+	source code/module.sh
+	python code/qual_trim.py -s "data/raw/whole_metagenome_samples.txt"
+	python code/rm_human_seqs.py -s "data/raw/whole_metagenome_samples.txt"
+	python code/create_contigs.py -s "data/raw/whole_metagenome_samples.txt"
+	python code/create_master_contig_file.py -s "data/raw/whole_metagenome_samples.txt"
+	python code/create_contig_length_table.py -cf "data/raw/all_contigs.fasta"
+
+
+# Create the needed OPFs with contigs 1kb or greater
+$(RAW)/all_contigs_1kbto10kb.fasta\
+$(PROC)/orf_gene_alignment.tsv\
+$(RAW)/diamond_analysis/orf_abund.tsv : code/remove_short_contigs.py\
+		code/concoct_scripts/cut_up_fasta.py code/prodigal_wrap.py\
+		code/diamond_wrap.py code/run_create_OPF_abund_table.R\
+		$(RAW)/mmseq2_opf_run/resultDB.m8
+	python code/remove_short_contigs.py -s "data/raw/whole_metagenome_samples.txt"
+	python2 code/concoct_scripts/cut_up_fasta.py -c 10000 -o 0 -m $(RAW)/all_contigs_greater1kb.fasta > $(RAW)/all_contigs_1kbto10kb.fasta
+	python code/prodigal_wrap.py
+	cp data/raw/mmseq2_opf_run/resultDB.m8 data/process/orf_gene_alignment.tsv
+	python code/diamond_wrap.py
+	Rscript code/run_create_OPF_abund_table.R $(RAW)/mmseq2_opf_run/clu.tsv $(RAW)/diamond_analysis/orf_abund.tsv
+
+
+
+# Get specific OPF SCFA KEGG matches
+$(PROC)/select_scfa_opf_matches.tsv : code/kegg_parse.py $(PROC)/scfa_kegg_ids.txt\
+		$(PROC)/orf_gene_alignment.tsv
+	python code/kegg_parse.py -iko "data/process/scfa_kegg_ids.txt" -gad "data/process/orf_gene_alignment.tsv" -o "data/process/select_scfa_opf_matches.tsv" 
+
+
 
 
 
