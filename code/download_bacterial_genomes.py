@@ -75,7 +75,7 @@ def find_genomes(data_base_to_use, output_dir):
 	# Create a master txt file of the key value pairs
 	for bacterium in temp_link_list:
 
-		temp_path_file.write(bacterium+'\t'+temp_link_list[bacterium])
+		temp_path_file.write(bacterium+'\t'+temp_link_list[bacterium]+'\n')
 	# close the writing to file
 	temp_path_file.close()
 
