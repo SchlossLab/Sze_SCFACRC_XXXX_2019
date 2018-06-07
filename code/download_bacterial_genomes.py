@@ -123,20 +123,26 @@ def download_from_ncbi(bacteria_needed, data_base_to_use, bacterial_list, output
 			# Execute the download
 			for link in bacterial_list:
 
-				os.system("wget -P %s --reject='*cds_from_genomic.fna.gz' \
+				temp_string = bacterial_list[link][55:]
+
+				os.system("wget -P %s \
+--reject='*cds_from_genomic.fna.gz' \
 --reject='rna_from_genomic.fna.gz' \
---accept='*genomic.fna.gz' %s/" % 
-			(output_dir, bacterial_list[link]))
+--accept='*genomic.fna.gz' %s/%s_genomic.fna.gz" % 
+			(output_dir, bacterial_list[link], temp_string))
 
 		# If it is not ALL try to download specific fasta
 		else:
 
 			try:
 
-				os.system("wget -P %s --reject='*cds_from_genomic.fna.gz' \
+				temp_string = bacterial_list[bacteria_needed][55:]
+
+				os.system("wget -P %s \
+--reject='*cds_from_genomic.fna.gz' \
 --reject='rna_from_genomic.fna.gz' \
---accept='*genomic.fna.gz' %s/" % 
-			(output_dir, bacterial_list[bacteria_needed]))
+--accept='*genomic.fna.gz' %s/%s_genomic.fna.gz" % 
+			(output_dir, bacterial_list[bacteria_needed], temp_string))
 			# If it fails pump out this error
 			except:
 
