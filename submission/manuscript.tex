@@ -125,36 +125,39 @@ Hershey Medical Center, Hershey, PA
 \subsection{Abstract}\label{abstract}
 
 \textbf{Background.} Colorectal cancer (CRC) is a growing health concern
-with a large percentage of the risk of developing disease being due to
-environmental factors. Certain bacterial community members have been
-associated to increase CRC while other taxa have been associated with
-normal colons. Some of the taxa associated with normal colons can use
-fiber to produce short-chain fatty acids (SCFAs) that can inhibit tumor
-growth in model systems. However, the data supporting the importance of
-SCFAs in human CRC is less certain. Here, we test the hypothesis that
-SCFA concentration changes in individuals with colorectal tumors.
+with the majority of the risk for developing disease being due to
+environmental factors. The microbiota is one of these environmental
+factors with certain bacterial community members being associated with
+CRC, while other taxa are associated to colons without tumors. Some of
+the taxa associated to colons without tumors can use fiber to produce
+short-chain fatty acids (SCFAs) that can inhibit tumor growth in model
+systems. However, the data supporting the importance of SCFAs in human
+CRC is less certain. Here, we test the hypothesis that SCFA
+concentrations are different in individuals with colorectal tumors.
 
-\textbf{Methods.} We analyzed a cross-sectional (n=490) and pre- and
-post-treatment (n=67) group for their concentrations of acetate,
-butyrate, and propionate. Analysis also included tumor classification
-models using Random Forest, imputed gene relative abundance with
-PICRUSt, and metagenomic sequencing on a subset (n=85) of the total
-cross-sectional group.
+\textbf{Methods.} We analyzed a cross-sectional (n=490) and longitudinal
+pre- and post-treatment (n=67) group for their concentrations of
+acetate, butyrate, and propionate. Analysis also included tumor
+classification models using Random Forest, imputed gene relative
+abundance with PICRUSt, and metagenomic sequencing on a subset (n=85) of
+the total cross-sectional group.
 
-\textbf{Results.} No difference in SCFA concentration was found between
-normal individuals and patients with adenoma or carcinoma (P-value
-\textgreater{} 0.15). There was no difference in classification models
-with or without SCFAs in their ability to predict adenoma or carcinoma
+\textbf{Results.} No difference in SCFA concentrations were found
+between individuals without tumors and patients with adenomas or
+carcinomas (P-value \textgreater{} 0.15). There was no difference in
+classification models with or without SCFAs in their ability to predict
+patients with adenomas or carcinomas versus individuals without tumors
 (P-value \textgreater{} 0.05). Using metagenomic sequencing, there was
-also no difference in genes involved with SCFA synthesis (P-value
-\textgreater{} 0.70).
+also no difference in genes involved with SCFA synthesis between
+individuals without tumors and patients with adenomas or carcinomas
+(P-value \textgreater{} 0.70).
 
 \textbf{Conclusions.} Although our data does not support the hypothesis
-that SCFAs decrease in individuals that have colorectal tumors, there
-may be specific scenarios where SCFAs may still be beneficial for
-treatment of CRC. Alternatively, there may be other metabolites that
-have not been thoroughly investigated that are more important to the
-development of human CRC.
+that SCFAs are different in individuals that have colorectal tumors,
+there may be context specific scenarios where SCFAs may still be
+beneficial for treatment of CRC. Alternatively, there may be other
+mechanisms that have not been thoroughly investigated that are more
+important to the development of human CRC.
 
 \newpage
 
@@ -162,7 +165,7 @@ development of human CRC.
 
 Colorectal cancer (CRC) is currently the third leading cancer-related
 cause of death within the US (1, 2). Although there is a genetic
-component to the disease, the envrionment has been attributed as an
+component to the disease, the environment has been attributed as an
 important and large risk factor for CRC (3). This has lead to the
 investigation of how the microbiota may exacerbate or cause tumorigensis
 (4--6) and whether the bacterial community is altered (7, 8). Multiple
@@ -225,7 +228,7 @@ Random Forest algorithm (19), used PICRUSt (20) and metagenomic
 sequencing to assess the genes involved in SCFA synthesis, and analyzed
 how well 16S rRNA gene sequencing can predict SCFA concentrations. This
 investigation provides additional information as to whether the taxa
-that are decreased in carcionma use SCFAs to help protect against colon
+that are decreased in carcinoma use SCFAs to help protect against colon
 tumorigenesis.
 
 \newpage
@@ -269,10 +272,10 @@ important for the synthesis of SCFAs {[}Table S1{]}, we looked for
 differences in gene abundance based on individuals having normal colons,
 adenomas, or carcinomas. First, using imputed gene relative abundance
 based on 16S rRNA gene sequencing we found no difference in any of the
-genes inolved with acetate, butyrate, or propionate synthesis (P-value
+genes involved with acetate, butyrate, or propionate synthesis (P-value
 \textgreater{} 0.90) {[}Table S2{]}. This similarity between groups is
 highlighted by visualizing genes important in butyrate synthesis
-{[}Figure 3A{]}. Using a Wilcoxson rank-sum test, there also was no
+{[}Figure 3A{]}. Using a Wilcoxon rank-sum test, there also was no
 difference in imputed gene relative abundance between pre- and
 post-treatment samples for any genes involved with SCFA synthesis
 (P-value \textgreater{} 0.70) {[}Table S3{]}. Next, we took a subset of
@@ -294,7 +297,7 @@ regardless of tumor status.} Using OTU data we built Random Forest
 models to classify higher than median and lower than median SCFA
 concentrations. Overall, OTU data had a reasonable ability to classify
 high and low SCFA concentrations {[}Figure S1A{]}. However, these models
-tended to be overfit, suggesting that rarer taxa may be important for
+tended to be over fit, suggesting that rarer taxa may be important for
 this classification {[}Figure S1A{]}. The most important OTUs to these
 models (assessed with mean decrease in accuracy (MDA)) were to taxa that
 are normally associated with SCFA production {[}Figure S1B{]}. These
@@ -393,14 +396,14 @@ Diagnosis of tumor was made by colonoscopic examination and
 histopathological review of biopsies obtained (26, 27). The University
 of Michigan Institutional Review Board approved the study and informed
 consent was obtained from all participants in accordance to the
-guidelines set out by the Helsinki Decleration.
+guidelines set out by the Helsinki Declaration.
 
 \textbf{Measuring specific SCFAs.} Our protocol for the measurement of
 acetate, butyrate, and propionate followed a previously published
 protocol that used a High-Performance Liquid Chromatography (HPLC)
 machine (28). The following changes to this protocol included the use of
 frozen fecal samples suspended in 1ml of PBS instead of fecal
-suspensions in DNA Genotek OmniGut tubes, and the use of the acutal
+suspensions in DNA Genotek OmniGut tubes, and the use of the actual
 weight of fecal samples instead of the average weight for SCFA
 concentration normalizations. These methodological changes did not
 affect the overall median concentrations of these SCFAs between the two
@@ -415,9 +418,9 @@ software package and clustering Operational Taxonomic Units (OTUs) at
 \textbf{Generating imputed metagenomes.} The use of PICRUSt version
 1.1.2 with the recommended standard operating protocol (20) was used.
 Briefly, the mothur shared file and metadata was converted into a biom
-formated table using the biom convert function, the subsequent biom file
-was processed with the `normalize\_by\_copy\_number.py' function, and
-subsequent imputed metagenomes created using the
+formatted table using the biom convert function, the subsequent biom
+file was processed with the `normalize\_by\_copy\_number.py' function,
+and subsequent imputed metagenomes created using the
 `predict\_metagenomes.py' function.
 
 \textbf{Obtaining Operational Protein Families from metagenomes.} A
@@ -471,7 +474,7 @@ rRNA gene sequencing data was created using the Random Forest algorithm.
 The authors thank the Great Lakes-New England Early Detection Research
 Network for providing the fecal samples that were used in this study. We
 would also like to thank Kwi Kim and Thomas M Schmidt for their help in
-running the short-chian fatty acid analysis on the High-Performace
+running the short-chain fatty acid analysis on the High-Performance
 Liquid Chromatography machine at the University of Michigan. Salary
 support for Marc A. Sze came from the Canadian Institute of Health
 Research and NIH grant UL1TR002240. Salary support for Patrick D.
@@ -810,7 +813,7 @@ metagenome analysis.
 \textbf{Figure S1. OTU-based Random Forest models of SCFA
 concentrations.} The train and test results of 100 different 80/20
 OTU-based models with 10-fold CV based on higher or lower than the
-medain SCFA concentration using classification Random Forest (A). The
+median SCFA concentration using classification Random Forest (A). The
 top 10 OTUs based on mean decrease in accuracy (MDA) for each model,
 colored by their lowest taxonomic identification (B).
 
