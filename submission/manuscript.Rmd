@@ -1,5 +1,5 @@
 ---
-title: "Revisiting Short-Chain Fatty Acids and the Microbiota in Colorectal Tumors"
+title: "Revisiting the Relationship between Short-Chain Fatty Acids, the Microbiota, and Colorectal Tumors"
 bibliography: references.bib
 output:
   pdf_document:
