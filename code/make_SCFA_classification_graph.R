@@ -77,7 +77,7 @@ auc_classification <- classification_model_data %>%
   geom_boxplot(position = position_dodge(width = 1)) + 
   geom_vline(xintercept=seq(1.5, length(unique(classification_summary$scfa))-0.5, 1), 
              lwd=1, colour="gray", alpha = 0.6) + 
-  theme_bw() + coord_cartesian(ylim = c(0, 0.8)) + 
+  theme_bw() + coord_cartesian(ylim = c(0, 1.0)) + 
   labs(x = "", y = "AUC") + ggtitle("A") + 
   scale_fill_manual(name = "Group", 
                     values = c("white", "darkgray")) + 

@@ -115,12 +115,12 @@ cross_graph <- function(scfa, dataList){
     ggplot(aes(
       factor(dx, 
              levels = c("normal", "adenoma", "cancer"), 
-             labels = c("Control", "Adenoma", "Carcinoma")), mmol_kg)) + 
+             labels = c("Control", "Adenoma", "Carcinoma")), log10(mmol_kg+1))) + 
     geom_jitter(aes(color = dx), width = 0.3, size = 2.5, alpha = 0.75, show.legend = F) + 
-    stat_summary(fun.y = median, fun.ymin = median, fun.ymax = median, 
-                 colour = "black", geom = "crossbar", size = 0.75, width = 0.5)  + 
+    stat_summary(fun.y = median, fun.ymin = median, fun.ymax = median,
+                 colour = "black", geom = "crossbar", size = 0.75, width = 0.5)  +
     scale_color_manual(values = c('#FFD700', '#DC143C', '#228B22')) + 
-    xlab("") + ylab("mmol per Kg") + theme_bw() + ggtitle(figlegend[[scfa]]) + 
+    labs(x = "", y = expression(Log["10"]~mmol~per~Kg)) + theme_bw() + ggtitle(figlegend[[scfa]]) + 
     theme(plot.title = element_text(face="bold", hjust = -0.07, size = 20), 
           panel.grid.major = element_blank(), 
           panel.grid.minor = element_blank(), 
@@ -129,14 +129,14 @@ cross_graph <- function(scfa, dataList){
           axis.text.x = element_text(size = 10, face = "bold"))
   
   if(scfa == "acetate"){
-    temp_graph <- temp_graph + annotate("text", label = paste("Acetate"), x = 3, y = 300, size = 4)
+    temp_graph <- temp_graph + annotate("text", label = paste("Acetate"), x = 3, y = 3, size = 4)
   }
   if(scfa == "butyrate"){
-    temp_graph <- temp_graph + annotate("text", label = paste("Butyrate"), x = 3, y = 80, size = 4)
-  } 
+    temp_graph <- temp_graph + annotate("text", label = paste("Butyrate"), x = 3, y = 3, size = 4)
+  }
   if(scfa == "propionate"){
-    temp_graph <- temp_graph + annotate("text", label = paste("Propionate"), x = 3, y = 110, size = 4)
-    
+    temp_graph <- temp_graph + annotate("text", label = paste("Propionate"), x = 3, y = 3, size = 4)
+
   }
   return(temp_graph)
 }
@@ -166,22 +166,24 @@ treat_graph <- function(scfa, dataList){
           panel.grid.minor = element_blank(), 
           axis.text.y = element_text(size = 10), 
           axis.title = element_text(size = 12), 
-          axis.text.x = element_text(size = 10, face = "bold"))
+          axis.text.x = element_text(size = 10, face = "bold"), 
+          strip.background = element_rect(fill = "white"), 
+          strip.text = element_text(face = "bold"))
   
   if(scfa == "acetate"){
     
-    temp_graph <- temp_graph + coord_cartesian(ylim = c(0, 2.5)) + 
-      annotate("text", label = paste("Acetate"), x = 1.5, y = 2.5, size = 3) 
+    temp_graph <- temp_graph + coord_cartesian(ylim = c(0, 3)) + 
+      annotate("text", label = paste("Acetate"), x = 1.5, y = 3, size = 3) 
   }
   if(scfa == "butyrate"){
     
-    temp_graph <- temp_graph + coord_cartesian(ylim = c(0, 2)) + 
-      annotate("text", label = paste("Butyrate"), x = 1.5, y = 2, size = 3) 
+    temp_graph <- temp_graph + coord_cartesian(ylim = c(0, 3)) + 
+      annotate("text", label = paste("Butyrate"), x = 1.5, y = 3, size = 3) 
   }
   if(scfa == "propionate"){
     
-    temp_graph <- temp_graph + coord_cartesian(ylim = c(0, 2.5)) + 
-      annotate("text", label = paste("Propionate"), x = 1.5, y = 2.5, size = 3) 
+    temp_graph <- temp_graph + coord_cartesian(ylim = c(0, 3)) + 
+      annotate("text", label = paste("Propionate"), x = 1.5, y = 3, size = 3) 
   }
   
   return(temp_graph)
