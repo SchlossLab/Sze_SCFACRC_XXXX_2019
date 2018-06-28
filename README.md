@@ -1,18 +1,15 @@
-## Revisiting short-chain fatty acids and the microbiota in colorectal tumors
+## Revisiting the relationship between short-chain fatty acids, the microbiota, and colorectal tumors
 
-**Background.** Colorectal cancer (CRC) is a growing health concern with a large percentage of
-the risk of developing disease being due to environmental factors. Certain bacterial community
-members have been associated to increase CRC while other taxa have been associated with normal
-colons. Some of the taxa associated with normal colons can use fiber to produce short-chain
-fatty acids (SCFAs) that can inhibit tumor growth in model systems. However, the data supporting the importance of SCFAs in human CRC is less certain. Here, we test the hypothesis that SCFA concentration changes in individuals with colorectal tumors.
+**Background.** Background. Colorectal cancer (CRC) is a growing health concern with the majority of the risk for developing disease being due to environmental factors. The microbiota is one of these environmental factors with certain bacterial community members being associated with CRC, while other taxa are associated to colons without tumors. Some of the taxa associated to colons without tumors can use fiber to produce short-chain fatty acids (SCFAs) that can inhibit tumor growth in model systems. However, the data supporting the importance of SCFAs in human CRC is less certain. Here, we test the hypothesis that SCFA concentrations are different in individuals with colorectal tumors.
 
-**Methods.** We analyzed a cross-sectional (n=490) and pre- and post-treatment (n=67) group for
-their concentrations of acetate, butyrate, and propionate. Analysis also included tumor classification models using Random Forest, imputed gene relative abundance with PICRUSt, and metagenomic sequencing on a subset (n=85) of the total cross-sectional group.
+**Methods.** We analyzed a cross-sectional (n=490) and longitudinal pre- and post-treatment (n=67) group for their concentrations of acetate, butyrate, and propionate. Analysis also included tumor classification models using Random Forest, imputed gene relative abundance with PICRUSt, and metagenomic sequencing on a subset (n=85) of the total cross-sectional group.
 
-**Results.** No difference in SCFA concentration was found between normal individuals and patients with adenoma or carcinoma (P-value > 0.15). There was no difference in classification models with or without SCFAs in their ability to predict adenoma or carcinoma (P-value > 0.05). Using metagenomic sequencing, there was also no difference in genes involved with SCFA synthesis (P-value > 0.70).
 
-**Conclusions.** Although our data does not support the hypothesis that SCFAs decrease in
-individuals that have colorectal tumors, there may be specific scenarios where SCFAs may still be beneficial for treatment of CRC. Alternatively, there may be other metabolites that have not been thoroughly investigated that are more important to the development of human CRC.
+**Results.** No difference in SCFA concentrations were found between individuals without tumors and patients with adenomas or carcinomas (P-value > 0.15). There was no difference in classification models with or without SCFAs in their ability to predict patients with adenomas or carcinomas versus individuals without tumors (P-value > 0.05). Using metagenomic sequencing, there was also no difference in genes involved with SCFA synthesis between individuals without tumors and patients with adenomas or carcinomas (P-value > 0.70).
+
+
+**Conclusions.** Although our data does not support the hypothesis that SCFAs are different in
+individuals that have colorectal tumors, there may be context specific scenarios where SCFAs may still be beneficial for treatment of CRC. Alternatively, there may be other mechanisms that have not been thoroughly investigated that are more important to the development of human CRC.
 
 
 
