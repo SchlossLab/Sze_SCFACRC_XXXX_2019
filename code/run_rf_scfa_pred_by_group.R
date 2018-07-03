@@ -331,7 +331,7 @@ for(i in names(split_final_data)){
   
   print(paste("Getting model data from ", i, " only....", sep = ""))
   
-  for(j in 1:1){
+  for(j in 1:100){
     
     # Generate an 80/20 data split
     rf_data <- sapply(scfas, function(x) eighty_twenty_split(x, split_final_data[[i]]), simplify = F)
