@@ -357,6 +357,20 @@ for(i in names(split_final_data)){
   print(paste("Completed getting all model data for ", i, " only.", sep = ""))
 }
 
+# Write out the data
+for(i in names(split_final_data)){
+  
+  sapply(scfas, function(x) write_csv(class_summary_model_data[[i]][[x]], 
+                                      paste("data/process/tables/", i, "_", 
+                                            x, "_classification_RF_group_summary.csv", sep = "")))
+  
+  sapply(scfas, function(x) 
+    write_csv(class_important_vars[[i]][[x]], 
+              paste("data/process/tables/", i, "_", x, "imp_otus_classification_RF_group_summary.csv", sep = "")))
+  
+}
+
+
 
 
 
