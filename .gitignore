@@ -13,6 +13,8 @@ data/*/*
 !README.md
 data/process/orf_gene_alignment.tsv
 
+*.fasta
+kraken_db/
 
 *.qsub*
 mothur*logfile
