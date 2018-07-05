@@ -68,11 +68,21 @@ test_imp_vars_summary <- imp_vars_models %>% bind_rows() %>%
          rankings = rep(c(1:10), 9))
 
 
+# Use the decscending importance graph (simialr to PCR paper graph) to highlight how 
+# important members are changing based on disease state
+
 test_imp_vars_summary %>% 
   filter(scfa_model == "acetate") %>% 
-  ggplot(aes(otu, median_mda, color = genus)) + 
+  ggplot(aes(rankings, median_mda, color = genus)) + 
   geom_pointrange(aes(ymin = min_mda, ymax = max_mda)) + 
-  facet_wrap(~model_group)
+  facet_wrap(~model_group) + theme_bw() + 
+  theme(plot.title = element_text(face="bold", hjust = -0.07, size = 20), 
+        legend.position = "bottom", 
+        legend.text = element_text(size = 8), 
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(), 
+        axis.text.x = element_blank(), 
+        axis.ticks.x = element_blank())
 
 
 
