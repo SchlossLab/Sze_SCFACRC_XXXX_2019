@@ -136,7 +136,7 @@ flattenCorrMatrix <- function(cormat, pmat) {
 
 test <- rcorr(as.matrix(select(acetate_shared, -Group)), type = "spearman")
 
-test2 <- flattenCorrMatrix(test$r, test$P) %>% 
+acetate_table <- flattenCorrMatrix(test$r, test$P) %>% 
   arrange(p) %>% 
   mutate(var1 = case_when(
     first_otu %in% acetate_otus[1:10] ~ "normal", 
@@ -147,6 +147,49 @@ test2 <- flattenCorrMatrix(test$r, test$P) %>%
       second_otu %in% acetate_otus[1:10] ~ "normal", 
       second_otu %in% acetate_otus[11:20] ~ "adenoma", 
       second_otu %in% acetate_otus[21:30] ~ "carcinoma", 
+      TRUE ~ "uh oh")) %>% 
+  left_join(select(taxonomy, OTU, genus), by = c("first_otu" = "OTU")) %>% 
+  rename(first_genus = genus) %>% 
+  mutate(first_genus = str_replace_all(first_genus, "_unclassified", "")) %>% 
+  left_join(select(taxonomy, OTU, genus), by = c("second_otu" = "OTU")) %>% 
+  rename(second_genus = genus) %>% 
+  mutate(second_genus = str_replace_all(second_genus, "_unclassified", ""))
+
+test <- rcorr(as.matrix(select(butyrate_shared, -Group)), type = "spearman")
+
+butyrate_table <- flattenCorrMatrix(test$r, test$P) %>% 
+  arrange(p) %>% 
+  mutate(var1 = case_when(
+    first_otu %in% butyrate_otus[1:10] ~ "normal", 
+    first_otu %in% butyrate_otus[11:20] ~ "adenoma", 
+    first_otu %in% butyrate_otus[21:30] ~ "carcinoma", 
+    TRUE ~ "uh oh"), 
+    var2 = case_when(
+      second_otu %in% butyrate_otus[1:10] ~ "normal", 
+      second_otu %in% butyrate_otus[11:20] ~ "adenoma", 
+      second_otu %in% butyrate_otus[21:30] ~ "carcinoma", 
+      TRUE ~ "uh oh")) %>% 
+  left_join(select(taxonomy, OTU, genus), by = c("first_otu" = "OTU")) %>% 
+  rename(first_genus = genus) %>% 
+  mutate(first_genus = str_replace_all(first_genus, "_unclassified", "")) %>% 
+  left_join(select(taxonomy, OTU, genus), by = c("second_otu" = "OTU")) %>% 
+  rename(second_genus = genus) %>% 
+  mutate(second_genus = str_replace_all(second_genus, "_unclassified", ""))
+
+
+test <- rcorr(as.matrix(select(propionate_shared, -Group)), type = "spearman")
+
+propionate_table <- flattenCorrMatrix(test$r, test$P) %>% 
+  arrange(p) %>% 
+  mutate(var1 = case_when(
+    first_otu %in% propionate_otus[1:10] ~ "normal", 
+    first_otu %in% propionate_otus[11:20] ~ "adenoma", 
+    first_otu %in% propionate_otus[21:30] ~ "carcinoma", 
+    TRUE ~ "uh oh"), 
+    var2 = case_when(
+      second_otu %in% propionate_otus[1:10] ~ "normal", 
+      second_otu %in% propionate_otus[11:20] ~ "adenoma", 
+      second_otu %in% propionate_otus[21:30] ~ "carcinoma", 
       TRUE ~ "uh oh")) %>% 
   left_join(select(taxonomy, OTU, genus), by = c("first_otu" = "OTU")) %>% 
   rename(first_genus = genus) %>% 
