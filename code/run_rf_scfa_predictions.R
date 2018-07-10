@@ -72,9 +72,9 @@ split_dataframe <- function(i, dataList){
   
   tempData <- dataList[[i]]
   
-  temp_regression <- tempData %>% select(mmol_kg, contains("Otu"))
+  temp_regression <- tempData %>% select(mmol_kg, Group, dx, contains("Otu"))
   
-  temp_high_low <- tempData %>% select(high_low, contains("Otu"))
+  temp_high_low <- tempData %>% select(high_low, Group, dx, contains("Otu"))
   
   finalList <- list(rf_regression = temp_regression, 
                     rf_groups = temp_high_low)
@@ -117,7 +117,8 @@ make_rf_model <- function(i, run_marker, train_data_name,
   # method_to_use are "rf" for classification and "rf" for regression rf
   # metric_to_use are "ROC" for classification and "Rsquared" for regression rf
   
-  tempData <- dataList[[i]][[train_data_name]]
+  tempData <- dataList[[i]][[train_data_name]] %>% 
+    select(-Group, -dx)
   
   #Create Overall specifications for model tuning
   # number controls fold of cross validation
@@ -163,7 +164,9 @@ make_rf_model <- function(i, run_marker, train_data_name,
 run_prediction <- function(i, model_data, train_data_name, control_type, 
                            var_of_int, dataList){
   
-  tempData <- dataList[[i]][[train_data_name]]
+  tempData <- dataList[[i]][[train_data_name]] %>% 
+    select(-Group, -dx)
+  
   tempModel <- model_data[[i]]
   
   
@@ -254,6 +257,67 @@ grab_importance <- function(i, run_number, type_of_model, modelList, dataHolder)
  return(dataHolder[[i]])
 }
 
+# Function to aggregate training probs data for samples in model
+add_model_probs_data <- function(i, model_list, split_data, data_Table, classif = T){
+  
+  temp_prob_results <- model_list[[i]]$pred
+  
+  if(classif == T){
+    
+    tempdata <- temp_prob_results %>% 
+      mutate(dx = split_data[[i]]$training_data %>% slice(rowIndex) %>% pull(dx), 
+             sample_id = split_data[[i]]$training_data %>% slice(rowIndex) %>% pull(Group), 
+             run = j)
+    
+    data_Table[[i]] <- data_Table[[i]] %>% bind_rows(tempdata)
+    
+  } else{
+    
+    temp_test <- summary(lm(test_data[[i]]$mmol_kg ~ test_data[[i]]$tempPredictions))
+    
+    tempdata <- tempTrainResults %>% 
+      filter(Rsquared == max(Rsquared)) %>% 
+      rename(train_r2 = Rsquared) %>% 
+      mutate(test_r2 = temp_test$adj.r.squared) %>% 
+      select(mtry, train_r2, test_r2, everything())
+    
+    data_Table[[i]] <- data_Table[[i]] %>% bind_rows(tempdata)
+  }
+  
+  return(data_Table[[i]])
+}
+
+
+
+# Function to aggregate training probs data for samples in model
+add_model_results_data <- function(i, model_list, split_data, data_Table, classif = T){
+  
+  temp_results <- model_list[[i]]
+  
+  if(classif == T){
+    
+    temp_summary <- temp_results %>% 
+      bind_cols(select(split_data[[i]]$test_data, Group, dx)) %>% 
+      mutate(run = 1)
+    
+    data_Table[[i]] <- data_Table[[i]] %>% bind_rows(temp_summary)
+    
+  } else{
+    
+    temp_test <- summary(lm(test_data[[i]]$mmol_kg ~ test_data[[i]]$tempPredictions))
+    
+    tempdata <- tempTrainResults %>% 
+      filter(Rsquared == max(Rsquared)) %>% 
+      rename(train_r2 = Rsquared) %>% 
+      mutate(test_r2 = temp_test$adj.r.squared) %>% 
+      select(mtry, train_r2, test_r2, everything())
+    
+    data_Table[[i]] <- data_Table[[i]] %>% bind_rows(tempdata)
+  }
+  
+  return(data_Table[[i]])
+}
+
 
 
 ##############################################################################################
@@ -270,8 +334,7 @@ metaF <- read_csv("data/raw/metadata/good_metaf_final.csv")
 # Load in shared data
 shared <- read_tsv("data/process/final.0.03.subsample.shared") %>% 
   mutate(Group = as.character(Group)) %>% 
-  select(-label, -numOtus) %>% 
-  mutate_at(vars(contains("Otu")), funs(log10(. + 1)))
+  select(-label, -numOtus)
 
 log_shared <- read_tsv("data/process/final.0.03.subsample.shared") %>% 
   mutate(Group = as.character(Group)) %>% 
@@ -320,6 +383,11 @@ class_important_vars <- list(acetate = data_frame(), butyrate = data_frame(),
 reg_important_vars <- list(acetate = data_frame(), butyrate = data_frame(), 
                              isobutyrate = data_frame(), propionate = data_frame())
 
+class_summary_probs_data <- list(acetate = data_frame(), butyrate = data_frame(), 
+                                 isobutyrate = data_frame(), propionate = data_frame())
+
+class_summary_test_results_data <- list(acetate = data_frame(), butyrate = data_frame(), 
+                                 isobutyrate = data_frame(), propionate = data_frame())
 
 # Set up initial store for summary data based on log data
 log_reg_summary_model_data <- list(acetate = data_frame(), butyrate = data_frame(), 
@@ -350,8 +418,14 @@ for(j in 1:100){
   class_summary_model_data <- sapply(scfas, function(x) 
     add_model_summary_data(x, class_test, ROC_data, class_summary_model_data, classif = T), simplify = F)
   
+  class_summary_probs_data <- sapply(scfas, function(x) 
+    add_model_probs_data(x, class_test, rf_data, class_summary_probs_data, classif = T), simplify = F)
+  
   class_important_vars <- sapply(scfas, function(x) 
     grab_importance(x, j, "classification", class_test, class_important_vars), simplify = F)
+  
+  class_summary_test_results_data <- sapply(scfas, function(x) 
+    add_model_results_data(x, class_pred, rf_data, class_summary_test_results_data, classif = T), simplify = F)
 }
 
 sapply(scfas, function(x) 
