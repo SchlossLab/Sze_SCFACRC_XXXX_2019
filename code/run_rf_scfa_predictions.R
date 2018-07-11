@@ -397,31 +397,32 @@ for(j in 1:100){
   
   # Generate an 80/20 data split
   rf_data <- sapply(scfas, function(x) eighty_twenty_split(x, "rf_groups", final_sp_data), simplify = F)
-  
+  # Run the classification model 10-fold CV (train) - 80%
   class_test <- sapply(scfas, function(x) 
     make_rf_model(x, j, "training_data", "high_low", "rf", "ROC", rf_data), 
     simplify = F)
-  
+  # Run the classification model on 20% (test)
   class_pred <- sapply(scfas, function(x) 
     run_prediction(x, class_test, "test_data", "raw", "high_low", rf_data), 
     simplify = F)
-  
+  # Generate the AUC and ROC curves
   ROC_data <- sapply(scfas, function(x) 
     get_test_roc(x, "high_low", "tempPredictions", class_pred, classif = T), simplify = F)
-  
+  # Record the model summary data
   class_summary_model_data <- sapply(scfas, function(x) 
     add_model_summary_data(x, class_test, ROC_data, class_summary_model_data, classif = T), simplify = F)
-  
+  # Record the training probs data from each sample from each run
   class_summary_probs_data <- sapply(scfas, function(x) 
     add_model_probs_data(x, class_test, rf_data, class_summary_probs_data), simplify = F)
-  
+  # Get the important vars for the specific run
   class_important_vars <- sapply(scfas, function(x) 
     grab_importance(x, j, "classification", class_test, class_important_vars), simplify = F)
-  
+  # Record the test probs data from each sample from each run
   class_summary_test_results_data <- sapply(scfas, function(x) 
     add_model_results_data(x, class_pred, rf_data, class_summary_test_results_data, classif = T), simplify = F)
 }
 
+# Write out the data
 sapply(scfas, function(x) 
   write_csv(class_summary_model_data[[x]], 
             paste("data/process/tables/", x, "_classification_RF_summary.csv", sep = "")))
@@ -448,6 +449,7 @@ for(j in 1:100){
   log_reg_rf_data <- sapply(scfas, 
                         function(x) eighty_twenty_split(x, "rf_regression", log_final_sp_data), simplify = F)
   
+  # Run the training 10-fold CV model on 80% of the data
   regression_test <- sapply(scfas, 
                             function(x) make_rf_model(x, j, "training_data", 
                                                       "mmol_kg", "rf", "Rsquared", reg_rf_data), simplify = F)
@@ -456,12 +458,14 @@ for(j in 1:100){
                             function(x) make_rf_model(x, j, "training_data", 
                                                       "mmol_kg", "rf", "Rsquared", log_reg_rf_data), simplify = F)
   
+  # Record the mmol/kg predictions for each sample in the training data
   reg_summary_probs_data <- sapply(scfas, function(x) 
     add_model_probs_data(x, regression_test, reg_rf_data, reg_summary_probs_data), simplify = F)
   
   log_reg_summary_probs_data <- sapply(scfas, function(x) 
     add_model_probs_data(x, log_regression_test, log_reg_rf_data, log_reg_summary_probs_data), simplify = F)
   
+  # Run predictions on the test data
   reg_pred <- sapply(scfas, function(x) 
     run_prediction(x, regression_test, "test_data", "raw", "mmol_kg", reg_rf_data), 
     simplify = F)
@@ -470,12 +474,14 @@ for(j in 1:100){
     run_prediction(x, log_regression_test, "test_data", "raw", "mmol_kg", log_reg_rf_data), 
     simplify = F)
   
+  # Record the mmol/kg predictions on the test data for each sample in the 20% hold out
   reg_summary_test_results_data <- sapply(scfas, function(x) 
     add_model_results_data(x, reg_pred, reg_rf_data, reg_summary_test_results_data, classif = F), simplify = F)
   
   log_reg_summary_test_results_data <- sapply(scfas, function(x) 
     add_model_results_data(x, log_reg_pred, log_reg_rf_data, log_reg_summary_test_results_data, classif = F), simplify = F)
   
+  # Record standard model summary data and important variable data
   reg_summary_model_data <- sapply(scfas, function(x) 
     add_model_summary_data(x, regression_test, reg_pred, reg_summary_model_data, classif = F), simplify = F)
   
@@ -489,6 +495,7 @@ for(j in 1:100){
     grab_importance(x, j, "regression", log_regression_test, log_reg_important_vars), simplify = F)
 }
 
+# Write out the non-log data
 sapply(scfas, function(x) 
   write_csv(reg_summary_model_data[[x]], 
             paste("data/process/tables/", x, "_regression_RF_summary.csv", sep = "")))
@@ -505,7 +512,7 @@ sapply(scfas, function(x)
   write_csv(reg_summary_test_results_data[[x]], 
             paste("data/process/tables/", x, "_regression_RF_test_conc_summary.csv", sep = "")))
 
-
+# Write out hte log data
 sapply(scfas, function(x) 
   write_csv(log_reg_summary_model_data[[x]], 
             paste("data/process/tables/log_", x, "_regression_RF_summary.csv", sep = "")))
