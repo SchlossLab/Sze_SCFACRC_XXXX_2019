@@ -258,31 +258,16 @@ grab_importance <- function(i, run_number, type_of_model, modelList, dataHolder)
 }
 
 # Function to aggregate training probs data for samples in model
-add_model_probs_data <- function(i, model_list, split_data, data_Table, classif = T){
+add_model_probs_data <- function(i, model_list, split_data, data_Table){
   
   temp_prob_results <- model_list[[i]]$pred
   
-  if(classif == T){
-    
-    tempdata <- temp_prob_results %>% 
-      mutate(dx = split_data[[i]]$training_data %>% slice(rowIndex) %>% pull(dx), 
-             sample_id = split_data[[i]]$training_data %>% slice(rowIndex) %>% pull(Group), 
-             run = j)
-    
-    data_Table[[i]] <- data_Table[[i]] %>% bind_rows(tempdata)
-    
-  } else{
-    
-    temp_test <- summary(lm(test_data[[i]]$mmol_kg ~ test_data[[i]]$tempPredictions))
-    
-    tempdata <- tempTrainResults %>% 
-      filter(Rsquared == max(Rsquared)) %>% 
-      rename(train_r2 = Rsquared) %>% 
-      mutate(test_r2 = temp_test$adj.r.squared) %>% 
-      select(mtry, train_r2, test_r2, everything())
-    
-    data_Table[[i]] <- data_Table[[i]] %>% bind_rows(tempdata)
-  }
+  tempdata <- temp_prob_results %>% 
+    mutate(dx = split_data[[i]]$training_data %>% slice(rowIndex) %>% pull(dx), 
+           sample_id = split_data[[i]]$training_data %>% slice(rowIndex) %>% pull(Group), 
+           run = j)
+  
+  data_Table[[i]] <- data_Table[[i]] %>% bind_rows(tempdata)
   
   return(data_Table[[i]])
 }
@@ -304,15 +289,12 @@ add_model_results_data <- function(i, model_list, split_data, data_Table, classi
     
   } else{
     
-    temp_test <- summary(lm(test_data[[i]]$mmol_kg ~ test_data[[i]]$tempPredictions))
+    temp_summary <- temp_results %>% bind_rows() %>% 
+      bind_cols(select(split_data[[i]]$test_data, Group, dx)) %>% 
+      mutate(run = 1)
     
-    tempdata <- tempTrainResults %>% 
-      filter(Rsquared == max(Rsquared)) %>% 
-      rename(train_r2 = Rsquared) %>% 
-      mutate(test_r2 = temp_test$adj.r.squared) %>% 
-      select(mtry, train_r2, test_r2, everything())
     
-    data_Table[[i]] <- data_Table[[i]] %>% bind_rows(tempdata)
+    data_Table[[i]] <- data_Table[[i]] %>% bind_rows(temp_summary)
   }
   
   return(data_Table[[i]])
@@ -389,6 +371,12 @@ class_summary_probs_data <- list(acetate = data_frame(), butyrate = data_frame()
 class_summary_test_results_data <- list(acetate = data_frame(), butyrate = data_frame(), 
                                  isobutyrate = data_frame(), propionate = data_frame())
 
+reg_summary_probs_data <- list(acetate = data_frame(), butyrate = data_frame(), 
+                                 isobutyrate = data_frame(), propionate = data_frame())
+
+reg_summary_test_results_data <- list(acetate = data_frame(), butyrate = data_frame(), 
+                                        isobutyrate = data_frame(), propionate = data_frame())
+
 # Set up initial store for summary data based on log data
 log_reg_summary_model_data <- list(acetate = data_frame(), butyrate = data_frame(), 
                                isobutyrate = data_frame(), propionate = data_frame())
@@ -397,6 +385,12 @@ log_reg_summary_model_data <- list(acetate = data_frame(), butyrate = data_frame
 log_reg_important_vars <- list(acetate = data_frame(), butyrate = data_frame(), 
                            isobutyrate = data_frame(), propionate = data_frame())
 
+
+log_reg_summary_probs_data <- list(acetate = data_frame(), butyrate = data_frame(), 
+                               isobutyrate = data_frame(), propionate = data_frame())
+
+log_reg_summary_test_results_data <- list(acetate = data_frame(), butyrate = data_frame(), 
+                                      isobutyrate = data_frame(), propionate = data_frame())
 
 # Run a 100 different splits for each SCFA on classification
 for(j in 1:100){
@@ -419,7 +413,7 @@ for(j in 1:100){
     add_model_summary_data(x, class_test, ROC_data, class_summary_model_data, classif = T), simplify = F)
   
   class_summary_probs_data <- sapply(scfas, function(x) 
-    add_model_probs_data(x, class_test, rf_data, class_summary_probs_data, classif = T), simplify = F)
+    add_model_probs_data(x, class_test, rf_data, class_summary_probs_data), simplify = F)
   
   class_important_vars <- sapply(scfas, function(x) 
     grab_importance(x, j, "classification", class_test, class_important_vars), simplify = F)
@@ -435,6 +429,14 @@ sapply(scfas, function(x)
 sapply(scfas, function(x) 
   write_csv(class_important_vars[[x]], 
             paste("data/process/tables/", x, "imp_otus_classification_RF_summary.csv", sep = "")))
+
+sapply(scfas, function(x) 
+  write_csv(class_summary_probs_data[[x]], 
+            paste("data/process/tables/", x, "_classification_RF_train_probs_summary.csv", sep = "")))
+
+sapply(scfas, function(x) 
+  write_csv(class_summary_test_results_data[[x]], 
+            paste("data/process/tables/", x, "_classification_RF_test_probs_summary.csv", sep = "")))
 
 # Run a 100 different splits for each SCFA on regression
 for(j in 1:100){
@@ -454,6 +456,12 @@ for(j in 1:100){
                             function(x) make_rf_model(x, j, "training_data", 
                                                       "mmol_kg", "rf", "Rsquared", log_reg_rf_data), simplify = F)
   
+  reg_summary_probs_data <- sapply(scfas, function(x) 
+    add_model_probs_data(x, regression_test, reg_rf_data, reg_summary_probs_data), simplify = F)
+  
+  log_reg_summary_probs_data <- sapply(scfas, function(x) 
+    add_model_probs_data(x, log_regression_test, log_reg_rf_data, log_reg_summary_probs_data), simplify = F)
+  
   reg_pred <- sapply(scfas, function(x) 
     run_prediction(x, regression_test, "test_data", "raw", "mmol_kg", reg_rf_data), 
     simplify = F)
@@ -461,6 +469,12 @@ for(j in 1:100){
   log_reg_pred <- sapply(scfas, function(x) 
     run_prediction(x, log_regression_test, "test_data", "raw", "mmol_kg", log_reg_rf_data), 
     simplify = F)
+  
+  reg_summary_test_results_data <- sapply(scfas, function(x) 
+    add_model_results_data(x, reg_pred, reg_rf_data, reg_summary_test_results_data, classif = F), simplify = F)
+  
+  log_reg_summary_test_results_data <- sapply(scfas, function(x) 
+    add_model_results_data(x, log_reg_pred, log_reg_rf_data, log_reg_summary_test_results_data, classif = F), simplify = F)
   
   reg_summary_model_data <- sapply(scfas, function(x) 
     add_model_summary_data(x, regression_test, reg_pred, reg_summary_model_data, classif = F), simplify = F)
@@ -483,6 +497,13 @@ sapply(scfas, function(x)
   write_csv(reg_important_vars[[x]], 
             paste("data/process/tables/", x, "imp_otus_regression_RF_summary.csv", sep = "")))
 
+sapply(scfas, function(x) 
+  write_csv(reg_summary_probs_data[[x]], 
+            paste("data/process/tables/", x, "_regression_RF_train_conc_summary.csv", sep = "")))
+
+sapply(scfas, function(x) 
+  write_csv(reg_summary_test_results_data[[x]], 
+            paste("data/process/tables/", x, "_regression_RF_test_conc_summary.csv", sep = "")))
 
 
 sapply(scfas, function(x) 
@@ -493,5 +514,11 @@ sapply(scfas, function(x)
   write_csv(log_reg_important_vars[[x]], 
             paste("data/process/tables/log_", x, "imp_otus_regression_RF_summary.csv", sep = "")))
 
+sapply(scfas, function(x) 
+  write_csv(log_reg_summary_probs_data[[x]], 
+            paste("data/process/tables/log_", x, "_regression_RF_train_conc_summary.csv", sep = "")))
 
+sapply(scfas, function(x) 
+  write_csv(log_reg_summary_test_results_data[[x]], 
+            paste("data/process/tables/log_", x, "_regression_RF_test_conc_summary.csv", sep = "")))
 
