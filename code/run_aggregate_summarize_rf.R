@@ -77,8 +77,22 @@ test_results <- list(
 test <- model_data$reg_train$acetate %>% 
   mutate(difference = pred - obs) %>% 
   group_by(run, dx) %>% 
-  summarise(median_diff = median(difference))
+  summarise(median_diff = median(difference), 
+            min_dff = min(difference), 
+            max_diff = max(difference)) %>% 
+  ungroup()
 
+
+kruskal_summary <- test %>% 
+  nest() %>% 
+  mutate(k_test = map(data, ~kruskal.test(median_diff ~ factor(dx), data = .x)), 
+         k_summary = map(k_test, broom::tidy)) %>% 
+  select(k_summary) %>% 
+  unnest()
+
+
+dunn_summary <- as.data.frame.list(dunn.test::dunn.test(test$median_diff, factor(test$dx), method = "bh"))
+  
 
 
 for(i in data_sets_names){
