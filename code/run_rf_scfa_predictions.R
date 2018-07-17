@@ -283,7 +283,7 @@ add_model_results_data <- function(i, model_list, split_data, data_Table, classi
     
     temp_summary <- temp_results %>% 
       bind_cols(select(split_data[[i]]$test_data, Group, dx)) %>% 
-      mutate(run = 1)
+      mutate(run = j)
     
     data_Table[[i]] <- data_Table[[i]] %>% bind_rows(temp_summary)
     
@@ -291,7 +291,7 @@ add_model_results_data <- function(i, model_list, split_data, data_Table, classi
     
     temp_summary <- temp_results %>% bind_rows() %>% 
       bind_cols(select(split_data[[i]]$test_data, Group, dx)) %>% 
-      mutate(run = 1)
+      mutate(run = j)
     
     
     data_Table[[i]] <- data_Table[[i]] %>% bind_rows(temp_summary)
