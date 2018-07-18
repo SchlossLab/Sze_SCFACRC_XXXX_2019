@@ -82,8 +82,6 @@ log_reg_data <- map(scfas, function(x)
   ungroup()
 
 ### Create the classification graph
-
-
 class_data %>% 
   ungroup() %>% 
   mutate(model = factor(model, 
@@ -99,8 +97,77 @@ class_data %>%
   geom_pointrange(aes(ymin = min_yes, ymax = max_yes), position = position_dodge(width = 0.6)) +  
   facet_wrap(~model) + theme_bw() + 
   coord_cartesian(ylim = c(0, 1)) + 
-  labs(x = "", y = "Correct Classification Probability")
+  labs(x = "", y = "Correct Classification Probability") + 
+  scale_color_manual(name = "", values = c('#228B22', '#FFD700', '#DC143C')) + 
+  theme(plot.title = element_text(face="bold", hjust = -0.07, size = 20), 
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(), 
+        legend.position = "bottom", 
+        legend.text = element_text(size = 10, face = "bold"), 
+        axis.text.y = element_text(size = 10), 
+        axis.title = element_text(size = 12), 
+        axis.text.x = element_text(size = 10, face = "bold"))
 
 
+### Create the regression graph
+reg_data %>% 
+  ungroup %>% 
+  mutate(model = factor(model, 
+                        levels = c("reg_train", "reg_test"), 
+                        labels = c("Training (Regression)", "Testing (Regression)")), 
+         dx = factor(dx, 
+                     levels = c("normal", "adenoma", "cancer"), 
+                     labels = c("Normal", "Adenoma", "Cancer")), 
+         scfa = factor(scfa, 
+                       levels = c("acetate", "butyrate", "propionate"), 
+                       labels = c("Acetate", "Butyrate", "Propionate"))) %>% 
+  ggplot(aes(scfa, median_diff, color = dx, group = dx)) + 
+  geom_hline(yintercept = 0, linetype = "dashed", color = "darkgray") + 
+  geom_point(position = position_dodge(width = 0.6)) + 
+  stat_summary(fun.y = median, fun.ymin = median, fun.ymax = median,
+               colour = "black", geom = "crossbar", size = 0.5, width = 0.4, 
+               position = position_dodge(width = 0.6)) + 
+  facet_wrap(~model) + theme_bw() + 
+  coord_cartesian(ylim = c(-20, 20)) + 
+  labs(x = "", y = "Difference from Actual Concentration") + 
+  scale_color_manual(name = "", values = c('#228B22', '#FFD700', '#DC143C')) + 
+  theme(plot.title = element_text(face="bold", hjust = -0.07, size = 20), 
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(), 
+        legend.position = "bottom", 
+        legend.text = element_text(size = 10, face = "bold"), 
+        axis.text.y = element_text(size = 10), 
+        axis.title = element_text(size = 12), 
+        axis.text.x = element_text(size = 10, face = "bold"))
 
 
+### Create the log regression graph
+log_reg_data %>% 
+  ungroup %>% 
+  mutate(model = factor(model, 
+                        levels = c("reg_train", "reg_test"), 
+                        labels = c("Training (Regression)", "Testing (Regression)")), 
+         dx = factor(dx, 
+                     levels = c("normal", "adenoma", "cancer"), 
+                     labels = c("Normal", "Adenoma", "Cancer")), 
+         scfa = factor(scfa, 
+                       levels = c("acetate", "butyrate", "propionate"), 
+                       labels = c("Acetate", "Butyrate", "Propionate"))) %>% 
+  ggplot(aes(scfa, median_diff, color = dx, group = dx)) + 
+  geom_hline(yintercept = 0, linetype = "dashed", color = "darkgray") + 
+  geom_point(position = position_dodge(width = 0.6)) + 
+  stat_summary(fun.y = median, fun.ymin = median, fun.ymax = median,
+               colour = "black", geom = "crossbar", size = 0.5, width = 0.4, 
+               position = position_dodge(width = 0.6)) + 
+  facet_wrap(~model) + theme_bw() + 
+  coord_cartesian(ylim = c(-20, 20)) + 
+  labs(x = "", y = expression(Difference~from~Actual~Log["10"]~Concentration)) + 
+  scale_color_manual(name = "", values = c('#228B22', '#FFD700', '#DC143C')) + 
+  theme(plot.title = element_text(face="bold", hjust = -0.07, size = 20), 
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(), 
+        legend.position = "bottom", 
+        legend.text = element_text(size = 10, face = "bold"), 
+        axis.text.y = element_text(size = 10), 
+        axis.title = element_text(size = 12), 
+        axis.text.x = element_text(size = 10, face = "bold"))
