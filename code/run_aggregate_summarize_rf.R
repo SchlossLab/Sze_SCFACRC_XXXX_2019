@@ -10,24 +10,28 @@ source('code/functions.R')
 loadLibs(c("tidyverse"))
 
 #setup variables that will be used
-scfas <- c("acetate", "butyrate", "isobutyrate", "propionate")
+scfas <- c("acetate", "butyrate", "propionate")
 
 
 # Read in the data
 # The data is obtained from the model tracking of the run_rf_scfa_predictions.R script
+# Put in a temporary run number until the analysis is re-run with it in the data frame.
 model_data <- list(
   class_train = sapply(scfas, function(x) 
     read_csv(paste("data/process/tables/", x, "_classification_RF_train_probs_summary.csv", sep = "")), simplify = F), 
   class_test = sapply(scfas, function(x) 
-    read_csv(paste("data/process/tables/", x, "_classification_RF_test_probs_summary.csv", sep = "")), simplify = F), 
+    read_csv(paste("data/process/tables/", x, "_classification_RF_test_probs_summary.csv", sep = "")) %>% 
+      mutate(run = rep(1:100, each = 85)), simplify = F), 
   reg_train = sapply(scfas, function(x) 
     read_csv(paste("data/process/tables/", x, "_regression_RF_train_conc_summary.csv", sep = "")), simplify = F),
   reg_test = sapply(scfas, function(x) 
-    read_csv(paste("data/process/tables/", x, "_regression_RF_test_conc_summary.csv", sep = "")), simplify = F),
+    read_csv(paste("data/process/tables/", x, "_regression_RF_test_conc_summary.csv", sep = "")) %>% 
+      mutate(run = rep(1:100, each = 85)), simplify = F),
   log_reg_train = sapply(scfas, function(x) 
     read_csv(paste("data/process/tables/log_", x, "_regression_RF_train_conc_summary.csv", sep = "")), simplify = F),
   log_reg_test = sapply(scfas, function(x) 
-    read_csv(paste("data/process/tables/log_", x, "_regression_RF_test_conc_summary.csv", sep = "")), simplify = F))
+    read_csv(paste("data/process/tables/log_", x, "_regression_RF_test_conc_summary.csv", sep = "")) %>% 
+      mutate(run = rep(1:100, each = 85)), simplify = F))
 
 
 # Create summary for chi-square test for proportion of correct and incorrect samples
@@ -56,8 +60,8 @@ create_count_table <- function(datatable, train_data = T){
               no = table(correct_class)[1]) %>% 
     ungroup() %>% 
     group_by(dx) %>% 
-    summarise(yes = round(mean(yes)), 
-              no = round(mean(no))) %>% 
+    summarise(yes = round(mean(yes, na.rm = T)), 
+              no = round(mean(no, na.rm = T))) %>% 
     as.data.frame()
   # Creates rownames from dx 
   rownames(tempData) <- tempData$dx
@@ -95,6 +99,36 @@ get_reg_diff <- function(datatable, train_data = T){
   # returns the summary table to the local environment
   return(tempData)
 }
+
+
+# Assign SCFA label to the respective comparison
+add_scfa_label <- function(dataList, list_names){
+  
+  for(i in list_names){
+    
+    temp_list <- dataList[[i]]
+    
+    scfa_names <- names(temp_list)
+    
+    if(str_detect(i, "class")){
+      
+      modified_list <- sapply(scfa_names, function(x) c(temp_list[[x]], scfa = x), simplify = F)
+      
+    } else{
+      
+      modified_list <- sapply(scfa_names, function(x) temp_list[[x]] %>% 
+                                tbl_df() %>% mutate(scfa = x), simplify = F)
+    }
+    
+    
+    dataList[[i]] <- modified_list
+  }
+  
+  return(dataList)
+  
+}
+
+
 
 
 # Set up the names of the list
@@ -136,7 +170,8 @@ for(i in data_sets_names){
       if(temp_pvalue < 0.05){
         # Run a dunn's analysis and replce the kruskal results with the dunns results
         analysis_summary[[j]] <- as.data.frame.list(
-          dunn.test::dunn.test(temp_tables[[j]]$median_diff, factor(temp_tables[[j]]$dx), method = "bh"))
+          dunn.test::dunn.test(temp_tables[[j]]$median_diff, factor(temp_tables[[j]]$dx), method = "bh")) %>% 
+          mutate(model = i)
       }
     }
     # Add it to the overall storage list
@@ -148,13 +183,20 @@ for(i in data_sets_names){
     temp_tables <- map(model_data[[i]], function(x) create_count_table(x, train_data = model_type))
     # Run a chi square test and add it to the overall storage list
     test_results[[i]] <- map(temp_tables, function(x) c(statistic = unname(chisq.test(x)$statistic), 
-                                                        pvalue = chisq.test((x))$p.value))
+                                                        pvalue = chisq.test((x))$p.value, 
+                                                        model = i))
     
   }
   
   # Keeps track of progress on stdout
   print(paste("Finished analysis of ", i, "...", sep = ""))
 }
+
+test <- add_scfa_label(test_results, data_sets_names)
+
+
+
+
 
 
 
