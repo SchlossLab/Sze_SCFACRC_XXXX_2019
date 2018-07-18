@@ -103,27 +103,29 @@ get_reg_diff <- function(datatable, train_data = T){
 
 # Assign SCFA label to the respective comparison
 add_scfa_label <- function(dataList, list_names){
+  # dataList is the full test_results list
+  # list_names comes from data_sets_names vector
   
+  # cycles through each of the model types
   for(i in list_names){
-    
+    # create a temporary list with names being scfas
     temp_list <- dataList[[i]]
-    
+    # grab the present scfas and create a temp vector
     scfa_names <- names(temp_list)
-    
+    # check if it is classification model or not
     if(str_detect(i, "class")){
-      
+      # add the respective scfa to the data
       modified_list <- sapply(scfa_names, function(x) c(temp_list[[x]], scfa = x), simplify = F)
       
     } else{
-      
+      # add the respective scfa to the data
       modified_list <- sapply(scfa_names, function(x) temp_list[[x]] %>% 
                                 tbl_df() %>% mutate(scfa = x), simplify = F)
     }
-    
-    
+    # replace the old data with the new data with scfa label
     dataList[[i]] <- modified_list
   }
-  
+  # return to the global environment
   return(dataList)
   
 }
@@ -192,19 +194,20 @@ for(i in data_sets_names){
   print(paste("Finished analysis of ", i, "...", sep = ""))
 }
 
+# Adds the SCFA to each test
 modified_test_results <- add_scfa_label(test_results, data_sets_names)
 
-
+# Transforms the classification results into a single data frame
 class_test_results <- bind_rows(tbl_df(t(as.data.frame.list(modified_test_results$class_train))), 
                                 tbl_df(t(as.data.frame.list(modified_test_results$class_test))))
 
-
+# Transforms the regression results into a single data frame
 reg_test_results <- bind_rows(modified_test_results$reg_train, modified_test_results$reg_test, 
                               modified_test_results$log_reg_train, modified_test_results$log_reg_test)
 
 
+# Write out the summary test tables
+write_csv(class_test_results, "data/process/tables/full_model_class_group_results.csv")
 
-
-# Assess probability differences
-
+write_csv(reg_test_results, "data/process/tables/full_model_reg_group_results.csv")
 
