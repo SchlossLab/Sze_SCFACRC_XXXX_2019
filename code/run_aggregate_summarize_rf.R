@@ -60,8 +60,8 @@ create_count_table <- function(datatable, train_data = T){
               no = table(correct_class)[1]) %>% 
     ungroup() %>% 
     group_by(dx) %>% 
-    summarise(yes = round(mean(yes, na.rm = T)), 
-              no = round(mean(no, na.rm = T))) %>% 
+    summarise(yes = round(median(yes, na.rm = T)), 
+              no = round(median(no, na.rm = T))) %>% 
     as.data.frame()
   # Creates rownames from dx 
   rownames(tempData) <- tempData$dx
