@@ -84,7 +84,11 @@ log_reg_data <- map(scfas, function(x)
 ### Create the classification graph
 
 
-
+class_data %>% ggplot(aes(scfa, median_yes, color = dx, group = dx)) + 
+  geom_pointrange(aes(ymin = min_yes, ymax = max_yes), position = position_dodge(width = 0.6)) +  
+  facet_wrap(~model) + 
+  coord_cartesian(ylim = c(0, 1)) + 
+  labs(x = "", y = "Correct Classification Probability")
 
 
 
