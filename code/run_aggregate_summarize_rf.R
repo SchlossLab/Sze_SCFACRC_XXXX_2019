@@ -192,10 +192,15 @@ for(i in data_sets_names){
   print(paste("Finished analysis of ", i, "...", sep = ""))
 }
 
-test <- add_scfa_label(test_results, data_sets_names)
+modified_test_results <- add_scfa_label(test_results, data_sets_names)
 
 
+class_test_results <- bind_rows(tbl_df(t(as.data.frame.list(modified_test_results$class_train))), 
+                                tbl_df(t(as.data.frame.list(modified_test_results$class_test))))
 
+
+reg_test_results <- bind_rows(modified_test_results$reg_train, modified_test_results$reg_test, 
+                              modified_test_results$log_reg_train, modified_test_results$log_reg_test)
 
 
 
