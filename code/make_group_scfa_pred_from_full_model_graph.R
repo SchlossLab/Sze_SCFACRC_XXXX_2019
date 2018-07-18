@@ -84,9 +84,20 @@ log_reg_data <- map(scfas, function(x)
 ### Create the classification graph
 
 
-class_data %>% ggplot(aes(scfa, median_yes, color = dx, group = dx)) + 
+class_data %>% 
+  ungroup() %>% 
+  mutate(model = factor(model, 
+                        levels = c("class_train", "class_test"), 
+                        labels = c("Training (Classification)", "Testing (Classification)")), 
+         dx = factor(dx, 
+                     levels = c("normal", "adenoma", "cancer"), 
+                     labels = c("Normal", "Adenoma", "Cancer")), 
+         scfa = factor(scfa, 
+                       levels = c("acetate", "butyrate", "propionate"), 
+                       labels = c("Acetate", "Butyrate", "Propionate"))) %>% 
+  ggplot(aes(scfa, median_yes, color = dx, group = dx)) + 
   geom_pointrange(aes(ymin = min_yes, ymax = max_yes), position = position_dodge(width = 0.6)) +  
-  facet_wrap(~model) + 
+  facet_wrap(~model) + theme_bw() + 
   coord_cartesian(ylim = c(0, 1)) + 
   labs(x = "", y = "Correct Classification Probability")
 
