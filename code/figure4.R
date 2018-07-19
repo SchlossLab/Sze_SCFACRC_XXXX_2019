@@ -7,6 +7,9 @@ source('code/functions.R')
 # Load needed libraries
 loadLibs(c("tidyverse", "gridExtra"))
 
+#setup variables that will be used
+scfas <- c("acetate", "butyrate", "propionate")
+
 
 # Read in classification data
 classification_model_data <- read_csv("data/process/tables/acetate_classification_RF_summary.csv") %>% 
@@ -61,8 +64,36 @@ combined_imp_class_summary <- classification_imp_otus %>%
   left_join(select(tax, OTU, genus), by = c("otu" = "OTU"))
 
 
-### Plot the classification AUC data ###
 
+# Read in the data
+# The data is obtained from the model tracking of the run_rf_scfa_predictions.R script
+# Put in a temporary run number until the analysis is re-run with it in the data frame.
+class_data <- map(scfas, function(x) 
+  read_csv(paste("data/process/tables/", x, "_classification_RF_train_probs_summary.csv", sep = "")) %>% 
+    mutate(scfa = x, 
+           model = "class_train")) %>% bind_rows() %>% 
+  bind_rows(map(scfas, function(x) 
+    read_csv(paste("data/process/tables/", x, "_classification_RF_test_probs_summary.csv", sep = "")) %>% 
+      mutate(run = rep(1:100, each = 85), 
+             scfa = x, 
+             model = "class_test")) %>% 
+      bind_rows() %>% 
+      rename(pred = tempPredictions, obs = high_low, sample_id = Group)) %>% 
+  mutate(correct_class = case_when(
+    pred == obs ~ "yes", 
+    TRUE ~ "no")) %>% 
+  group_by(model, scfa, run, dx) %>% 
+  summarise(yes = table(correct_class)[2]/(table(correct_class)[2] + table(correct_class)[1]), 
+            no = table(correct_class)[1]/(table(correct_class)[2] + table(correct_class)[1])) %>% 
+  ungroup() %>% 
+  group_by(model, scfa, dx) %>% 
+  summarise(median_yes = median(yes, na.rm = T), 
+            median_no = median(no, na.rm = T), 
+            min_yes = min(yes, na.rm = T), 
+            max_yes = max(yes, na.rm = T))
+
+
+### Plot the classification AUC data ###
 auc_classification <- classification_model_data %>% 
   gather("groupings", "auc", train_AUC:test_AUC) %>% 
   separate(groupings, c("group", "metric"), sep = "_") %>% 
@@ -79,16 +110,17 @@ auc_classification <- classification_model_data %>%
              lwd=1, colour="gray", alpha = 0.6) + 
   theme_bw() + coord_cartesian(ylim = c(0, 1.0)) + 
   labs(x = "", y = "AUC") + ggtitle("A") + 
-  scale_fill_manual(name = "Group", 
+  scale_fill_manual(name = "", 
                     values = c("white", "darkgray")) + 
-  theme(plot.title = element_text(face="bold", hjust = -0.07, size = 20), 
+  theme(plot.title = element_text(face="bold", hjust = -0.20, size = 20), 
+        legend.position = "bottom", 
         panel.grid.major = element_blank(), 
         panel.grid.minor = element_blank(), 
         axis.text.y = element_text(size = 10), 
         axis.title = element_text(size = 12), 
         axis.text.x = element_text(size = 10, face = "bold"))
 
-
+# Plot the top 10 OTUs in the model graph
 imp_otus_classification <- combined_imp_class_summary %>% 
   ungroup() %>% 
   mutate(scfa = factor(scfa, 
@@ -98,10 +130,10 @@ imp_otus_classification <- combined_imp_class_summary %>%
   geom_pointrange(aes(ymin = min_mda, ymax = max_mda), position = position_dodge(width = 1), size = 1) + 
   geom_vline(xintercept=seq(1.5, length(unique(classification_imp_otus$scfa))-0.5, 1), 
              lwd=1, colour="gray", alpha = 0.6) + 
-  theme_bw() + labs(x = "", y = "Median MDA") + ggtitle("B") + 
+  theme_bw() + labs(x = "", y = "Median MDA") + ggtitle("C") + 
   scale_color_manual(name = "", values = c("#B0171F", "#FF6EB4", "#9B30FF", "#4169E1", 
                                            "#63B8FF", "#FFD700", "#00FF00", "#FF7F00")) + 
-  theme(plot.title = element_text(face="bold", hjust = -0.07, size = 20), 
+  theme(plot.title = element_text(face="bold", hjust = -0.04, size = 20), 
         panel.grid.major = element_blank(), 
         panel.grid.minor = element_blank(), 
         legend.position = "bottom", 
@@ -113,104 +145,40 @@ imp_otus_classification <- combined_imp_class_summary %>%
 
 
 
-regression_model_data <- read_csv("data/process/tables/acetate_regression_RF_summary.csv") %>%
-  mutate(scfa = "acetate") %>%
-  bind_rows(
-    read_csv("data/process/tables/butyrate_regression_RF_summary.csv") %>%
-      mutate(scfa = "butyrate"),
-    read_csv("data/process/tables/propionate_regression_RF_summary.csv") %>%
-      mutate(scfa = "propionate"))
-
-
-regression_summary <- regression_model_data %>%
-  group_by(scfa) %>%
-  summarise(median_train_r2 = median(train_r2),
-            max_train_r2 = max(train_r2),
-            min_train_r2 = min(train_r2),
-            median_test_r2 = median(test_r2),
-            max_test_r2 = max(test_r2),
-            min_test_r2 = min(test_r2),
-            median_sens = median(RMSE), max_sens = max(RMSE), min_sens = min(RMSE),
-            median_spec = median(MAE), max_spec = max(MAE), min_spec = min(MAE)) %>%
-  gather("groupings", "r2", median_train_r2:min_test_r2)
-
-#### This needs updating once the files have been re done (accidentally overwrote the files)
-regression_imp_otus <- read_csv("data/process/tables/acetateimp_otus_regression_RF_summary.csv") %>%
-  mutate(scfa = "acetate") %>%
-  bind_rows(
-    read_csv("data/process/tables/butyrateimp_otus_regression_RF_summary.csv") %>%
-      mutate(scfa = "butyrate"),
-    read_csv("data/process/tables/propionateimp_otus_regression_RF_summary.csv") %>%
-      mutate(scfa = "propionate")) %>%
-  group_by(scfa, otu) %>%
-  summarise(median_mda = median(Overall),
-            max_mda = max(Overall),
-            min_mda = min(Overall)) %>%
-  arrange(desc(median_mda), .by_group = T) %>%
-  slice(1:10)
-
-combined_imp_reg_summary <- regression_imp_otus %>% 
-  left_join(select(tax, OTU, genus), by = c("otu" = "OTU"))
-
-### Plot the regression data ###
-
-regression_summary %>%
-  select(scfa, groupings, r2) %>%
-  separate(groupings, c("range_data", "groups"), sep = "_") %>%
-  spread(range_data, r2) %>%
-  mutate(groups = factor(groups,
-                         levels = c("train", "test"),
-                         labels = c("Train", "Test")),
-         scfa = factor(scfa,
-                       levels = c("acetate", "butyrate", "propionate"),
-                       labels = c("Acetate", "Butyrate", "Propionate")),
-         min = case_when(min < 0 ~ 0,
-                         TRUE ~ min)) %>%
-  ggplot(aes(scfa, median, color = groups, group = groups)) +
-  geom_pointrange(aes(ymin = min, ymax = max), position = position_dodge(width = 0.5), size = 1) +
-  geom_vline(xintercept=seq(1.5, length(unique(classification_summary$scfa))-0.5, 1),
-             lwd=1, colour="gray", alpha = 0.6) +
-  theme_bw() + coord_cartesian(ylim = c(0, 0.4)) +
-  labs(x = "", y = "R Squared") +
-  scale_color_manual(name = "Group",
-                     values = c("black", "darkgray")) +
-  theme(plot.title = element_text(face="bold", hjust = -0.07, size = 20),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        axis.text.y = element_text(size = 10),
-        axis.title = element_text(size = 12),
-        axis.text.x = element_text(size = 10, face = "bold"))
-
-
-combined_imp_reg_summary %>% 
+### Create the classification graph
+test_data_graph <- class_data %>% 
   ungroup() %>% 
-  mutate(scfa = factor(scfa, 
+  mutate(model = factor(model, 
+                        levels = c("class_train", "class_test"), 
+                        labels = c("Training (Classification)", "Testing (Classification)")), 
+         dx = factor(dx, 
+                     levels = c("normal", "adenoma", "cancer"), 
+                     labels = c("Normal", "Adenoma", "Cancer")), 
+         scfa = factor(scfa, 
                        levels = c("acetate", "butyrate", "propionate"), 
                        labels = c("Acetate", "Butyrate", "Propionate"))) %>% 
-  ggplot(aes(scfa, median_mda, color = genus, group = otu)) + 
-  geom_pointrange(aes(ymin = min_mda, ymax = max_mda), position = position_dodge(width = 1), size = 1) + 
-  geom_vline(xintercept=seq(1.5, length(unique(classification_imp_otus$scfa))-0.5, 1), 
-             lwd=1, colour="gray", alpha = 0.6) + 
-  theme_bw() + labs(x = "", y = "Median MDA") + ggtitle("B") + 
-  scale_color_manual(name = "", values = c("#B0171F", "#FF6EB4", "#9B30FF", "#4169E1", 
-                                           "#63B8FF", "#FFD700", "#00FF00", "#FF7F00")) + 
-  theme(plot.title = element_text(face="bold", hjust = -0.07, size = 20), 
+  ggplot(aes(scfa, median_yes, color = dx, group = dx)) + 
+  geom_pointrange(aes(ymin = min_yes, ymax = max_yes), position = position_dodge(width = 0.6)) +  
+  facet_wrap(~model) + theme_bw() + ggtitle("B") + 
+  coord_cartesian(ylim = c(0, 1)) + 
+  labs(x = "", y = "Correct Classification Probability") + 
+  scale_color_manual(name = "", values = c('#228B22', '#FFD700', '#DC143C')) + 
+  theme(plot.title = element_text(face="bold", hjust = -0.09, size = 20), 
         panel.grid.major = element_blank(), 
         panel.grid.minor = element_blank(), 
         legend.position = "bottom", 
-        legend.title = element_blank(),
-        legend.text = element_text(face = "italic"), 
+        legend.text = element_text(size = 10, face = "bold"), 
         axis.text.y = element_text(size = 10), 
         axis.title = element_text(size = 12), 
         axis.text.x = element_text(size = 10, face = "bold"))
 
 
 ### Create a merged graph
-prediction_plot <- grid.arrange(auc_classification, imp_otus_classification, 
-                                layout_matrix = rbind(c(1, 2, 2)))
+prediction_plot <- grid.arrange(auc_classification, imp_otus_classification, test_data_graph, 
+                                layout_matrix = rbind(c(1, 3, 3), c(2, 2, 2)))
 
 # Write out to specific directory
-ggsave("results/figures/FigureS1.pdf", prediction_plot, width = 11, height = 6)
+ggsave("results/figures/Figure4.pdf", prediction_plot, width = 11, height = 8)
 
 
 
