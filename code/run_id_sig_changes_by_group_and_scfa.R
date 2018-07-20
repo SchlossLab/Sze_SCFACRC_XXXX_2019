@@ -232,5 +232,12 @@ sig_reg_summary <- norm_reg %>% bind_rows() %>%
               mutate(model = "crc_reg") %>% 
               select(otu, genus, dx, statistic, estimate, p.value, bh, scfa, model))
 
+# Write out the significant data
+write_csv(sig_class_summary, "data/process/tables/significant_class_otu_comp_summary.csv")
+
+write_csv(sig_reg_summary, "data/process/tables/significant_reg_otu_comp_summary.csv")
+
+
+
 
 
