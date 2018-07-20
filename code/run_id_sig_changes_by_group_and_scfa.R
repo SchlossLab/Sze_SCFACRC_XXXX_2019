@@ -12,7 +12,7 @@ loadLibs(c("tidyverse", "caret"))
 
 
 #setup variables that will be used
-scfas <- c("acetate", "butyrate", "isobutyrate", "propionate")
+scfas <- c("acetate", "butyrate", "propionate")
 
 # Samples that had to little volume to actually be measured
 not_measured <- c("3367653", "2041650", "2043650", "3027650")
@@ -131,16 +131,16 @@ final_sp_data <- sapply(scfas,
                         function(x) split_dataframe(x, final_data), simplify = F)
 
 # Set up the separate analysis lists
-class_data <- list(acetate = c(), butyrate = c(), isobutyrate = c(), propionate = c())
-reg_data <- list(acetate = c(), butyrate = c(), isobutyrate = c(), propionate = c())
+class_data <- list(acetate = c(), butyrate = c(), propionate = c())
+reg_data <- list(acetate = c(), butyrate = c(), propionate = c())
 
-norm_class <- list(acetate = c(), butyrate = c(), isobutyrate = c(), propionate = c())
-adn_class <- list(acetate = c(), butyrate = c(), isobutyrate = c(), propionate = c())
-crc_class <- list(acetate = c(), butyrate = c(), isobutyrate = c(), propionate = c())
+norm_class <- list(acetate = c(), butyrate = c(), propionate = c())
+adn_class <- list(acetate = c(), butyrate = c(), propionate = c())
+crc_class <- list(acetate = c(), butyrate = c(), propionate = c())
 
-norm_reg <- list(acetate = c(), butyrate = c(), isobutyrate = c(), propionate = c())
-adn_reg <- list(acetate = c(), butyrate = c(), isobutyrate = c(), propionate = c())
-crc_reg <- list(acetate = c(), butyrate = c(), isobutyrate = c(), propionate = c())
+norm_reg <- list(acetate = c(), butyrate = c(), propionate = c())
+adn_reg <- list(acetate = c(), butyrate = c(), propionate = c())
+crc_reg <- list(acetate = c(), butyrate = c(), propionate = c())
 
 # Set up and run the analysis
 for(i in scfas){
@@ -153,7 +153,9 @@ for(i in scfas){
     mutate(wil_test = map(data, ~wilcox.test(rel_abund ~ high_low, data = .x)),
            summary_data = map(wil_test, broom::tidy)) %>%
     select(otu, dx, summary_data) %>%
-    unnest(summary_data)
+    unnest(summary_data) %>% 
+    left_join(select(taxonomy, OTU, genus), by = c("otu" = "OTU")) %>% 
+    mutate(scfa = i)
   # Separate by normal
   norm_class[[i]] <- class_data[[i]] %>%
     filter(dx == "normal") %>%
@@ -180,7 +182,9 @@ for(i in scfas){
     mutate(spear_test = map(data, ~cor.test(.x$rel_abund, .x$mmol_kg, method = "spearman")), 
            summary_data = map(spear_test, broom::tidy)) %>% 
     select(otu, dx, summary_data) %>% 
-    unnest(summary_data)
+    unnest(summary_data) %>% 
+    left_join(select(taxonomy, OTU, genus), by = c("otu" = "OTU")) %>% 
+    mutate(scfa = i)
   # Separate by normal
   norm_reg[[i]] <- reg_data[[i]] %>%
     filter(dx == "normal") %>%
@@ -200,5 +204,33 @@ for(i in scfas){
   print(paste("Completed correlation of mmol/kg tests of ", i, ".", sep = ""))
   
 }
+
+
+sig_class_summary <- norm_class %>% bind_rows() %>% 
+  filter(bh < 0.05) %>% 
+  mutate(model = "norm_class") %>% 
+  select(otu, genus, dx, statistic, p.value, bh, scfa, model) %>% 
+  bind_rows(adn_class %>% bind_rows() %>% 
+              filter(bh < 0.05) %>% 
+              mutate(model = "adn_class") %>% 
+              select(otu, genus, dx, statistic, p.value, bh, scfa, model), 
+            crc_class %>% bind_rows() %>% 
+              filter(bh < 0.05) %>% 
+              mutate(model = "crc_class") %>% 
+              select(otu, genus, dx, statistic, p.value, bh, scfa, model))
+
+sig_reg_summary <- norm_reg %>% bind_rows() %>% 
+  filter(bh < 0.05) %>% 
+  mutate(model = "norm_reg") %>% 
+  select(otu, genus, dx, statistic, estimate, p.value, bh, scfa, model) %>% 
+  bind_rows(adn_reg %>% bind_rows() %>% 
+              filter(bh < 0.05) %>% 
+              mutate(model = "adn_reg") %>% 
+              select(otu, genus, dx, statistic, estimate, p.value, bh, scfa, model), 
+            crc_reg %>% bind_rows() %>% 
+              filter(bh < 0.05) %>% 
+              mutate(model = "crc_reg") %>% 
+              select(otu, genus, dx, statistic, estimate, p.value, bh, scfa, model))
+
 
 
