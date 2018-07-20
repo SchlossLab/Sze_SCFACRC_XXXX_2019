@@ -25,7 +25,7 @@ imp_vars_models <- list(final_data_normal = c(), final_data_adenoma = c(), final
 
 
 # Load in the data
-for(i in names(data_groups)){
+for(i in names(data_models)){
   
   data_models[[i]] <- sapply(scfas, function(x) read_csv(paste("data/process/tables/", i, "_",
                                             x, "_classification_RF_group_summary.csv", sep = "")) %>% 
