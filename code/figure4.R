@@ -175,6 +175,8 @@ test_data_graph <- reg_data %>%
   coord_cartesian(ylim = c(-20, 20)) + 
   labs(x = "", y = "Difference from Actual Concentration") + 
   scale_color_manual(name = "", values = c('#228B22', '#FFD700', '#DC143C')) + 
+  annotate("text", label = paste("Higher in Observed"), x = 2.9, y = 18, size = 3.5) + 
+  annotate("text", label = paste("Higher in Predicted"), x = 2.9, y = -18, size = 3.5) + 
   theme(plot.title = element_text(face="bold", hjust = -0.07, size = 20), 
         panel.grid.major = element_blank(), 
         panel.grid.minor = element_blank(), 
