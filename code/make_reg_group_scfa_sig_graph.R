@@ -36,7 +36,7 @@ graph_data <- reg_data %>%
   group_by(scfa, dx, direction, family) %>% 
   count()
 
-graph_data %>% 
+number_corr_plot <- graph_data %>% 
   ungroup() %>% 
   mutate(dx = factor(dx, 
                      levels = c("normal", "adenoma", "cancer"), 
@@ -58,5 +58,16 @@ graph_data %>%
   facet_grid(scfa~direction) +
   labs(x = "", y = "Number of Significant OTUs") + 
   scale_fill_manual(name = "", values = c('#9B30FF', '#63B8FF', '#008080', '#8FBC8F', '#FF7F00', '#6C7B8B')) + 
-  theme(legend.position = "bottom")
+  theme(legend.position = "bottom") + 
+  theme(plot.title = element_text(face="bold", hjust = -0.07, size = 20), 
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(), 
+        legend.position = "bottom", 
+        legend.text = element_text(size = 10), 
+        axis.text.y = element_text(size = 10), 
+        axis.title = element_text(size = 12), 
+        axis.text.x = element_text(size = 10, face = "bold"))
+
+ggsave("results/figures/Figure5.pdf", number_corr_plot, width = 7, height = 8)
+
 
