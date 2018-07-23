@@ -322,15 +322,40 @@ $(PROC)/sra_meta_conversion.txt : $(TABLES)/select_scfa_opf_kruskal_summary.csv\
 	Rscript code/run_opf_select_scfa_analysis.R
 
 
-# Run RF model classifications of SCFA high/low
-SCFA_RF_DATA = $(foreach S, $(SCFA), $(TABLES)/$(S)_classification_RF_summary.csv)
-SCFA_RF_IMP = $(foreach S, $(SCFA), $(TABLES)/$(S)_imp_otus_classification_RF_summary.csv)
+# Run RF model classifications of SCFA high/low and regression of SCFA concentrations
+SCFA_RF_C_DATA = $(foreach S, $(SCFA), $(TABLES)/$(S)_classification_RF_summary.csv)
+SCFA_RF_C_IMP = $(foreach S, $(SCFA), $(TABLES)/$(S)_imp_otus_classification_RF_summary.csv)
+SCFA_RF_C_TRAIN = $(foreach S, $(SCFA), $(TABLES)/$(S)_classification_RF_train_probs_summary.csv)
+SCFA_RF_C_TEST = $(foreach S, $(SCFA), $(TABLES)/$(S)_classification_RF_test_probs_summary.csv)
 
-$(SCFA_RF_DATA)\
-$(SCFA_RF_IMP) : $(PROC)/picrust_metadata $(RAW)/metadata/good_metaf_final.csv\
+SCFA_RF_R_DATA = $(foreach S, $(SCFA), $(TABLES)/$(S)_regression_RF_summary.csv)
+SCFA_RF_R_IMP = $(foreach S, $(SCFA), $(TABLES)/$(S)_imp_otus_regression_RF_summary.csv)
+SCFA_RF_R_TRAIN = $(foreach S, $(SCFA), $(TABLES)/$(S)_regression_RF_train_conc_summary.csv)
+SCFA_RF_R_TEST = $(foreach S, $(SCFA), $(TABLES)/$(S)_regression_RF_test_conc_summary.csv)
+
+SCFA_RF_LR_DATA = $(foreach S, $(SCFA), $(TABLES)/log_$(S)_regression_RF_summary.csv)
+SCFA_RF_LR_IMP = $(foreach S, $(SCFA), $(TABLES)/log_$(S)_imp_otus_regression_RF_summary.csv)
+SCFA_RF_LR_TRAIN = $(foreach S, $(SCFA), $(TABLES)/log_$(S)_regression_RF_train_conc_summary.csv)
+SCFA_RF_LR_TEST = $(foreach S, $(SCFA), $(TABLES)/log_$(S)_regression_RF_test_conc_summary.csv)
+
+
+$(SCFA_RF_C_DATA) $(SCFA_RF_C_IMP) $(SCFA_RF_C_TRAIN) $(SCFA_RF_C_TEST)\
+$(SCFA_RF_R_DATA) $(SCFA_RF_R_IMP) $(SCFA_RF_R_TRAIN) $(SCFA_RF_R_TEST)\
+$(SCFA_RF_LR_DATA) $(SCFA_RF_LR_IMP)\
+$(SCFA_RF_LR_TRAIN)\
+$(SCFA_RF_LR_TEST) : $(PROC)/picrust_metadata $(RAW)/metadata/good_metaf_final.csv\
 		$(PROC)/final.0.03.subsample.shared $(FINAL_SCFA_DATA)\
 		code/run_rf_scfa_predictions.R
 	Rscript code/run_rf_scfa_predictions.R
+
+
+# Get significant correlations with high/low SCFAs or concentration SCFA
+$(TABLES)/significant_class_otu_comp_summary.csv\
+$(TABLES)/significant_reg_otu_comp_summary.csv : $(PROC)/final.taxonomy\
+		$(PROC)/picrust_metadata $(RAW)/metadata/good_metaf_final.csv\
+		$(PROC)/final.0.03.subsample.shared $(FINAL_SCFA_DATA)\
+		code/run_id_sig_changes_by_group_and_scfa.R
+	Rscript code/run_id_sig_changes_by_group_and_scfa.R
 
 
 
@@ -358,9 +383,20 @@ $(FIGS)/Figure3.pdf : $(TABLES)/selected_scfa_gene_data.csv\
 		$(TABLES)/select_scfa_opf_data.csv code/make_pi_opf_combined_graph.R
 	Rscript code/make_pi_opf_combined_graph.R
 
-$(FIGS)/FigureS1.pdf : $(SCFA_RF_DATA) $(SCFA_RF_IMP)\
-		code/make_SCFA_classification_graph.R
-	Rscript code/make_SCFA_classification_graph.R
+
+$(FIGS)/Figure4.pdf : $(SCFA_RF_R_TRAIN) $(SCFA_RF_R_TEST) $(SCFA_RF_R_DATA)\
+		$(SCFA_RF_R_IMP) code/figure4.R
+	Rscript code/figure4.R
+
+$(FIGS)/Figure5.pdf : $(PROC)/final.taxonomy $(TABLES)/significant_reg_otu_comp_summary.csv\
+		code/make_reg_group_scfa_sig_graph.R
+	Rscript code/make_reg_group_scfa_sig_graph.R
+	
+
+$(FIGS)/FigureS1.pdf : $(SCFA_RF_C_TRAIN) $(SCFA_RF_C_TEST) $(SCFA_RF_C_DATA)\
+		$(SCFA_RF_C_IMP) code/figureS1.R
+	Rscript code/figureS1.R
+
 
 
 
