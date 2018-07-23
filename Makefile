@@ -414,6 +414,6 @@ write.paper : $(FINAL)/manuscript.Rmd $(FINAL)/supplement.Rmd\
 		$(FINAL)/references.bib $(FINAL)/mbio.csl $(FINAL)/header.tex\
 		$(FIGS)/Figure1.pdf $(FIGS)/Figure2.pdf\
 		$(FIGS)/Figure3.pdf $(FIGS)/Figure4.pdf\
-		$(FIGS)/Figure5.pdf\
-		$(FIGS)/FigureS1.pdf code/Run_render_paper.R
+		$(FIGS)/Figure5.pdf $(FIGS)/FigureS1.pdf\
+		$(FIGS)/FigureS2.pdf code/Run_render_paper.R
 	R -e "source('code/Run_render_paper.R')"
