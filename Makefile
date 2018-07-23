@@ -391,13 +391,15 @@ $(FIGS)/Figure4.pdf : $(SCFA_RF_R_TRAIN) $(SCFA_RF_R_TEST) $(SCFA_RF_R_DATA)\
 $(FIGS)/Figure5.pdf : $(PROC)/final.taxonomy $(TABLES)/significant_reg_otu_comp_summary.csv\
 		code/make_reg_group_scfa_sig_graph.R
 	Rscript code/make_reg_group_scfa_sig_graph.R
-	
+
 
 $(FIGS)/FigureS1.pdf : $(SCFA_RF_C_TRAIN) $(SCFA_RF_C_TEST) $(SCFA_RF_C_DATA)\
 		$(SCFA_RF_C_IMP) code/figureS1.R
 	Rscript code/figureS1.R
 
-
+$(FIGS)/FigureS2.pdf : $(PROC)/final.taxonomy $(TABLES)/significant_class_otu_comp_summary.csv\
+		code/make_class_group_scfa_sig_graph.R
+	Rscript code/make_class_group_scfa_sig_graph.R
 
 
 ################################################################################
