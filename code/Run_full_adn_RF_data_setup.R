@@ -22,7 +22,7 @@ metaI <- filter(metaI, !(sample %in% good_metaf$initial)) %>%
   mutate(Dx_Bin = gsub("adv Adenoma", "adv_adenoma", Dx_Bin))
 
 #setup variables that will be used
-scfas <- c("acetate", "butyrate", "isobutyrate", "propionate")
+scfas <- c("acetate", "butyrate", "propionate")
 
 # Samples that had to little volume to actually be measured
 not_measured <- c("3367653", "2041650", "2043650", "3027650")
