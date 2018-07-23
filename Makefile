@@ -349,6 +349,14 @@ $(SCFA_RF_LR_TEST) : $(PROC)/picrust_metadata $(RAW)/metadata/good_metaf_final.c
 	Rscript code/run_rf_scfa_predictions.R
 
 
+# Aggregate and run the analysis on the RF models
+$(TABLES)/full_model_class_group_results.csv\
+$(TABLES)/full_model_reg_group_results.csv : $(SCFA_RF_C_TRAIN) $(SCFA_RF_C_TEST)\
+		$(SCFA_RF_R_TRAIN) $(SCFA_RF_R_TEST) $(SCFA_RF_LR_TRAIN) $(SCFA_RF_LR_TEST)\
+		code/run_aggregate_summarize_rf.R
+	Rscript code/run_aggregate_summarize_rf.R
+
+
 # Get significant correlations with high/low SCFAs or concentration SCFA
 $(TABLES)/significant_class_otu_comp_summary.csv\
 $(TABLES)/significant_reg_otu_comp_summary.csv : $(PROC)/final.taxonomy\
