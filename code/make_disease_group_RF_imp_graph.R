@@ -61,11 +61,7 @@ all_adn <- all_data %>%
         axis.title = element_text(size = 12),
         axis.text.x = element_text(size = 10, face = "bold"))
 
-#values = c('#9B30FF', '#63B8FF', '#008080', '#8FBC8F', '#FF7F00', '#6C7B8B')
-#
-#values = c("#FF6EB4", "#9B30FF", "#4B0082", "#4169E1", 
-#           "#63B8FF", "#FFD700", "#00FF00", "#FF7F00")
-  
+
 only_otu_adn <- all_data %>% 
   filter(model == "adn_otu") %>% 
   mutate(Variable = factor(Variable, 
@@ -121,12 +117,6 @@ all_crc <- all_data %>%
         axis.title = element_text(size = 12),
         axis.text.x = element_text(size = 10, face = "bold"))
 
-
-
-#values = c('#9B30FF', '#63B8FF', '#008080', '#8FBC8F', '#FF7F00', '#6C7B8B')
-#
-#values = c("#FF6EB4", "#9B30FF", "#4B0082", "#4169E1", 
-#           "#63B8FF", "#FFD700", "#00FF00", "#FF7F00")
 
 
 only_otu_crc <- all_data %>% 
