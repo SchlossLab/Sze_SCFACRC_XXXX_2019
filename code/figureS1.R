@@ -61,7 +61,8 @@ tax <- read_tsv("data/process/final.taxonomy") %>%
          genus = str_replace_all(genus, "_", " "))
 
 combined_imp_class_summary <- classification_imp_otus %>% 
-  left_join(select(tax, OTU, genus), by = c("otu" = "OTU"))
+  left_join(select(tax, OTU, family), by = c("otu" = "OTU")) %>% 
+  mutate(family = str_replace_all(family, "_unclassified", ""))
 
 
 
@@ -121,27 +122,115 @@ auc_classification <- classification_model_data %>%
         axis.text.x = element_text(size = 10, face = "bold"))
 
 # Plot the top 10 OTUs in the model graph
-imp_otus_classification <- combined_imp_class_summary %>% 
+acetate_imp_graph <- combined_imp_class_summary %>% 
   ungroup() %>% 
-  mutate(scfa = factor(scfa, 
-                       levels = c("acetate", "butyrate", "propionate"), 
-                       labels = c("Acetate", "Butyrate", "Propionate"))) %>% 
-  ggplot(aes(scfa, median_mda, color = genus, group = otu)) + 
+  filter(scfa == "acetate") %>% 
+  mutate(otu = factor(otu, 
+                      levels = rev(otu), 
+                      labels = rev(otu)), 
+         family = case_when(
+           family %in% c("Firmicutes", "Pasteurellaceae", "Verrucomicrobiaceae") ~ "Other", 
+           TRUE ~ family), 
+         family = factor(family, 
+                         levels = c("Clostridiales", "Lachnospiraceae", "Ruminococcaceae", "Other"), 
+                         labels = c("Clostridiales", "Lachnospiraceae", "Ruminococcaceae", "Other"))) %>% 
+  ggplot(aes(otu, median_mda, color = family)) + 
   geom_pointrange(aes(ymin = min_mda, ymax = max_mda), position = position_dodge(width = 1), size = 1) + 
-  geom_vline(xintercept=seq(1.5, length(unique(classification_imp_otus$scfa))-0.5, 1), 
-             lwd=1, colour="gray", alpha = 0.6) + 
-  theme_bw() + labs(x = "", y = "Median MDA") + ggtitle("C") + 
-  scale_color_manual(name = "", values = c("#B0171F", "#FF6EB4", "#9B30FF", "#4169E1", 
-                                           "#63B8FF", "#FFD700", "#00FF00", "#FF7F00")) + 
-  theme(plot.title = element_text(face="bold", hjust = -0.04, size = 20), 
+  coord_flip(ylim = c(-5, 25)) + theme_bw() + ggtitle("C") + 
+  annotate("text", label = paste("Acetate"), x = 4.7, y = 16.5, size = 3.5) +
+  labs(x = "", y = "Mean Decrease in Accuracy") + 
+  scale_color_manual(name = "", values = c('#9B30FF', '#63B8FF', '#FF7F00', '#6C7B8B')) + 
+  theme(plot.title = element_text(face="bold", hjust = -0.35, size = 20), 
         panel.grid.major = element_blank(), 
         panel.grid.minor = element_blank(), 
-        legend.position = "bottom", 
+        legend.position = c(0.7, 0.2), 
+        legend.background = element_rect(color = "black"), 
         legend.title = element_blank(),
-        legend.text = element_text(face = "italic"), 
+        legend.text = element_text(face = "italic", size = 6.5), 
         axis.text.y = element_text(size = 10), 
         axis.title = element_text(size = 12), 
         axis.text.x = element_text(size = 10, face = "bold"))
+
+butyrate_imp_graph <- combined_imp_class_summary %>% 
+  ungroup() %>% 
+  filter(scfa == "butyrate") %>% 
+  mutate(otu = factor(otu, 
+                      levels = rev(otu), 
+                      labels = rev(otu)), 
+         family = case_when(
+           family %in% c("Firmicutes", "Pasteurellaceae", "Verrucomicrobiaceae") ~ "Other", 
+           TRUE ~ family), 
+         family = factor(family, 
+                         levels = c("Clostridiales", "Lachnospiraceae", "Ruminococcaceae", "Other"), 
+                         labels = c("Clostridiales", "Lachnospiraceae", "Ruminococcaceae", "Other"))) %>% 
+  ggplot(aes(otu, median_mda, color = family)) + 
+  geom_pointrange(aes(ymin = min_mda, ymax = max_mda), position = position_dodge(width = 1), size = 1) + 
+  coord_flip(ylim = c(-5, 25)) + theme_bw() + 
+  annotate("text", label = paste("Butyrate"), x = 4.7, y = 16.5, size = 3.5) + 
+  labs(x = "", y = "Mean Decrease in Accuracy") + ggtitle("D") + 
+  scale_color_manual(name = "", values = c('#9B30FF', '#63B8FF', '#FF7F00', '#6C7B8B')) + 
+  theme(plot.title = element_text(face="bold", hjust = -0.35, size = 20), 
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(), 
+        legend.position = c(0.7, 0.2), 
+        legend.background = element_rect(color = "black"),
+        legend.title = element_blank(),
+        legend.text = element_text(face = "italic", size = 6.5), 
+        axis.text.y = element_text(size = 10), 
+        axis.title = element_text(size = 12), 
+        axis.text.x = element_text(size = 10, face = "bold"))
+
+propionate_imp_graph <- combined_imp_class_summary %>% 
+  ungroup() %>% 
+  filter(scfa == "propionate") %>% 
+  mutate(otu = factor(otu, 
+                      levels = rev(otu), 
+                      labels = rev(otu)), 
+         family = case_when(
+           family %in% c("Firmicutes", "Pasteurellaceae", "Verrucomicrobiaceae") ~ "Other", 
+           TRUE ~ family), 
+         family = factor(family, 
+                         levels = c("Clostridiales", "Lachnospiraceae", "Ruminococcaceae", "Other"), 
+                         labels = c("Clostridiales", "Lachnospiraceae", "Ruminococcaceae", "Other"))) %>% 
+  ggplot(aes(otu, median_mda, color = family)) + 
+  geom_pointrange(aes(ymin = min_mda, ymax = max_mda), position = position_dodge(width = 1), size = 1) + 
+  coord_flip(ylim = c(-5, 25)) + theme_bw() + 
+  annotate("text", label = paste("Propionate"), x = 4.7, y = 16.5, size = 3.5) + 
+  labs(x = "", y = "Mean Decrease in Accuracy") + ggtitle("E") + 
+  scale_color_manual(name = "", values = c('#9B30FF', '#63B8FF', '#FF7F00', '#6C7B8B')) + 
+  theme(plot.title = element_text(face="bold", hjust = -0.35, size = 20), 
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(), 
+        legend.position = c(0.7, 0.2), 
+        legend.background = element_rect(color = "black"), 
+        legend.title = element_blank(),
+        legend.text = element_text(face = "italic", size = 6.5), 
+        axis.text.y = element_text(size = 10), 
+        axis.title = element_text(size = 12), 
+        axis.text.x = element_text(size = 10, face = "bold"))
+
+
+# imp_otus_classification <- combined_imp_class_summary %>% 
+#   ungroup() %>% 
+#   mutate(scfa = factor(scfa, 
+#                        levels = c("acetate", "butyrate", "propionate"), 
+#                        labels = c("Acetate", "Butyrate", "Propionate"))) %>% 
+#   ggplot(aes(scfa, median_mda, color = family, group = otu)) + 
+#   geom_pointrange(aes(ymin = min_mda, ymax = max_mda), position = position_dodge(width = 1), size = 1) + 
+#   geom_vline(xintercept=seq(1.5, length(unique(classification_imp_otus$scfa))-0.5, 1), 
+#              lwd=1, colour="gray", alpha = 0.6) + 
+#   theme_bw() + labs(x = "", y = "Median MDA") + ggtitle("C") + 
+#   scale_color_manual(name = "", values = c("#B0171F", "#FF6EB4", "#9B30FF", "#4169E1", 
+#                                            "#63B8FF", "#FFD700", "#00FF00", "#FF7F00")) + 
+#   theme(plot.title = element_text(face="bold", hjust = -0.04, size = 20), 
+#         panel.grid.major = element_blank(), 
+#         panel.grid.minor = element_blank(), 
+#         legend.position = "bottom", 
+#         legend.title = element_blank(),
+#         legend.text = element_text(face = "italic"), 
+#         axis.text.y = element_text(size = 10), 
+#         axis.title = element_text(size = 12), 
+#         axis.text.x = element_text(size = 10, face = "bold"))
 
 
 
@@ -174,8 +263,9 @@ test_data_graph <- class_data %>%
 
 
 ### Create a merged graph
-prediction_plot <- grid.arrange(auc_classification, imp_otus_classification, test_data_graph, 
-                                layout_matrix = rbind(c(1, 3, 3), c(2, 2, 2)))
+prediction_plot <- grid.arrange(auc_classification, test_data_graph, 
+                                acetate_imp_graph, butyrate_imp_graph, propionate_imp_graph, 
+                                layout_matrix = rbind(c(1, 2, 2), c(3, 4, 5)))
 
 # Write out to specific directory
 ggsave("results/figures/FigureS1.pdf", prediction_plot, width = 11, height = 8)
