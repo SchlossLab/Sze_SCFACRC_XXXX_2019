@@ -232,4 +232,4 @@ prediction_plot <- grid.arrange(adenoma, all_adn, only_otu_adn,
                                 layout_matrix = rbind(c(1, 2, 3), c(4, 5, 6)))
 
 # Write out to specific directory
-ggsave("results/figures/Figure2.pdf", prediction_plot, width = 15, height = 8)
+ggsave("results/figures/Figure4.pdf", prediction_plot, width = 15, height = 8)

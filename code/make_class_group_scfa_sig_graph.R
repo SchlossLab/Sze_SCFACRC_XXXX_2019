@@ -62,5 +62,5 @@ number_class_plot <- graph_data %>%
         axis.text.x = element_text(size = 10, face = "bold"))
 
 
-ggsave("results/figures/FigureS2.pdf", number_class_plot, width = 8, height = 8)
+ggsave("results/figures/FigureS1.pdf", number_class_plot, width = 8, height = 8)
 

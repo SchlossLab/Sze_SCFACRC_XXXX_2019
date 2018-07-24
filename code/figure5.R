@@ -306,4 +306,4 @@ prediction_plot <- grid.arrange(r2_classification, test_data_graph,
                                 layout_matrix = rbind(c(1, 2, 2), c(3, 4, 5)))
 
 # Write out to specific directory
-ggsave("results/figures/Figure4.pdf", prediction_plot, width = 11, height = 8)
+ggsave("results/figures/Figure5.pdf", prediction_plot, width = 11, height = 8)

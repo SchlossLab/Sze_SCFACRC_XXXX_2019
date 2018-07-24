@@ -380,34 +380,38 @@ $(FIGS)/Figure1.pdf : $(RAW)/metadata/good_metaf_final.csv\
 	Rscript code/make_scfa_measures_hplc_figure.R
 
 
-$(FIGS)/Figure2.pdf : $(TABLES)/adn_full_AUC_model_summary.csv\
+$(FIGS)/Figure2.pdf : $(TABLES)/selected_scfa_gene_data.csv\
+		$(TABLES)/select_scfa_opf_data.csv code/make_pi_opf_combined_graph.R
+	Rscript code/make_pi_opf_combined_graph.R
+
+
+$(FIGS)/Figure3.pdf : $(PROC)/final.taxonomy $(TABLES)/significant_reg_otu_comp_summary.csv\
+		code/make_reg_group_scfa_sig_graph.R
+	Rscript code/make_reg_group_scfa_sig_graph.R
+
+
+$(FIGS)/Figure4.pdf : $(TABLES)/adn_full_AUC_model_summary.csv\
 		$(TABLES)/adn_otu_only_AUC_model_summary.csv\
 		$(TABLES)/crc_full_AUC_model_summary.csv\
 		$(TABLES)/crc_otu_only_AUC_model_summary.csv\
 		code/make_rf_auc_graphs.R
 	Rscript code/make_rf_auc_graphs.R
 
-$(FIGS)/Figure3.pdf : $(TABLES)/selected_scfa_gene_data.csv\
-		$(TABLES)/select_scfa_opf_data.csv code/make_pi_opf_combined_graph.R
-	Rscript code/make_pi_opf_combined_graph.R
+
+$(FIGS)/Figure5.pdf : $(SCFA_RF_R_TRAIN) $(SCFA_RF_R_TEST) $(SCFA_RF_R_DATA)\
+		$(SCFA_RF_R_IMP) code/figure5.R
+	Rscript code/figure5.R
 
 
-$(FIGS)/Figure4.pdf : $(SCFA_RF_R_TRAIN) $(SCFA_RF_R_TEST) $(SCFA_RF_R_DATA)\
-		$(SCFA_RF_R_IMP) code/figure4.R
-	Rscript code/figure4.R
-
-$(FIGS)/Figure5.pdf : $(PROC)/final.taxonomy $(TABLES)/significant_reg_otu_comp_summary.csv\
-		code/make_reg_group_scfa_sig_graph.R
-	Rscript code/make_reg_group_scfa_sig_graph.R
-
-
-$(FIGS)/FigureS1.pdf : $(SCFA_RF_C_TRAIN) $(SCFA_RF_C_TEST) $(SCFA_RF_C_DATA)\
-		$(SCFA_RF_C_IMP) code/figureS1.R
-	Rscript code/figureS1.R
-
-$(FIGS)/FigureS2.pdf : $(PROC)/final.taxonomy $(TABLES)/significant_class_otu_comp_summary.csv\
+$(FIGS)/FigureS1.pdf : $(PROC)/final.taxonomy $(TABLES)/significant_class_otu_comp_summary.csv\
 		code/make_class_group_scfa_sig_graph.R
 	Rscript code/make_class_group_scfa_sig_graph.R
+
+$(FIGS)/FigureS2.pdf : $(SCFA_RF_C_TRAIN) $(SCFA_RF_C_TEST) $(SCFA_RF_C_DATA)\
+		$(SCFA_RF_C_IMP) code/figureS2.R
+	Rscript code/figureS2.R
+
+
 
 
 ################################################################################

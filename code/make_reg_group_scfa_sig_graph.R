@@ -68,6 +68,6 @@ number_corr_plot <- graph_data %>%
         axis.title = element_text(size = 12), 
         axis.text.x = element_text(size = 10, face = "bold"))
 
-ggsave("results/figures/Figure5.pdf", number_corr_plot, width = 7, height = 8)
+ggsave("results/figures/Figure3.pdf", number_corr_plot, width = 7, height = 8)
 
 
