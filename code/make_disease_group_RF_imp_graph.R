@@ -30,18 +30,36 @@ all_data <- read_csv("data/process/tables/adn_full_MDA_Summary.csv") %>%
     Variable %in% c("acetate", "butyrate", "propionate") ~ str_to_title(Variable), 
     TRUE ~ family), 
     family = str_replace(family, "_unclassified", ""), 
-    family = str_replace_all(family, "_", " "))
+    family = str_replace_all(family, "_", " "), 
+    Variable = case_when(
+      Variable %in% c("acetate", "butyrate", "propionate") ~ str_to_title(Variable), 
+      TRUE ~ Variable))
 
 all_adn <- all_data %>% 
   filter(model == "adn_full") %>% 
   mutate(Variable = factor(Variable, 
                            levels = rev(Variable), 
-                           labels = rev(Variable))) %>% 
+                           labels = rev(Variable)), 
+         family = str_replace(family, "Enterobacteriaceae", "Other"), 
+         family = factor(family, 
+                         levels = c("Acetate", "Butyrate", "Clostridiales", "Lachnospiraceae", 
+                                    "Porphyromonadaceae", "Ruminococcaceae", "Other"), 
+                         labels = c("Acetate", "Butyrate", "Clostridiales", "Lachnospiraceae", 
+                                    "Porphyromonadaceae", "Ruminococcaceae", "Other"))) %>% 
   ggplot(aes(Variable, median_mda, color = family)) + 
   geom_pointrange(aes(ymin = iqr25, ymax = iqr75), position = position_dodge(width = 1), size = 1) + 
-  coord_flip(ylim = c(0, 6)) + theme_bw() + 
-  scale_color_manual(name = "", values = c('#FF3E96', '#8B475D', '#8B008B', '#63B8FF', '#008080', '#FF7F00')) + 
-  theme(legend.position = "bottom")
+  coord_flip(ylim = c(0, 3)) + theme_bw() + 
+  labs(x = "", y = "Mean Decrease in Accuracy") + 
+  scale_color_manual(name = "", values = c('#FF3E96', '#8B475D', '#9B30FF', 
+                                           '#63B8FF', '#008080', '#FF7F00', '#6C7B8B'), 
+                     guide = guide_legend(nrow = 4)) + 
+  theme(legend.position = c(0.7, 0.3), 
+        legend.background = element_rect(color = "black"), 
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.text.y = element_text(size = 10),
+        axis.title = element_text(size = 12),
+        axis.text.x = element_text(size = 10, face = "bold"))
 
 #values = c('#9B30FF', '#63B8FF', '#008080', '#8FBC8F', '#FF7F00', '#6C7B8B')
 #
@@ -52,38 +70,95 @@ only_otu_adn <- all_data %>%
   filter(model == "adn_otu") %>% 
   mutate(Variable = factor(Variable, 
                            levels = rev(Variable), 
-                           labels = rev(Variable))) %>% 
+                           labels = rev(Variable)), 
+         family = str_replace(family, "Bacteroidaceae", "Other"), 
+         family = factor(family, 
+                         levels = c("Clostridiales", "Lachnospiraceae", 
+                                    "Ruminococcaceae", "Other"), 
+                         labels = c("Clostridiales", "Lachnospiraceae", 
+                                    "Ruminococcaceae", "Other"))) %>% 
   ggplot(aes(Variable, median_mda, color = family)) + 
   geom_pointrange(aes(ymin = iqr25, ymax = iqr75), position = position_dodge(width = 1), size = 1) + 
-  coord_flip(ylim = c(0, 6)) + theme_bw() + 
-  scale_color_manual(name = "", values = c("#8B7E66", "#9B30FF", "#63B8FF", "#FF7F00")) + 
-  theme(legend.position = "bottom")
+  coord_flip(ylim = c(0, 3)) + theme_bw() + 
+  labs(x = "", y = "Mean Decrease in Accuracy") + 
+  scale_color_manual(name = "", values = c("#9B30FF", "#63B8FF", "#FF7F00", "#6C7B8B"), 
+                     guide = guide_legend(nrow = 2)) + 
+  theme(legend.position = c(0.7, 0.3), 
+        legend.background = element_rect(color = "black"), 
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.text.y = element_text(size = 10),
+        axis.title = element_text(size = 12),
+        axis.text.x = element_text(size = 10, face = "bold"))
+
 
 
 all_crc <- all_data %>% 
   filter(model == "crc_full") %>% 
   mutate(Variable = factor(Variable, 
                            levels = rev(Variable), 
-                           labels = rev(Variable))) %>% 
+                           labels = rev(Variable)), 
+         family = case_when(
+           family %in% c("Bacillales Incertae Sedis XI", "Bacteroidaceae", 
+                         "Coriobacteriaceae", "Streptococcaceae") ~ "Other", 
+           TRUE ~ family), 
+         family = factor(family, 
+                         levels = c("Fusobacteriaceae", "Lachnospiraceae", "Porphyromonadaceae", 
+                                    "Ruminococcaceae", "Other"), 
+                         labels = c("Fusobacteriaceae", "Lachnospiraceae", "Porphyromonadaceae", 
+                                    "Ruminococcaceae", "Other"))) %>% 
   ggplot(aes(Variable, median_mda, color = family)) + 
   geom_pointrange(aes(ymin = iqr25, ymax = iqr75), position = position_dodge(width = 1), size = 1) + 
   coord_flip(ylim = c(0, 5)) + theme_bw() + 
-  theme(legend.position = "bottom")
+  labs(x = "", y = "Mean Decrease in Accuracy") + 
+  scale_color_manual(name = "", values = c("#000000", "#63B8FF", "#008080", "#FF7F00", "#6C7B8B"),
+                     guide = guide_legend(nrow = 3)) + 
+  theme(legend.position = c(0.7, 0.3), 
+        legend.background = element_rect(color = "black"), 
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.text.y = element_text(size = 10),
+        axis.title = element_text(size = 12),
+        axis.text.x = element_text(size = 10, face = "bold"))
+
+
+
+#values = c('#9B30FF', '#63B8FF', '#008080', '#8FBC8F', '#FF7F00', '#6C7B8B')
+#
+#values = c("#FF6EB4", "#9B30FF", "#4B0082", "#4169E1", 
+#           "#63B8FF", "#FFD700", "#00FF00", "#FF7F00")
 
 
 only_otu_crc <- all_data %>% 
   filter(model == "crc_otu") %>% 
   mutate(Variable = factor(Variable, 
                            levels = rev(Variable), 
-                           labels = rev(Variable))) %>% 
+                           labels = rev(Variable)), 
+         family = case_when(
+           family %in% c("Bacillales Incertae Sedis XI", "Bacteroidaceae", 
+                         "Coriobacteriaceae", "Desulfovibrionaceae", 
+                         "Prevotellaceae", "Streptococcaceae") ~ "Other", 
+           TRUE ~ family), 
+         family = factor(family, 
+                         levels = c("Lachnospiraceae", "Porphyromonadaceae", "Other"), 
+                         labels = c("Lachnospiraceae", "Porphyromonadaceae", "Other"))) %>% 
   ggplot(aes(Variable, median_mda, color = family)) + 
   geom_pointrange(aes(ymin = iqr25, ymax = iqr75), position = position_dodge(width = 1), size = 1) + 
   coord_flip(ylim = c(0, 5)) + theme_bw() + 
-  theme(legend.position = "bottom")
+  labs(x = "", y = "Mean Decrease in Accuracy") + 
+  scale_color_manual(name = "", values = c("#63B8FF", "#008080", "#6C7B8B"),
+                     guide = guide_legend(nrow = 2)) + 
+  theme(legend.position = c(0.7, 0.3), 
+        legend.background = element_rect(color = "black"), 
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.text.y = element_text(size = 10),
+        axis.title = element_text(size = 12),
+        axis.text.x = element_text(size = 10, face = "bold"))
 
 
 ### Create a merged graph
-prediction_plot <- grid.arrange(only_otu_adn, all_adn, all_crc, only_otu_crc, 
+prediction_plot <- grid.arrange(all_adn, only_otu_adn, all_crc, only_otu_crc, 
                                 layout_matrix = rbind(c(1, 2), c(3, 4)))
 
 # Write out to specific directory
