@@ -485,15 +485,16 @@ colorectal cancer may be found.
 described in detail previously (29, 30). In brief, this study used fecal
 samples obtained at either a single cross-sectional time point (n=490)
 or from before (pre-) and after (post-) treatment of a patient's tumor
-(n=67). For patients undergoing treatment for their tumor the length of
-time between their initial and follow up sample ranged from 188 - 546
-days. Our use of treatment has been previously defined as encompassing
-removal of a tumor with or without chemotherapy and radiation (29).
-Diagnosis of tumor was made by colonoscopic examination and
-histopathological review of biopsies obtained (29, 30). The University
-of Michigan Institutional Review Board approved the study and informed
-consent was obtained from all participants in accordance to the
-guidelines set out by the Helsinki Declaration.
+(adenoma n =41 and carcinoma n = 26). For patients undergoing treatment
+for their tumor the length of time between their initial and follow up
+sample ranged from 188 - 546 days. Our use of treatment has been
+previously defined as encompassing removal of a tumor with or without
+chemotherapy and radiation (29). Diagnosis of tumor was made by
+colonoscopic examination and histopathological review of biopsies
+obtained (29, 30). The University of Michigan Institutional Review Board
+approved the study and informed consent was obtained from all
+participants in accordance to the guidelines set out by the Helsinki
+Declaration.
 
 \textbf{Measuring specific SCFAs.} Our protocol for the measurement of
 acetate, butyrate, and propionate followed a previously published
@@ -507,10 +508,15 @@ affect the overall median concentrations of these SCFAs between the two
 studies (see Table 1 (24) and Figure 1 here).
 
 \textbf{16s rRNA gene sequencing.} The workflow and processing have been
-previously described (29, 31, 32). The major differences from these
+previously described (29, 31, 32). In brief, sequences were quality
+filtered and contigs created from the paired end reads. Any sequences
+with ambiguous base calls were discarded. Contigs were then checked for
+matches to the V4 region of the 16S rRNA gene using the SILVA database
+(33). Chimeras were identifed and removed using UCHIME and OTUs
+clustered at 97\% similarity (34). The major differences from these
 previous reports include: the use of version 1.39.5 of the mothur
 software package and clustering Operational Taxonomic Units (OTUs) at
-97\% similarity using the OptClust algorithm (33).
+97\% similarity using the OptClust algorithm (35).
 
 \textbf{Generating imputed metagenomes.} The use of PICRUSt version
 1.1.2 with the recommended standard operating protocol (22) was used.
@@ -524,45 +530,54 @@ and subsequent imputed metagenomes created using the
 subset of the cross-sectional group (n=490) containing a total of 85
 individuals (normal n=29, adenoma n=28, and carcinoma n=28) was shotgun
 sequenced on an Illumina HiSeq using 125 bp paired end reads and a
-previously described method (34). Briefly, the sequences were quality
+previously described method (36). Briefly, the sequences were quality
 filtered and sequences aligning to the human genome were removed prior
-to contig assembly with MEGAHIT (35). Open Reading Frames (ORFs) were
-identified using Prodigal (36), counts generated using Diamond (37),
+to contig assembly with MEGAHIT (37). Open Reading Frames (ORFs) were
+identified using Prodigal (38), counts generated using Diamond (39),
 subsequent clustering into Operational Protein Families (OPFs) used
-mmseq2 (38), and OPF alignment used the KEGG database (39).
+mmseq2 (40), and OPF alignment used the KEGG database (41).
 
 \textbf{Pulling genes involved with SCFA synthesis.} Specific genes
 located near the end of the pathways involved in the synthesis of
 acetate, butyrate, and propionate were analyzed for any differences
 between individuals with normal colons and those with tumors. These
-genes were based on pathways from KEGG as well as previous research (39,
-40) and a list can be found in the supplemental material {[}Table S1{]}.
+genes were based on pathways from KEGG as well as previous research (41,
+42) and a list can be found in the supplemental material {[}Table S1{]}.
 
 \textbf{Random Forest models.} The model was first trained on 80\% of
 the data and then tested on the held out 20\% (80/20 split) using the
-Random Forest algorithm for classification models (21). This was
-repeated on 100 different 80/20 splits of the data to generate a
-reasonable range for the AUC of the model. The reported AUCs, unless
-otherwise specified, are for the test sets. The classification models
-were built to group normal versus adenoma, normal versus carcinoma, and
-high versus low SCFA concentrations.
+Random Forest algorithm for classification and regression models via the
+caret package (21, 43). This was repeated on 100 different 80/20 splits
+of the data to generate a reasonable range for the AUC of the model. The
+reported AUCs, unless otherwise specified, are for the test sets. The
+classification models were built to group normal versus adenoma, normal
+versus carcinoma, and high versus low SCFA concentrations. The
+regression models were built to classify the SCFA concentrations of
+acetate, butyrate, and propionate regardless of disease status.
 
 \textbf{Statistical analysis workflow.} All analysis was performed using
-the statistical language R (41). Generally, a Kruskal-Walis rank sum
+the statistical language R (44). Generally, a Kruskal-Walis rank sum
 test with a Dunn's post-hoc test was used to assess differences between
 the groups used. Where appropriate Benjamini-Hochberg was used to
-correct for multiple comparisons (42). First, we assessed differences in
+correct for multiple comparisons (45). First, we assessed differences in
 SCFA concentrations measured by HPLC between individuals with normal
 colons and patients with tumors (adenoma or carcinoma). We then analyzed
 whether SCFA concentrations changed in patients with an adenoma or
-carcinoma pre- versus post-treatment. Next, we assessed whether OTUs
-alone or OTUs and SCFAs were better able to classify individuals with
-and without tumor using Random Forest models. Next, the imputed gene
-counts of important mediators of SCFA synthesis was tested.
-Additionally, the counts generated for OPFs that matched important genes
-involved with SCFA creation were analyzed. Finally, models to classify
-high or low SCFA concentration based on the median of each SCFA and 16S
-rRNA gene sequencing data was created using the Random Forest algorithm.
+carcinoma pre- versus post-treatment. Next, the imputed gene counts of
+important mediators of SCFA synthesis was tested. Additionally, the
+counts generated for OPFs that matched important genes involved with
+SCFA creation were analyzed. From here we analyzed the number of
+significant positive and negative correlations between OTU relative
+abundance and SCFA concentrations in individuals without tumors and
+patients with adenomas or carcinomas using Spearman's rho. Next, we
+assessed whether OTUs alone or OTUs and SCFAs were better able to
+classify individuals with and without tumors using Random Forest models.
+Finally, models to classify high or low SCFA concentration based on the
+median of each SCFA or the actual concentration using 16S rRNA gene
+sequencing data was created using the Random Forest algorithm. For all
+Random Forest models, the assessment of the most important variables was
+based on the top 10 feautres (OTUs or SCFAs) using the mean decrease in
+accuracy.
 
 \newpage
 
@@ -823,65 +838,87 @@ amplicon sequence data on the MiSeq illumina sequencing platform.
 Applied and Environmental Microbiology \textbf{79}:5112--5120.
 doi:\href{https://doi.org/10.1128/aem.01043-13}{10.1128/aem.01043-13}.
 
+\hypertarget{ref-Quast2012}{}
+33. \textbf{Quast C}, \textbf{Pruesse E}, \textbf{Yilmaz P},
+\textbf{Gerken J}, \textbf{Schweer T}, \textbf{Yarza P}, \textbf{Peplies
+J}, \textbf{Glöckner FO}. 2012. The SILVA ribosomal RNA gene database
+project: Improved data processing and web-based tools. Nucleic Acids
+Research \textbf{41}:D590--D596.
+doi:\href{https://doi.org/10.1093/nar/gks1219}{10.1093/nar/gks1219}.
+
+\hypertarget{ref-Edgar2011}{}
+34. \textbf{Edgar RC}, \textbf{Haas BJ}, \textbf{Clemente JC},
+\textbf{Quince C}, \textbf{Knight R}. 2011. UCHIME improves sensitivity
+and speed of chimera detection. Bioinformatics \textbf{27}:2194--2200.
+doi:\href{https://doi.org/10.1093/bioinformatics/btr381}{10.1093/bioinformatics/btr381}.
+
 \hypertarget{ref-opticlust_westcott2017}{}
-33. \textbf{Westcott SL}, \textbf{Schloss PD}. 2017. OptiClust, an
+35. \textbf{Westcott SL}, \textbf{Schloss PD}. 2017. OptiClust, an
 improved method for assigning amplicon-based sequence data to
 operational taxonomic units. mSphere \textbf{2}:e00073--17.
 doi:\href{https://doi.org/10.1128/mspheredirect.00073-17}{10.1128/mspheredirect.00073-17}.
 
 \hypertarget{ref-Hannigan2017}{}
-34. \textbf{Hannigan GD}, \textbf{Duhaime MB}, \textbf{Ruffin MT},
+36. \textbf{Hannigan GD}, \textbf{Duhaime MB}, \textbf{Ruffin MT},
 \textbf{Koumpouras CC}, \textbf{Schloss PD}. 2017. Diagnostic potential
 \& the interactive dynamics of the colorectal cancer virome.
 doi:\href{https://doi.org/10.1101/152868}{10.1101/152868}.
 
 \hypertarget{ref-Li2015}{}
-35. \textbf{Li D}, \textbf{Liu C-M}, \textbf{Luo R}, \textbf{Sadakane
+37. \textbf{Li D}, \textbf{Liu C-M}, \textbf{Luo R}, \textbf{Sadakane
 K}, \textbf{Lam T-W}. 2015. MEGAHIT: An ultra-fast single-node solution
 for large and complex metagenomics assembly via succinct de bruijn
 graph. Bioinformatics \textbf{31}:1674--1676.
 doi:\href{https://doi.org/10.1093/bioinformatics/btv033}{10.1093/bioinformatics/btv033}.
 
 \hypertarget{ref-Hyatt2010}{}
-36. \textbf{Hyatt D}, \textbf{Chen G-L}, \textbf{LoCascio PF},
+38. \textbf{Hyatt D}, \textbf{Chen G-L}, \textbf{LoCascio PF},
 \textbf{Land ML}, \textbf{Larimer FW}, \textbf{Hauser LJ}. 2010.
 Prodigal: Prokaryotic gene recognition and translation initiation site
 identification. BMC Bioinformatics \textbf{11}:119.
 doi:\href{https://doi.org/10.1186/1471-2105-11-119}{10.1186/1471-2105-11-119}.
 
 \hypertarget{ref-Buchfink2014}{}
-37. \textbf{Buchfink B}, \textbf{Xie C}, \textbf{Huson DH}. 2014. Fast
+39. \textbf{Buchfink B}, \textbf{Xie C}, \textbf{Huson DH}. 2014. Fast
 and sensitive protein alignment using DIAMOND. Nature Methods
 \textbf{12}:59--60.
 doi:\href{https://doi.org/10.1038/nmeth.3176}{10.1038/nmeth.3176}.
 
 \hypertarget{ref-Steinegger2017}{}
-38. \textbf{Steinegger M}, \textbf{Söding J}. 2017. MMseqs2 enables
+40. \textbf{Steinegger M}, \textbf{Söding J}. 2017. MMseqs2 enables
 sensitive protein sequence searching for the analysis of massive data
 sets. Nature Biotechnology.
 doi:\href{https://doi.org/10.1038/nbt.3988}{10.1038/nbt.3988}.
 
 \hypertarget{ref-Kanehisa2015}{}
-39. \textbf{Kanehisa M}, \textbf{Sato Y}, \textbf{Kawashima M},
+41. \textbf{Kanehisa M}, \textbf{Sato Y}, \textbf{Kawashima M},
 \textbf{Furumichi M}, \textbf{Tanabe M}. 2015. KEGG as a reference
 resource for gene and protein annotation. Nucleic Acids Research
 \textbf{44}:D457--D462.
 doi:\href{https://doi.org/10.1093/nar/gkv1070}{10.1093/nar/gkv1070}.
 
 \hypertarget{ref-scfa_baxter2014}{}
-40. \textbf{Baxter NT}, \textbf{Zackular JP}, \textbf{Chen GY},
+42. \textbf{Baxter NT}, \textbf{Zackular JP}, \textbf{Chen GY},
 \textbf{Schloss PD}. 2014. Structure of the gut microbiome following
 colonization with human feces determines colonic tumor burden.
 Microbiome \textbf{2}:20.
 doi:\href{https://doi.org/10.1186/2049-2618-2-20}{10.1186/2049-2618-2-20}.
 
+\hypertarget{ref-caret_citation}{}
+43. \textbf{Jed Wing MKC from}, \textbf{Weston S}, \textbf{Williams A},
+\textbf{Keefer C}, \textbf{Engelhardt A}, \textbf{Cooper T},
+\textbf{Mayer Z}, \textbf{Kenkel B}, \textbf{R Core Team},
+\textbf{Benesty M}, \textbf{Lescarbeau R}, \textbf{Ziem A},
+\textbf{Scrucca L}, \textbf{Tang Y}, \textbf{Candan C}, \textbf{Hunt.
+T}. 2017. Caret: Classification and regression training.
+
 \hypertarget{ref-r_citation_2017}{}
-41. \textbf{R Core Team}. 2017. R: A language and environment for
+44. \textbf{R Core Team}. 2017. R: A language and environment for
 statistical computing. R Foundation for Statistical Computing, Vienna,
 Austria.
 
 \hypertarget{ref-benjamini_controlling_1995}{}
-42. \textbf{Benjamini Y}, \textbf{Hochberg Y}. 1995. Controlling the
+45. \textbf{Benjamini Y}, \textbf{Hochberg Y}. 1995. Controlling the
 false discovery rate: A practical and powerful approach to multiple
 testing. Journal of the Royal Statistical Society Series B
 (Methodological) \textbf{57}:289--300.
