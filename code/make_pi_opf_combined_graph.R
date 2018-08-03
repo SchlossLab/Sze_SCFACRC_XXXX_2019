@@ -29,20 +29,17 @@ opf_data <- read_csv("data/process/tables/select_scfa_opf_data.csv") %>%
   filter(kegg_id %in% butyrate_genes)
 
 imputed_fig <- picrust_data %>% 
+  filter(kegg_ortholog == "K00929") %>% 
   mutate(dx = factor(dx, 
                 levels = c("normal", "adenoma", "cancer"), 
-                labels = c("Control", "Adenoma", "Carcinoma")), 
-         kegg_ortholog = factor(kegg_ortholog, 
-                                levels = c("K00929", "K01034", "K01035"), 
-                                labels = c("Butyrate Kinase", "Acetate CoA\n(alpha subunit)", 
-                                           "Acetate CoA\n(beta subunit)"))) %>% 
+                labels = c("Control", "Adenoma", "Carcinoma"))) %>% 
   ggplot(aes(kegg_ortholog, log10(rel_abund), fill = dx)) + 
   geom_boxplot(position = position_dodge(width = 1)) + 
   geom_vline(xintercept=seq(1.5, length(unique(picrust_data$kegg_ortholog))-0.5, 1), 
              lwd=1, colour="gray") + 
-  theme_bw() + ggtitle("A") + 
+  theme_bw() + ggtitle("A") + coord_cartesian(ylim = c(0, 8)) + 
   scale_fill_manual(values = c('#228B22', '#FFD700', '#DC143C')) + 
-  labs(x = "", y = expression(Log["10"]~Imputed~Relative~Abundance)) + 
+  labs(x = "Butyrate Kinase", y = expression(Log["10"]~Imputed~Relative~Abundance)) + 
   theme(plot.title = element_text(face="bold", hjust = -0.07, size = 20), 
         panel.grid.major = element_blank(), 
         panel.grid.minor = element_blank(),
@@ -50,7 +47,8 @@ imputed_fig <- picrust_data %>%
         legend.title = element_blank(),
         axis.text.y = element_text(size = 10), 
         axis.title = element_text(size = 12), 
-        axis.text.x = element_text(size = 10, face = "bold"))
+        axis.text.x = element_blank(), 
+        axis.ticks.x = element_blank())
 
 
 metagenome_fig <- opf_data %>% 
@@ -63,7 +61,7 @@ metagenome_fig <- opf_data %>%
   geom_boxplot(position = position_dodge(width = 1)) + 
   theme_bw() + ggtitle("B") + 
   scale_fill_manual(values = c('#228B22', '#FFD700', '#DC143C')) + 
-  labs(x = "", y = "Counts per Million") + 
+  labs(x = "Butyrate Kinase", y = "Counts per Million") + 
   theme(plot.title = element_text(face="bold", hjust = -0.07, size = 20), 
         panel.grid.major = element_blank(), 
         panel.grid.minor = element_blank(),
@@ -71,11 +69,12 @@ metagenome_fig <- opf_data %>%
         legend.title = element_blank(),
         axis.text.y = element_text(size = 10), 
         axis.title = element_text(size = 12), 
-        axis.text.x = element_text(size = 10, face = "bold"))
+        axis.text.x = element_blank(), 
+        axis.ticks.x = element_blank())
 
 # Combine the graphs together
 gene_plot <- grid.arrange(imputed_fig, metagenome_fig, 
-                          layout_matrix = rbind(c(1, 1, 2)))
+                          layout_matrix = rbind(c(1, 2)))
 # Write out to specific directory
 ggsave("results/figures/Figure2.pdf", gene_plot, width = 9, height = 5)
 
