@@ -383,29 +383,33 @@ resident taxa that are associated with protection against tumorigeneis
 are not ones associated with acetate, butyrate, or propionate
 production.
 
-\textbf{Random Forest models for SCFA concentrations have different top
-10 most important OTUs than tumor models.} Using OTU data we built
-Random Forest models to classify either SCFA concentration or
-higher/lower than median SCFA concentrations. Overall, OTU data had a
-reasonable ability to classify both SCFA concentrations and high/low
-SCFA groups {[}Figure 5A \& S2A{]}. However, these models tended to be
-over fit, suggesting that rarer taxa may be important for this
-classification {[}Figure 5A \& S2A{]}. Additionally, there were
-differences in accuracy for both model types based on whether the
-individual had no tumors, an adenoma, or a carcinoma {[}Figure 5B \&
-S2B{]}. There also was minimal overlap between these SCFA classification
-model's most important OTUs and those used to classify patients with
-adenoma or carcinoma tumors {[}Figure 4B-C, 4E-F, 5C-E, and S2C-E{]}.
-The only OTU that did overlap between the models was OTU00167
-(\emph{Clostridiales}) {[}Figure 4B-C, 4E-F, 5C-E, and S2C-E{]}.
-Additionally, OTU00167 was in the top 10 most important OTUs for the OTU
-adenoma model but not in the SCFA and OTU adenoma model while acetate
-and butyrate concentrations were {[}Figure 4B-C{]}. These observations
-provide further evidence that it is possible to identify specific OTUs
-associated with higher SCFA concentrations and that these OTUs belong to
-taxa known to produce acetate, butyrate, and propionate. Although it is
-possible to identify OTUs associated with SCFA production, our results
-do not support the hypothesis that SCFA concentration or OTUs associated
+\textbf{The most important OTUs in Random Forest models built to
+classify SCFA concentrations or tumors are not the same.} It is possible
+that due to the way the Random Forest algorithm works, OTUs associated
+with SCFA concentrations could be downweighted in importance within the
+adenoma or carcinoma models when SCFA concentrations are included. To
+test if this is the case we used OTU data and built Random Forest models
+to classify SCFA concentrations. Although the correlation between the
+predicted and actual SCFA concentrations were moderately associated with
+each other {[}Figure 5A{]}, there was a difference in accuracy based on
+whether the fecal sample was from an individual without tumors or from
+patients with adenomas or carcinomas {[}Figure 5B{]}. Additionally,
+because the training set R\textsuperscript{2} was always higher than the
+test set R\textsuperscript{2}, all SCFA concentration models tended to
+be over fit, suggesting that rarer taxa are important for these
+classifications {[}Figure 5A{]}. When comparing the adenoma or carcinoma
+model to the SCFA concentration models there was minimal overlap between
+these model's most important OTUs {[}Figure 4B-C, 4E-F and 5C-E{]}. The
+only OTU that was in the top 10 most important variables that had
+overlap between the models was OTU00167 (\emph{Clostridiales}) {[}Figure
+4B-C, 4E-F, 5C-E{]}. Similar observations were made when using high/low
+SCFA groups based on higher/lower than median SCFA concentrations
+{[}Figure S2{]}. Collectively, these observations provide evidence that
+it is possible to identify specific OTUs associated with higher SCFA
+concentrations and accordingly these OTUs belong to taxa known to
+produce acetate, butyrate, and propionate. Although it is possible to
+identify OTUs associated with SCFA production, overall, our results do
+not support the hypothesis that SCFA concentration or OTUs associated
 with their production are different between individuals with no tumors
 and patients with adenomas or carcinomas.
 
