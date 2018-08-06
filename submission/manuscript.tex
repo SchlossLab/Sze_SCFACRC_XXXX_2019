@@ -350,28 +350,38 @@ propionate.
 
 \textbf{SCFA concentrations do not replace important
 \emph{Clostridiales}, \emph{Lachnospiraceae}, and \emph{Ruminococcaceae}
-OTUs in Random Forest models built to classify tumors.} SCFA
-concentrations could improve prediction of tumors based on specific
-bacterial community structures. Our OTU data can be used in combination
-with SCFAs to assess whether there is a community dependent context to
-SCFA classification of tumors. Using the Random Forest algorithm we
-built models with OTU abundance data or OTU abundances and SCFA
-concentrations to classify normal versus adenoma and normal versus
-carcinoma fecal samples. For adenoma and carcinoma models, there was no
-difference between the median AUC of models with or without SCFA
-concentrations (P-value \textgreater{} 0.05) {[}Figure 4A \& 4D{]}.
-There was little difference between the top 10 most important OTUs, as
-measured by mean decrease in accuracy, in models using SCFA and OTUs
-versus OTUs only {[}Figure 4B-C \& 4E-F{]}. The main reason for this was
-because SCFA concentrations replaced the information gained by specific
-OTUs rather than add new information to the model {[}Figure 4B-C{]}. The
-SCFA concentrations also only replaced select OTUs with taxonomic
-classification to \emph{Clostridiales}, \emph{Lachnospiraceae}, and
-\emph{Ruminococcaceae} with many OTUs within these taxa remaining in the
-top 10 {[}Figure 4B \& 4C{]}. In combination with the previous results
-on taxa correlations, these observations provide additional evidence
-that the resident taxa within models that classify tumor are not ones
-associated with acetate, butyrate, or propionate production.
+OTUs in Random Forest models built to classify tumors.} Despite the lack
+of difference in positive correlations between OTUs and SCFA
+concentrations between individuals with and without tumors, OTUs
+associated with SCFA concentrations could still be the most important
+variables to Random Forest models built to classify patients with
+adenomas or carcinomas. We tested this by using the Random Forest
+algorithm to build models with OTU abundance data or OTU abundances and
+SCFA concentrations to classify normal versus adenoma and normal versus
+carcinoma fecal samples. With these models we compared whether OTUs with
+taxonomic classification to \emph{Clostridiales},
+\emph{Lachnospiraceae}, and \emph{Ruminococcaceae} remained in the OTU
+and SCFA model. Additionally, we also compared whether any of the
+important OTUs that remained also had significant correlations with SCFA
+concentrations. Both our adenoma and carcinoma models classified
+patients with a similar degree of success, as measured by the area under
+the curve (AUC) (P-value \textgreater{} 0.05) {[}Figure 4A \& 4D{]}.
+After the addition of SCFA concentrations to the adenoma or carcinoma
+models, many OTUs with taxonomic classification to \emph{Clostridiales},
+\emph{Lachnospiraceae}, and \emph{Ruminococcaceae} remained as important
+variables to the model {[}Figure Figure 4B-C \& 4E-F{]}. After adding
+SCFA concentrations to the adenoma model, there were only 2 OTUs
+significantly associated with SCFA concentration that were part of the
+top 10 most important variables and both were postively associated with
+acetate, butyrate, or propionate concentrations. When SCFA
+concentrations were added to the carcinoma model, only 1 OTU that was
+associated with SCFA concentration remained as part of the top 10 most
+important variables and it was negatively associated with acetate and
+butyrate concentrations. In combination with the previous results on OTU
+correlations, these observations provide additional evidence that the
+resident taxa that are associated with protection against tumorigeneis
+are not ones associated with acetate, butyrate, or propionate
+production.
 
 \textbf{Random Forest models for SCFA concentrations have different top
 10 most important OTUs than tumor models.} Using OTU data we built
