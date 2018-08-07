@@ -366,6 +366,13 @@ $(TABLES)/significant_reg_otu_comp_summary.csv : $(PROC)/final.taxonomy\
 	Rscript code/run_id_sig_changes_by_group_and_scfa.R
 
 
+# Run a comparision of significantly correlated OTUs and those in RF models
+$(TABLES)/sig_association_and_RF_top10.csv : $(TABLES)/significant_reg_otu_comp_summary.csv\
+		$(PROC)/final.taxonomy $(TABLES)/adn_full_MDA_Summary.csv\
+		$(TABLES)/crc_full_MDA_Summary.csv $(TABLES)/adn_otu_only_MDA_Summary.csv\
+		$(TABLES)/crc_otu_only_MDA_Summary.csv code/run_rf_sig_reg_comparison.R
+	Rscript code/run_rf_sig_reg_comparison.R
+
 
 ################################################################################
 #
