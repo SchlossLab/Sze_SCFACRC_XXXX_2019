@@ -184,7 +184,7 @@ The authors thank the Great Lakes-New England Early Detection Research Network f
 
 \newpage
 
-**Figure 1. No change in SCFA measurements was observed between normal, adenoma, and carcinoma individuals using HPLC.** Acetate (A), butyrate (B), and propionate (C) concentrations in fecal samples of individuals without colon tumors (Control), adenomas, and carcinomas (C). The black lines indicate the median SCFA concentration. Acetate (D), butyrate (E), and propionate (F) concentrations in fecal samples before and after treatment for adenoma (yellow) and carcinoma (red). The black dots and lines represent the median change in SCFA concentration.
+**Figure 1. No change in SCFA measurements was observed between normal, adenoma, and carcinoma individuals using HPLC.** Acetate (A), butyrate (B), and propionate (C) concentrations in fecal samples of individuals without colon tumors (Normal), adenomas, and carcinomas (C). The black lines indicate the median SCFA concentration. Acetate (D), butyrate (E), and propionate (F) concentrations in fecal samples before and after treatment for adenoma (yellow) and carcinoma (red). The black dots and lines represent the median change in SCFA concentration.
 
 **Figure 2. No change in the butyrate kinase gene abudnance was observed between normal, adenoma, and carcinoma individuals.** Imputed gene relative abundance of important butyrate pathway genes using PICRUSt (A). Counts per million (corrected for size and number of contigs in an OPF) for the Butyrate Kinase gene (B).
 
