@@ -20,7 +20,7 @@ loadLibs(c("tidyverse", "scales", "knitr", "rmarkdown", "stringr"))
 ```
 
 
-**Table S1: Breakdown of select genes and corresponding KEGG ID analyzed.**
+**Table S1: SCFA enzymes and corresponding KEGG ID analyzed.**
 ```{r supplemental_table1, echo=FALSE, message=FALSE, warning=FALSE}
 
 Kegg_ID <- c("K00929", "K01034", "K01035", "K01908", "K01895", "K00932", "K19697", 
@@ -37,7 +37,7 @@ Gene_Name <- c("Butyrate Kinase", "Acetate CoA subnunit A", "Acetate CoA subunit
 
 sup_table1 <- data_frame(Kegg_ID, Gene_Name)
 
-colnames(sup_table1) <-  c("KEGG IDs", "Gene Name")
+colnames(sup_table1) <-  c("KEGG IDs", "Enzyme Name")
 
 
 kable(sup_table1, format = "markdown", align = 'c', padding = 2)
@@ -69,7 +69,8 @@ kable(table_s2, format = "markdown", align = 'c', padding = 2)
 
 table_s3 <- read_csv("../data/process/tables/specific_scfa_wilcox_picrust_treatment_summary.csv") %>% 
   select(kegg_ortholog, group, statistic, p.value, bh) %>% 
-   mutate_at(vars(p.value:bh), function(x) round(x, digits = 3)) 
+   mutate_at(vars(p.value:bh), function(x) round(x, digits = 3)) %>% 
+  arrange(kegg_ortholog, group)
  
 
 colnames(table_s3) <-  c("KEGG IDs", "Disease Group", "Test Statistic", "P-value", "BH")
@@ -113,7 +114,8 @@ table_s5 <- read_csv("../data/process/tables/significant_reg_otu_comp_summary.cs
          family = str_replace_all(family, "_unclassified", ""), 
          family = str_replace_all(family, "_", " "), 
          genus = str_replace_all(family, "_unclassified", ""), 
-         genus = str_replace_all(family, "_", " "))
+         genus = str_replace_all(family, "_", " ")) %>% 
+  arrange(scfa, dx, bh)
 
 colnames(table_s5) <-  c("OTU", "Family", "Genus", "Group", "SCFA", "Rho", "P-value", "BH")
 
@@ -142,7 +144,8 @@ table_s6 <- read_csv("../data/process/tables/significant_class_otu_comp_summary.
   mutate(family = str_replace_all(family, "_unclassified", ""), 
          family = str_replace_all(family, "_", " "), 
          genus = str_replace_all(family, "_unclassified", ""), 
-         genus = str_replace_all(family, "_", " "))
+         genus = str_replace_all(family, "_", " ")) %>% 
+  arrange(scfa, dx, bh)
 
 colnames(table_s6) <-  c("OTU", "Family", "Genus", "Group", "SCFA", "P-value", "BH")
 
