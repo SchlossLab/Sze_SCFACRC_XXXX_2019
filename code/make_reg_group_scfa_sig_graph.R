@@ -63,7 +63,7 @@ number_corr_plot <- graph_data %>%
         panel.grid.major = element_blank(), 
         panel.grid.minor = element_blank(), 
         legend.position = "bottom", 
-        legend.text = element_text(size = 10), 
+        legend.text = element_text(size = 10, face = "italic"), 
         axis.text.y = element_text(size = 10), 
         axis.title = element_text(size = 12), 
         axis.text.x = element_text(size = 10, face = "bold"))
