@@ -115,7 +115,7 @@ cross_graph <- function(scfa, dataList){
     ggplot(aes(
       factor(dx, 
              levels = c("normal", "adenoma", "cancer"), 
-             labels = c("Control", "Adenoma", "Carcinoma")), log10(mmol_kg+1))) + 
+             labels = c("Normal", "Adenoma", "Carcinoma")), log10(mmol_kg+1))) + 
     geom_jitter(aes(color = dx), width = 0.3, size = 2.5, alpha = 0.75, show.legend = F) + 
     stat_summary(fun.y = median, fun.ymin = median, fun.ymax = median,
                  colour = "black", geom = "crossbar", size = 0.75, width = 0.5)  +

@@ -32,7 +32,7 @@ imputed_fig <- picrust_data %>%
   filter(kegg_ortholog == "K00929") %>% 
   mutate(dx = factor(dx, 
                 levels = c("normal", "adenoma", "cancer"), 
-                labels = c("Control", "Adenoma", "Carcinoma"))) %>% 
+                labels = c("Normal", "Adenoma", "Carcinoma"))) %>% 
   ggplot(aes(kegg_ortholog, log10(rel_abund), fill = dx)) + 
   geom_boxplot(position = position_dodge(width = 1)) + 
   geom_vline(xintercept=seq(1.5, length(unique(picrust_data$kegg_ortholog))-0.5, 1), 
@@ -54,7 +54,7 @@ imputed_fig <- picrust_data %>%
 metagenome_fig <- opf_data %>% 
   mutate(disease = factor(disease, 
                 levels = c("Healthy", "Adenoma", "Cancer"), 
-                labels = c("Control", "Adenoma", "Carcinoma")), 
+                labels = c("Normal", "Adenoma", "Carcinoma")), 
          kegg_id = factor(kegg_id, 
                           levels = c("K00929"), labels = c("Butyrate Kinase"))) %>% 
   ggplot(aes(kegg_id, combined_count, fill = disease)) + 
