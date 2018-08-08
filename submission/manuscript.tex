@@ -657,10 +657,12 @@ The authors thank the Great Lakes-New England Early Detection Research
 Network for providing the fecal samples that were used in this study. We
 would also like to thank Kwi Kim and Thomas M Schmidt for their help in
 running the short-chain fatty acid analysis on the High-Performance
-Liquid Chromatography machine at the University of Michigan. Salary
-support for Marc A. Sze came from the Canadian Institute of Health
-Research and NIH grant UL1TR002240. Salary support for Patrick D.
-Schloss came from NIH grants P30DK034933 and 1R01CA215574.
+Liquid Chromatography machine at the University of Michigan. We would
+also like to thank Ada Hagan for providing valuable feedback on earlier
+drafts of the manuscript. Salary support for Marc A. Sze came from the
+Canadian Institute of Health Research and NIH grant UL1TR002240. Salary
+support for Patrick D. Schloss came from NIH grants P30DK034933 and
+1R01CA215574.
 
 \newpage
 
@@ -996,31 +998,23 @@ testing. Journal of the Royal Statistical Society Series B
 \newpage
 
 \textbf{Figure 1. No change in SCFA measurements was observed between
-normal, adenoma, and carcinoma individuals using HPLC.} Acetate
-concentrations in fecal samples of individuals without colon tumors,
-adenomas, and carcinomas (A). Butyrate concentrations in fecal samples
-of individuals without colon tumors, adenomas, and carcinomas (B).
-Propionate concentrations in fecal samples of individuals without colon
-tumors, adenomas, and carcinomas (C). The black lines indicate the
-median SCFA concentration. Acetate concentrations in fecal samples
-before and after treatment for adenoma (yellow) and carcinoma (red) (D).
-Butyrate concentrations in fecal samples before and after treatment for
-adenoma (yellow) and carcinoma (red) (E). Propionate concentrations in
-fecal samples before and after treatment for adenoma (yellow) and
-carcinoma (red) (F). The black dots and lines represent the median
-change in SCFA concentration.
+normal, adenoma, and carcinoma individuals using HPLC.} Acetate (A),
+butyrate (B), and propionate (C) concentrations in fecal samples of
+individuals without colon tumors (Control), adenomas, and carcinomas
+(C). The black lines indicate the median SCFA concentration. Acetate
+(D), butyrate (E), and propionate (F) concentrations in fecal samples
+before and after treatment for adenoma (yellow) and carcinoma (red). The
+black dots and lines represent the median change in SCFA concentration.
 
-\textbf{Figure 2. No change in butyrate producing genes identified
-between normal, adenoma, and carcinoma individuals.} Imputed gene
-relative abundance of important butyrate pathway genes using PICRUSt
-(A). Counts per million (corrected for size and number of contigs in an
-OPF) for the Butyrate Kinase gene (B). The other butyrate pathway genes
-from the PICRUSt analysis did not align to any of the OPFs in the
-metagenome analysis.
+\textbf{Figure 2. No change in the butyrate kinase gene abudnance was
+observed between normal, adenoma, and carcinoma individuals.} Imputed
+gene relative abundance of important butyrate pathway genes using
+PICRUSt (A). Counts per million (corrected for size and number of
+contigs in an OPF) for the Butyrate Kinase gene (B).
 
 \textbf{Figure 3. Patients with adenomas had the higest number of
-significant negative correlations between OTU relative abundance and
-SCFA concentration.} Colors denote the family or lowest taxonomic ID
+statistically significant correlations between OTU relative abundance
+and SCFA concentration.} Colors denote the family or lowest taxonomic ID
 that an OTU classified to. Fewer significant positive correlations were
 observed overall. Additionally, the differences in the number of
 significant positive correlations between patients with adenomas versus
@@ -1028,36 +1022,36 @@ individuals without tumors (normal) and patients with carcinomas was not
 as pronounced as the number of significant negative correlations.
 
 \textbf{Figure 4. SCFA concentrations do not improve OTU-based Random
-Forest models.} The area under the curve of 100 different 80/20 split
-OTU-based normal versus adenoma 10-fold CV models with and without SCFAs
-(A). The top 10 most important OTUs or SCFAs in the SCFA and OTU adenoma
-model (B). The top 10 most important OTUs in the OTU adenoma model (C).
-The area under the curve of 100 different 80/20 OTU-based normal versus
-carcinoma 10-fold CV models with and without SCFAs (D). The top 10 most
-important OTUs or SCFAs in the SCFA and OTU carcinoma model (E). The top
-10 most important OTUs in the OTU carcinoma model (F). For (A) and (D)
-the black line represents the median AUC. The dotted line highlights an
-AUC of 0.5.
+Forest models.} Individuals without tumors versus patients with adenomas
+model with and without SCFAs area under the curve (AUC) from 100 80/20
+splits with 10-fold cross-validation (A). The top 10 most important OTUs
+or SCFAs in the SCFA and OTU adenoma model (B). The top 10 most
+important OTUs in the OTU adenoma model (C). Individuals without tumors
+versus patients with carcinomas model with and without SCFAs area under
+the curve (AUC) from 100 80/20 splits with 10-fold cross-validation (D).
+The top 10 most important OTUs or SCFAs in the SCFA and OTU carcinoma
+model (E). The top 10 most important OTUs in the OTU carcinoma model
+(F). For (A) and (D) the black line represents the median AUC. The
+dotted line highlights an AUC of 0.5.
 
 \textbf{Figure 5. OTU-based regression Random Forest models of SCFA
 concentrations.} The train and test correlation between actual and
 predicted values from 100 different 80/20 split OTU-based models with
 10-fold CV using regression Random Forest (A). The model accuracy of
 predicted SCFA concentrations differed between individuals without
-tumors, patients with adenomas, and patients with carcinomas. Generally,
-patients with carcinomas had predicted concentrations closest to their
-actual measured concentration (B). The top 10 OTUs based on mean
-decrease in accuracy (MDA) for each SCFA model, colored by their lowest
-taxonomic identification (C).
+tumors, patients with adenomas, and patients with carcinomas.
+Differences between the actual and predicted SCFA concentrations based
+on whether individuals did not have tumors (Normal), had an adenoma, or
+had a carcinoma (B). The top 10 OTUs based on mean decrease in accuracy
+(MDA) for each SCFA model, colored by their lowest taxonomic
+identification (C).
 
 \newpage
 
 \textbf{Figure S1. Patients with adenomas had the higest number of
 significant differences in OTU relative abundance between high/low SCFA
 groups.} Colors denote the family or lowest taxonomic ID that an OTU
-classified to. Fewer significant OTUs were observed in individuals
-without tumors (normal) and patients with carcinomas versus patients
-with adenomas.
+classified to.
 
 \textbf{Figure S2. OTU-based classification Random Forest models of
 high/low SCFA groups based on overall SCFA median concentration.} The
@@ -1065,10 +1059,9 @@ train and test results of 100 different 80/20 split OTU-based models
 with 10-fold CV based on higher or lower than the median SCFA
 concentration using classification Random Forest (A). The model accuracy
 of predicted high/low SCFA groups differed between individuals without
-tumors, patients with adenomas, and patients with carcinomas. Patients
-with adenomas consistently had the best classification accuracy (B). The
-top 10 OTUs based on mean decrease in accuracy (MDA) for each SCFA
-model, colored by their lowest taxonomic identification (C).
+tumors, patients with adenomas, and patients with carcinomas (B). The
+top 10 OTUs based on mean decrease in accuracy for each SCFA model,
+colored by their lowest taxonomic identification (C).
 
 
 \end{document}
