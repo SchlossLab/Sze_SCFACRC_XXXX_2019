@@ -59,7 +59,7 @@ $(REFS)/trainset14_032015.% :
 
 # Grab greengenes reference files for picrust
 
-$(REFS)/gg_13_5_99.align : 
+$(REFS)/gg_13_5_99.align :
 	wget -N http://www.mothur.org/w/images/b/be/GG_13_5_otuMapTable.zip
 	unzip GG_13_5_otuMapTable.zip
 	mv GG_13_5_otuMapTable/*.txt $(REFS)/
@@ -180,14 +180,14 @@ TR_ACETATE = $(foreach S, $(PLATES), $(RAW)/Raw_hplc_files/acetate/transformed_$
 TR_ACETATE_PLATES = $(addsuffix _scfa_crc_acetate.csv,$(TR_ACETATE))
 
 BUTYRATE = $(foreach S, $(PLATES), $(RAW)/Raw_hplc_files/butyrate/$(S))
-BUTYRATE_PLATES = $(addsuffix _scfa_crc_acetate.txt,$(BUTYRATE))
-TR_BUTYRATE = $(foreach S, $(PLATES), $(RAW)/Raw_hplc_files/acetate/transformed_$(S))
-TR_BUTYRATE_PLATES = $(addsuffix _scfa_crc_acetate.csv,$(TR_BUTYRATE))
+BUTYRATE_PLATES = $(addsuffix _scfa_crc_butyrate.txt,$(BUTYRATE))
+TR_BUTYRATE = $(foreach S, $(PLATES), $(RAW)/Raw_hplc_files/butyrate/transformed_$(S))
+TR_BUTYRATE_PLATES = $(addsuffix _scfa_crc_butyrate.csv,$(TR_BUTYRATE))
 
 PROPIONATE = $(foreach S, $(PLATES), $(RAW)/Raw_hplc_files/propionate/$(S))
-PROPIONATE_PLATES = $(addsuffix _scfa_crc_acetate.txt,$(PROPIONATE))
-TR_PROPIONATE = $(foreach S, $(PLATES), $(RAW)/Raw_hplc_files/acetate/transformed_$(S))
-TR_PROPIONATE_PLATES = $(addsuffix _scfa_crc_acetate.csv,$(TR_PROPIONATE))
+PROPIONATE_PLATES = $(addsuffix _scfa_crc_propionate.txt,$(PROPIONATE))
+TR_PROPIONATE = $(foreach S, $(PLATES), $(RAW)/Raw_hplc_files/propionate/transformed_$(S))
+TR_PROPIONATE_PLATES = $(addsuffix _scfa_crc_propionate.csv,$(TR_PROPIONATE))
 
 SCFA_PROCESSING_CODE = $(foreach S, $(PLATES), code/run_$(S)_convert_scfa_concentrations.R)
 
@@ -207,7 +207,7 @@ $(PROPIONATE_PLATES) $(SCFA_PROCESSING_CODE) code/combine_plates.R
 	Rscript code/run_plate7_convert_scfa_concentrations.R
 	Rscript code/run_plate8_convert_scfa_concentrations.R
 	Rscript code/combine_plates.R
-		
+
 
 # Run the SCFA analysis for cross-sectional and pre/post-treatment
 SCFA_KRUSKAL_DATA = $(foreach S, $(SCFA), $(TABLES)/$(S)_kruskal_crc_groups.csv)
@@ -273,8 +273,8 @@ $(TABLES)/adn_otu_only_MDA_Summary.csv : $(PROC)/final.0.03.subsample.shared\
 
 
 # Run the random forest analysis for OTU only Carcinoma classifications
-$(TABLES)/crc_full_eighty_twenty_splits.csv\
-$(TABLES)/crc_full_test_data.csv\
+$(TABLES)/crc_OTU_only_eighty_twenty_splits.csv\
+$(TABLES)/crc_OTU_only_test_data.csv\
 $(TABLES)/crc_otu_only_AUC_model_summary.csv\
 $(TABLES)/crc_otu_only_raw_mda_values.csv\
 $(TABLES)/crc_otu_only_MDA_Summary.csv : $(PROC)/final.0.03.subsample.shared\
@@ -309,18 +309,19 @@ $(TABLES)/selected_scfa_treatment_picrust_gene_data.csv : $(RAW)/metadata/metaI_
 
 
 # Get specific OPF SCFA KEGG matches
-$(PROC)/select_scfa_opf_matches.tsv : code/kegg_parse.py $(PROC)/scfa_kegg_ids.txt\
-		$(PROC)/orf_gene_alignment.tsv
-	python code/kegg_parse.py -iko "data/process/scfa_kegg_ids.txt" -gad "data/process/orf_gene_alignment.tsv" -o "data/process/select_scfa_opf_matches.tsv" 
+# Nothing seems to depend on theis target
+# $(PROC)/select_scfa_opf_matches.tsv : code/kegg_parse.py $(PROC)/scfa_kegg_ids.txt\
+# 		$(PROC)/orf_gene_alignment.tsv
+# 	python code/kegg_parse.py -iko "data/process/scfa_kegg_ids.txt" -gad "data/process/orf_gene_alignment.tsv" -o "data/process/select_scfa_opf_matches.tsv"
 
 
 # Run specific SCFA OPF analysis
-$(PROC)/select_scfa_opf_matches.tsv\
-$(PROC)/opf_shared.tsv\
-$(PROC)/sra_meta_conversion.txt : $(TABLES)/select_scfa_opf_kruskal_summary.csv\
-		$(TABLES)/select_scfa_opf_data.csv code/run_opf_select_scfa_analysis.R
-	Rscript code/run_opf_select_scfa_analysis.R
-
+# Nothing seems to depend on these targets and they are redundant with the previous rule
+# $(PROC)/select_scfa_opf_matches.tsv\
+# $(PROC)/opf_shared.tsv\
+# $(PROC)/sra_meta_conversion.txt : $(TABLES)/select_scfa_opf_kruskal_summary.csv\
+# 		$(TABLES)/select_scfa_opf_data.csv code/run_opf_select_scfa_analysis.R
+# 	Rscript code/run_opf_select_scfa_analysis.R
 
 # Run RF model classifications of SCFA high/low and regression of SCFA concentrations
 SCFA_RF_C_DATA = $(foreach S, $(SCFA), $(TABLES)/$(S)_classification_RF_summary.csv)
