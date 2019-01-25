@@ -60,7 +60,7 @@ and patients with adenomas or carcinomas (P-value > 0.15). Using metagenomic seq
 * Gnu Make should be located in the user's PATH
 * mothur (v1.39.5) should be located in the user's PATH
 * R (v. 3.4.4) should be located in the user's PATH
-* PICRUSt (v. 1.1.2) should be located on the user's computer.
+* PICRUSt (v. 1.1.3) should be located in the user's PATH.
 
 
 #### Running analysis
