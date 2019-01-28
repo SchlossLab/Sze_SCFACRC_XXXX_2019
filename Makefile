@@ -155,7 +155,7 @@ $(RAW)/all_contigs.fasta : code/module.sh\
 	python code/rm_human_seqs.py -s "data/raw/whole_metagenome_samples.txt"
 	python code/create_contigs.py -s "data/raw/whole_metagenome_samples.txt"
 	python code/create_master_contig_file.py -s "data/raw/whole_metagenome_samples.txt"
-	python code/create_contig_length_table.py -cf "data/raw/all_contigs.fasta"
+#	python code/create_contig_length_table.py -cf "data/raw/all_contigs.fasta"
 
 
 # Create the needed OPFs with contigs 1kb or greater
@@ -164,7 +164,8 @@ $(PROC)/orf_gene_alignment.tsv\
 $(RAW)/diamond_analysis/orf_abund.tsv : code/remove_short_contigs.py\
 		code/concoct_scripts/cut_up_fasta.py code/prodigal_wrap.py\
 		code/diamond_wrap.py code/run_create_OPF_abund_table.R\
-		$(RAW)/mmseq2_opf_run/resultDB.m8
+		$(RAW)/mmseq2_opf_run/resultDB.m8\
+		$(RAW)/all_contigs.fasta
 	python code/remove_short_contigs.py -s "data/raw/whole_metagenome_samples.txt"
 	python2 code/concoct_scripts/cut_up_fasta.py -c 10000 -o 0 -m $(RAW)/all_contigs_greater1kb.fasta > $(RAW)/all_contigs_1kbto10kb.fasta
 	python code/prodigal_wrap.py
