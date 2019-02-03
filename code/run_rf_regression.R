@@ -145,7 +145,7 @@ pipeline <- function(dataset, model){
   return(results)
 }
 
-# Function to save the RMSE values
+# Function to save the RMSE values and save them as .csv
 get_RMSE <- function(dataset, models, split_number){
   for(ml in models){
     
