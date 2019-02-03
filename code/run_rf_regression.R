@@ -152,8 +152,8 @@ testTransformed <- predict(preProcValues, testing)
 
 # Cross-validation method
 cv <- trainControl(method="repeatedcv",
-                   repeats = 1,
-                   number=5,
+                   repeats = 10,
+                   number=10,
                    returnResamp="final",
                    classProbs=FALSE,
                    indexFinal=NULL,
@@ -170,12 +170,13 @@ trained_model <-  train(mmol_kg ~ .,
                           ntree=1000)
 
 # Mean AUC value over repeats of the best cost parameter during training
-cv_auc <- getTrainPerf(trained_model)$TrainROC
-# Predict on the test set and get predicted probabilities
-rpartProbs <- predict(trained_model, testTransformed, type="prob")
-test_roc <- roc(ifelse(testTransformed$dx == "cancer", 1, 0), 
-                rpartProbs[[2]])
-
-
+cv_auc <- getTrainPerf(trained_model)
+# Training results
+results <- trained_model$results
+# Predictions for 1 data-split
+predictions <- predict(trained_model, testTransformed, type = "raw")
+realval_predictions <- cbind(predictions, actual = testTransformed$mmol_kg)
+# RMSE values for test data from 1 datasplit
+RMSE(predictions,testTransformed$mmol_kg)
 
 
