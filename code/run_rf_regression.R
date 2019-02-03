@@ -164,7 +164,7 @@ pipeline <- function(dataset, model){
                    indexFinal=NULL,
                    savePredictions = TRUE)
   # Hyper-parameter tuning budget
-  grid <-  expand.grid(mtry = c(80,500,1000,1500))
+  grid <-  expand.grid(mtry = c(80,500))
   # Train model for 1 data-split but with 10fold-10repeat CV
   trained_model <-  train(mmol_kg ~ .,
                           data=trainTransformed,
@@ -203,7 +203,7 @@ get_AUCs <- function(models, split_number){
     RMSE_results_dataframe <- data.frame(RMSE_results) %>% 
       rename(cv=X1, test=X2) %>% 
       mutate(model=ml) %>% 
-      write.csv(file=paste0("data/temp/best_hp_results_", ml,"_", split_number, ".csv"), row.names=F)
+      write.csv(file=paste0("data/best_hp_results_", ml,"_", split_number, ".csv"), row.names=F)
     # ------------------------------------------------------------------   
     
     # ------------------------------------------------------------------   
@@ -212,7 +212,7 @@ get_AUCs <- function(models, split_number){
     # Convert to dataframe and add a column noting the model name
     dataframe <- data.frame(all_results) %>% 
       mutate(model=ml) %>% 
-      write.csv(file=paste0("data/temp/all_hp_results_", ml,"_", split_number, ".csv"), row.names=F)
+      write.csv(file=paste0("data/all_hp_results_", ml,"_", split_number, ".csv"), row.names=F)
     # ------------------------------------------------------------------ 
   }
 }
