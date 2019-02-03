@@ -164,26 +164,26 @@ pipeline <- function(dataset, model){
                    indexFinal=NULL,
                    savePredictions = TRUE)
   # Hyper-parameter tuning budget
-  grid <-  expand.grid(mtry = c(80,500))
+  grid <-  expand.grid(mtry = c(80,500, 1000, 1500))
   # Train model for 1 data-split but with 10fold-10repeat CV
   trained_model <-  train(mmol_kg ~ .,
                           data=trainTransformed,
                           method = "rf",
                           trControl = cv,
-                          metric = "accuracy",
+                          metric = "RMSE",
                           tuneGrid = grid,
                           ntree=1000)
   # Mean AUC value over repeats of the best mtry parameter during training
-  cv_RMSE <- getTrainPerf(trained_model)
+  cv_RMSE <- getTrainPerf(trained_model)$TrainRMSE
   # Training results for all the mtry parameters
-  results <- trained_model$results
+  model_results <- trained_model$results
   # Predictions with the best mtry parameter for 1 data-split
   predictions <- predict(trained_model, testTransformed, type = "raw")
   realval_predictions <- cbind(predictions, actual = testTransformed$mmol_kg)
   # RMSE values for test data from 1 datasplit
-  test_RMSE(predictions,testTransformed$mmol_kg)
+  test_RMSE <- RMSE(predictions,testTransformed$mmol_kg)
   
-  results <- list(cv_RMSE, test_RMSE, results)
+  results <- list(cv_RMSE, test_RMSE, model_results)
   return(results)
 }
 
@@ -201,7 +201,7 @@ get_AUCs <- function(models, split_number){
     RMSE_results <- matrix(c(results[[1]], results[[2]]), ncol=2) 
     # Convert to dataframe and add a column noting the model name
     RMSE_results_dataframe <- data.frame(RMSE_results) %>% 
-      rename(cv=X1, test=X2) %>% 
+      rename(cv_RMSE=X1, test_RMSE=X2) %>% 
       mutate(model=ml) %>% 
       write.csv(file=paste0("data/best_hp_results_", ml,"_", split_number, ".csv"), row.names=F)
     # ------------------------------------------------------------------   
