@@ -133,50 +133,103 @@ scfa_medians <- lapply(all_data, function(x) median(x$mmol_kg))
 # get final data tables to be used in the RF analysis
 final_data <- get_high_low(all_data, scfa_medians, scfas)
 
-#split the data for the downstream nzv that needs to occur
+#split the data for each SCFA 
 final_sp_data <- sapply(scfas, 
                         function(x) split_dataframe(x, final_data), simplify = F)
 
-
+# We will only analyze acetate downstream
 final_acetate_data <- final_sp_data$acetate$rf_regression %>% 
   select(-Group, -dx)
 
-# Stratified data partitioning %80 training - %20 testing
-inTraining <- createDataPartition(final_acetate_data$mmol_kg, p = .80, list = FALSE)
-training <- final_acetate_data[ inTraining,]
-testing  <- final_acetate_data[-inTraining,]
-# Scale all features between 0-1
-preProcValues <- preProcess(training, method = "range")
-trainTransformed <- predict(preProcValues, training)
-testTransformed <- predict(preProcValues, testing)
+pipeline <- function(dataset, model){
+  # Create vectors to save cv and test AUC values for every data-split
+  results_total <-  data.frame()
+  test_aucs <- c()
+  cv_aucs <- c()
+  # Stratified data partitioning %80 training - %20 testing
+  inTraining <- createDataPartition(dataset$mmol_kg, p = .80, list = FALSE)
+  training <- dataset[ inTraining,]
+  testing  <- dataset[-inTraining,]
+  # Scale all features between 0-1
+  preProcValues <- preProcess(training, method = "range")
+  trainTransformed <- predict(preProcValues, training)
+  testTransformed <- predict(preProcValues, testing)
 
-# Cross-validation method
-cv <- trainControl(method="repeatedcv",
+  # Cross-validation method
+  cv <- trainControl(method="repeatedcv",
                    repeats = 10,
                    number=10,
                    returnResamp="final",
                    classProbs=FALSE,
                    indexFinal=NULL,
                    savePredictions = TRUE)
-
-grid <-  expand.grid(mtry = c(80,500,1000,1500))
-
-trained_model <-  train(mmol_kg ~ .,
+  # Hyper-parameter tuning budget
+  grid <-  expand.grid(mtry = c(80,500,1000,1500))
+  # Train model for 1 data-split but with 10fold-10repeat CV
+  trained_model <-  train(mmol_kg ~ .,
                           data=trainTransformed,
                           method = "rf",
                           trControl = cv,
                           metric = "accuracy",
                           tuneGrid = grid,
                           ntree=1000)
+  # Mean AUC value over repeats of the best mtry parameter during training
+  cv_RMSE <- getTrainPerf(trained_model)
+  # Training results for all the mtry parameters
+  results <- trained_model$results
+  # Predictions with the best mtry parameter for 1 data-split
+  predictions <- predict(trained_model, testTransformed, type = "raw")
+  realval_predictions <- cbind(predictions, actual = testTransformed$mmol_kg)
+  # RMSE values for test data from 1 datasplit
+  test_RMSE(predictions,testTransformed$mmol_kg)
+  
+  results <- list(cv_RMSE, test_RMSE, results)
+  return(results)
+}
 
-# Mean AUC value over repeats of the best cost parameter during training
-cv_auc <- getTrainPerf(trained_model)
-# Training results
-results <- trained_model$results
-# Predictions for 1 data-split
-predictions <- predict(trained_model, testTransformed, type = "raw")
-realval_predictions <- cbind(predictions, actual = testTransformed$mmol_kg)
-# RMSE values for test data from 1 datasplit
-RMSE(predictions,testTransformed$mmol_kg)
+######################################################################
+#------------------------- DEFINE FUNCTION -------------------#
+######################################################################
+get_AUCs <- function(models, split_number){
+  for(ml in models){
+    
+    # Save results of the modeling pipeline as a list
+    results <- pipeline(final_acetate_data, ml) 
+    
+    # ------------------------------------------------------------------ 
+    # Create a matrix with cv_aucs and test_aucs from 100 data splits
+    RMSE_results <- matrix(c(results[[1]], results[[2]]), ncol=2) 
+    # Convert to dataframe and add a column noting the model name
+    RMSE_results_dataframe <- data.frame(RMSE_results) %>% 
+      rename(cv=X1, test=X2) %>% 
+      mutate(model=ml) %>% 
+      write.csv(file=paste0("data/temp/best_hp_results_", ml,"_", split_number, ".csv"), row.names=F)
+    # ------------------------------------------------------------------   
+    
+    # ------------------------------------------------------------------   
+    # Save all tunes from 100 data splits and corresponding AUCs
+    all_results <- results[3]
+    # Convert to dataframe and add a column noting the model name
+    dataframe <- data.frame(all_results) %>% 
+      mutate(model=ml) %>% 
+      write.csv(file=paste0("data/temp/all_hp_results_", ml,"_", split_number, ".csv"), row.names=F)
+    # ------------------------------------------------------------------ 
+  }
+}
 
+######################## RUN PIPELINE #############################
+# Get the cv and test AUCs for 100 data-splits
+start_time <- Sys.time()
+
+input <- commandArgs(trailingOnly=TRUE) # recieve input from model
+# Get variables from command line
+seed <- as.numeric(input[1])
+model <- input[2]
+
+set.seed(seed)
+get_AUCs(model, input[1]) # model will be "Random_Forest"
+
+end_time <- Sys.time()
+print(end_time - start_time)
+###################################################################
 
