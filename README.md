@@ -58,10 +58,21 @@ and patients with adenomas or carcinomas (P-value > 0.15). Using metagenomic seq
 
 #### Dependencies and locations
 * Gnu Make should be located in the user's PATH
-* mothur (v1.39.5) should be located in the user's PATH
-* R (v. 3.4.4) should be located in the user's PATH
+* mothur (v1.42) should be located in the user's PATH
+* R (v. 3.X.X) should be located in the user's PATH
 * PICRUSt (v. 1.1.3) should be located in the user's PATH.
+* mmseqs2
+* various modules that are on flux
 
+Dependencies:
+* SRA toolkit v.2.8.2 (in path)
+* mothur v.1.42.0 (in path)
+* picrust v.1.53.0 (in path)
+* R packages
+	- tidyverse v.1.2.1
+
+Need KEGG's genes.pep.format.fasta in data/references
+Analysis assumes the use of 12 processors
 
 #### Running analysis
 
