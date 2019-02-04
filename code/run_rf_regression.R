@@ -76,27 +76,6 @@ split_dataframe <- function(i, dataList){
 }
 
 
-# Function to make an initial 80/20 split within the data
-eighty_twenty_split <- function(i, data_of_int, dataList){
-  
-  tempData <- dataList[[i]][[data_of_int]]
-  
-  sampling_vector <- c(1:length(rownames(tempData)))
-  
-  trainValues <- sample(sampling_vector, round(length(sampling_vector)*0.8))
-  
-  #tempTrain <- tempData %>% sample_frac(0.8, replace = FALSE)
-  
-  #tempTest <- tempData %>% filter(!(rownames(tempTrain) %in% rownames(.)))
-  
-  finalList <- list(
-    training_data = tempData[trainValues, ], 
-    test_data = tempData[-trainValues, ])
-  
-  
-  return(finalList)
-  
-}
 
 # Function to run Begum's pipeline
 pipeline <- function(dataset, model){
@@ -214,7 +193,7 @@ final_sp_data <- sapply(scfas,
 
 # We will only analyze acetate downstream
 final_acetate_data <- final_sp_data$acetate$rf_regression %>% 
-  select(-Group, -dx)
+  select(-Group, -dx) # We won't be doing comparisons of adenoma, normal and cancer. We have all the samples in this data. 
 
 
 ######################## RUN PIPELINE #############################
