@@ -1,46 +1,46 @@
-### Align Metadata with shared file 
+### Align Metadata with shared file
 ### Preps a metadata file for creation of a biom file for picrust
-### Marc Sze
+### Marc Sze; modified by Pat Schloss
 
-
-# Load in needed functions and libraries
-source('code/functions.R')
 
 # Load needed libraries
-loadLibs(c("tidyverse"))
+library("tidyverse")
+
+## Read in the conserved taxonomy file
+read_tsv("data/mothur/crc.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.opti_mcc.0.03.cons_gg.taxonomy") %>%
+	mutate(Taxonomy=str_replace_all(Taxonomy, ".*unknown.*", "k__Bacteria(100);p__(100);c__(100);o__(100);f__(100);g__(100);s__(100);")) %>%
+	write_tsv("data/picrust/crc.cons.taxonomy")
 
 ## Read in needed data tables
+metaInitial <- read_csv("data/raw/metadata/cross_section.csv",
+												col_types=list(sample=col_character())) %>%
+  select(sample, dx, fit_result) %>%
+	mutate(time_point = "initial") %>%
+  rename(Group = sample)
 
-metaI <- read_csv("data/raw/metadata/metaI_final.csv") %>% 
-  select(sample, Dx_Bin, dx, fit_result) %>% 
-  rename(Group = sample) %>% 
-  mutate()
+metaFollowUp <- read_csv("data/raw/metadata/follow_up.csv",
+												col_types=list(initial=col_character(), followUp=col_character())) %>%
+  gather(key = "time_point", value = "Group", initial, followUp) %>%
+  select(Group, dx, fit_result, time_point)
 
-metaF <- read_csv("data/raw/metadata/good_metaf_final.csv") %>% 
-  gather(key = "time_point", value = "Group", initial, followUp) %>% 
-  select(Group, Dx_Bin, dx, fit_result)
-
-shared <- read_tsv("data/process/final.shared")
 
 # Merge the metadata together into a single table
-combined_meta <- metaI %>% 
-  filter(!(Group %in% metaF$Group)) %>% 
-  bind_rows(metaF) %>% 
-  mutate(Dx_Bin = stringr::str_replace(Dx_Bin, "adv Adenoma", "adv_adenoma"), 
-         Dx_Bin = stringr::str_replace(Dx_Bin, "High Risk Normal", "Normal"))
-
-# reorder combined meta file to match the shared
-combined_meta <- combined_meta %>% slice(match(shared$Group, Group))
+metadata <- full_join(metaFollowUp, metaInitial)
 
 
-# Write out the table to the process dir
-write_tsv(combined_meta, "data/process/picrust_metadata")
+# Get the shared file and join the metadata
+meta_shared <- read_tsv("data/mothur/crc.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.opti_mcc.0.03.subsample.shared",
+									col_types=list(Group=col_character())) %>%
+					inner_join(metadata, shared, by="Group")
 
 
 
 
+# reorder combined meta file to match the shared and write to data/picrust
+meta_shared %>%
+	select(Group, dx, fit_result, time_point) %>%
+	write_tsv("data/picrust/crc.metadata")
 
-
-
-
-
+meta_shared %>%
+	select(-dx, -fit_result, -time_point) %>%
+	write_tsv("data/picrust/crc.shared")

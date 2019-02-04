@@ -1,26 +1,32 @@
 #!bash
 
 #Set local variables
-PICRUST=~/picrust/scripts
-WORKDIR=data/process
+REF=data/references
+WORKDIR=data/picrust
+mkdir -p $WORKDIR
 
 # create a useable biom formated table for picrust
 # help from https://github.com/rprops/PICRUSt_from_mothur
 
 # Create an empty nsti file for later use
-touch $WORKDIR/nsti.txt
+#touch $WORKDIR/nsti.txt
+
+BIOM=data/picrust/crc.0.03.biom
+
+# make biom format from subsampled shared file
+Rscript code/picrust_align_metadata.R #this uses the subsampled shared file
+mothur "#make.biom(shared=data/picrust/crc.shared, label=0.03, reftaxonomy=$REF/gg_13_5_99.gg.tax, constaxonomy=data/picrust/crc.cons.taxonomy, metadata=data/picrust/crc.metadata, picrust=$REF/97_otu_map.txt)"
 
 # Comments on whether this is an acceptable biom format
-biom validate-table -i $WORKDIR/gg_final.0.03.biom
-# Convert to an acceptable biom format for picrust
-biom convert --table-type="OTU table" -i $WORKDIR/gg_final.0.03.biom -o $WORKDIR/temp_OTU_table.txt --to-tsv --header-key taxonomy
-biom convert -i $WORKDIR/temp_OTU_table.txt -o $WORKDIR/gg_corr_OTU_table.biom --table-type="OTU table" --to-json --process-obs-metadata taxonomy
-# Double check that it is now the right format
-biom validate-table -i $WORKDIR/gg_corr_OTU_table.biom
-# Run the picrust program to make predictions 
-$PICRUST/normalize_by_copy_number.py -i $WORKDIR/gg_corr_OTU_table.biom -o $WORKDIR/gg_corr_normalized_otus.biom
-$PICRUST/predict_metagenomes.py -i $WORKDIR/gg_corr_normalized_otus.biom -o $WORKDIR/predicted_metagenomes.biom -a $WORKDIR/nsti.txt
-		# using -f tag creates a tab delimited table
+biom validate-table -i $BIOM
 
-#biom convert --table-type="OTU table" -i normalized_otus.biom -o normalized_otus_table.txt --header-key taxonomy --to-tsv
-#biom convert -i normalized_otus.biom -o normalized_otus_table.txt  --table-type "otu table"
+# Convert to an acceptable biom format for picrust
+biom convert --table-type="OTU table" -i $BIOM -o $WORKDIR/temp_OTU_table.txt --to-tsv --header-key taxonomy
+biom convert -i $WORKDIR/temp_OTU_table.txt -o $BIOM --table-type="OTU table" --to-json --process-obs-metadata taxonomy
+
+# Double check that it is now the right format
+biom validate-table -i $BIOM
+
+# Run the picrust program to make predictions
+normalize_by_copy_number.py -i $BIOM -o $WORKDIR/crc.normalized.biom
+predict_metagenomes.py -f -i $WORKDIR/crc.normalized.biom -o $WORKDIR/crc.metagenomes.tsv -a $WORKDIR/crc.nsti
