@@ -1,66 +1,51 @@
 #!bash
 
 # Load needed modules
-module load sratoolkit/2.7.0
+module load sratoolkit/2.8.2-1
 
 #Set local variables
-mothurRv=/nfs/turbo/schloss-lab/bin/mothur_src/mothur
-DOWNDIR=data/raw
-WORKDIR=data/process
+# mothurRv=/nfs/turbo/schloss-lab/bin/mothur_src/mothur
+mkdir data/raw/16S
+DOWNDIR=data/raw/16S
+WORKDIR=data/mothur
 REF=data/references
 
-#Future section for dowloading data
-wget -r -q -np -nd -k -P $DOWNDIR ftp://ftp-trace.ncbi.nih.gov/sra/sra-instant/reads/ByStudy/sra/SRP/SRP062/SRP062005/
-wget -r -q -np -nd -k -P $DOWNDIR ftp://ftp-trace.ncbi.nih.gov/sra/sra-instant/reads/ByStudy/sra/SRP/SRP096/SRP096978/
+#Get list of files to download
+wget -O $DOWNDIR/SRP062005_info.csv 'http://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?save=efetch&db=sra&rettype=runinfo&term=SRP062005'
 
-#Unzip fastq files and place them in work directory
-for sample in $DOWNDIR/*.sra
+wget -O $DOWNDIR/SRP096978_info.csv 'http://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?save=efetch&db=sra&rettype=runinfo&term=SRP096978'
+
+#Split sra files into fastq files
+URLS=`cut -f 10 -d , $DOWNDIR/*_info.csv | grep "http"`
+for sample in $URLS
 do
-	fastq-dump --split-files $sample -O $WORKDIR
-
+	fastq-dump --split-files $sample -O $DOWNDIR
+	echo $sample
 done
 
-#Run mothur process
+# make files file
+cut -d , -f 1,12 data/raw/16S/SRP0* | grep "SRR" | sed -E "s/(^SRR.*),([^_]*)_.*/\2\t\\1_1.fastq\t\\1_2.fastq/" > $DOWNDIR/crc.files
 
-$mothurRv "#make.contigs(file=$WORKDIR/stability.files, processors=4);
-	summary.seqs(fasta=current);
-	screen.seqs(fasta=current, group=current, summary=current, maxambig=0, maxlength=275);
-	summary.seqs(fasta=current);
+#Run mothur process
+mothur "#make.contigs(file=crc.files, inputdir=$DOWNDIR/16S, outputdir=$WORKDIR, processors=12);
+	screen.seqs(fasta=current, group=current, maxambig=0, maxlength=275);
 	unique.seqs(fasta=current);
-	summary.seqs(fasta=current, name=current);
 	count.seqs(name=current, group=current);
-	summary.seqs(fasta=current, count=current);
 	align.seqs(fasta=current, reference=$REF/silva.v4.align);
-	summary.seqs(fasta=current, count=current);
-	screen.seqs(fasta=current, count=current, summary=current, start=1968, end=11550, maxhomop=8);
-	summary.seqs(fasta=current,count=current);
+	screen.seqs(fasta=current, count=current, start=1968, end=11550, maxhomop=8);
 	filter.seqs(fasta=current, vertical=T, trump=.);
 	unique.seqs(fasta=current, count=current);
 	pre.cluster(fasta=current, count=current, diffs=2);
 	chimera.uchime(fasta=current, count=current, dereplicate=t);
 	remove.seqs(fasta=current, accnos=current);
-	summary.seqs(fasta=current,count=current);
-	classify.seqs(fasta=current, count=current, reference=$REF/trainset14_032015.pds.fasta, taxonomy=$REF/trainset14_032015.pds.tax, cutoff=80);
+	classify.seqs(fasta=current, count=current, reference=$REF/trainset16_022016.pds.fasta, taxonomy=$REF/trainset16_022016.pds.tax, cutoff=80);
 	remove.lineage(fasta=current, count=current, taxonomy=current, taxon=Chloroplast-Mitochondria-unknown-Archaea-Eukaryota);
-	get.groups(fasta=current, count=current, groups=mock1-mock2-mock5-mock6-mock7);
-	seq.error(fasta=current, count=current, reference=$REF/HMP_MOCK.fasta, aligned=F)"
-
-
-# Rename final fasta, taxa, and count file
-
-mv $WORKDIR/stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.fasta $WORKDIR/unmatched.fasta
-mv $WORKDIR/stability.trim.contigs.good.unique.good.filter.unique.precluster.denovo.uchime.pick.pick.count_table $WORKDIR/unmatched.count_table
-mv $WORKDIR/stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pds.wang.pick.taxonomy $WORKDIR/unmatched.taxonomy
-
-# Move Error analysis to error directory
-
-mv $WORKDIR/stability.*.error.* $WORKDIR/error_analysis/
-mv $WORKDIR/stability.trim.contigs.good.unique.good.filter.unique.precluster.denovo.uchime.pick.pick.pick.count_table $WORKDIR/error_analysis/
-mv $WORKDIR/stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.fasta $WORKDIR/error_analysis/
-cp $WORKDIR/stability.files $WORKDIR/followup.files
-
-# Split the files for clustering
-
-$mothurRv "#cluster.split(fasta=$WORKDIR/unmatched.fasta, count=$WORKDIR/unmatched.count_table, taxonomy=$WORKDIR/unmatched.taxonomy, splitmethod=classify, taxlevel=5, cutoff=0.1, cluster=F, processors=4)"
-
-
+	remove.groups(fasta=current, count=current, taxonomy=current, groups=mock1-mock2-mock5-mock6-mock7);
+	cluster.split(fasta=current, count=current, taxonomy=current, taxlevel=4, cutoff=0.03);
+	make.shared(list=current, count=current, label=0.03);
+	sub.sample(shared=current);
+	classify.otu(list=current, count=current, taxonomy=current, label=0.03);
+	system(mv data/mothur/crc.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.opti_mcc.0.03.cons.taxonomy data/mothur/crc.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.opti_mcc.0.03.cons_rdp.taxonomy)
+	classify.seqs(fasta=current, count=current, reference=$REF/gg_13_5_99.gg.fasta, taxonomy=$REF/gg_13_5_99.gg.tax, cutoff=80);
+	classify.otu(list=current, count=current, taxonomy=current, label=0.03);
+	system(mv data/mothur/crc.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.opti_mcc.0.03.cons.taxonomy data/mothur/crc.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.opti_mcc.0.03.cons_gg.taxonomy)"
