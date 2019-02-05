@@ -19,11 +19,9 @@ kraken_db/
 
 head.batch
 tail.batch
-*.qsub*
 mothur*logfile
 *temp*
 *.docx
-*.pbs
 *.pbs.o*
 *.fastq
 *.sra
