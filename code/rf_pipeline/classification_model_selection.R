@@ -9,8 +9,8 @@
 ######################################################################
 
 ######################################################################
-# Dependencies and Outputs: 
-#    Filename to put to function: 
+# Dependencies and Outputs:
+#    Filename to put to function:
 #     "Random_Forest"
 
 
@@ -29,8 +29,9 @@
 ######################################################################
 #------------------------- DEFINE FUNCTION -------------------#
 ######################################################################
+
 tuning_grid <- function(model){
-  
+
   # Cross-validation method
   cv <- trainControl(method="repeatedcv",
                      repeats = 100,
@@ -40,15 +41,15 @@ tuning_grid <- function(model){
                      summaryFunction=twoClassSummary,
                      indexFinal=NULL,
                      savePredictions = TRUE)
+										 
   # Grid and caret method defined for random forest classification model
   if(model=="Random_Forest"){
     grid <-  expand.grid(mtry = c(80,500,1000,1500))
     method = "rf"
   }
-  else { 
+  else {
     print("Model not available")
   }
   params <- list(grid, method, cv)
   return(params)
 }
-

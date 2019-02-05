@@ -1,13 +1,13 @@
 ######################################################################
 # Author: Begum Topcuoglu
 # Date: 2019-01-15
-# Title: Generate files that has cv and test AUCs for100 data-split 
+# Title: Generate files that has cv and test AUCs for100 data-split
 ######################################################################
 
 ######################################################################
-# Dependencies and Outputs: 
+# Dependencies and Outputs:
 # This function accept files generated in main.R
-#    Filename to put to function: 
+#    Filename to put to function:
 #   "Random_Forest"
 
 
@@ -24,41 +24,43 @@
 #----------------- Read in necessary libraries -------------------#
 ######################################################################
 
-deps = c("reshape2", "kernlab","LiblineaR", "doParallel","pROC", "caret", "gtools", "tidyverse", "ggpubr", "ggplot2","knitr","rmarkdown","vegan");
-for (dep in deps){
-  if (dep %in% installed.packages()[,"Package"] == FALSE){
-    install.packages(as.character(dep), quiet=TRUE);
-  }
-  library(dep, verbose=FALSE, character.only=TRUE)
-}
+library(tidyverse)
+
+# deps = c("reshape2", "kernlab","LiblineaR", "doParallel","pROC", "caret", "gtools", "tidyverse", "ggpubr", "ggplot2","vegan");
+# for (dep in deps){
+#   if (dep %in% installed.packages()[,"Package"] == FALSE){
+#     install.packages(as.character(dep), quiet=TRUE);
+#   }
+#   library(dep, verbose=FALSE, character.only=TRUE)
+# }
 
 ######################################################################
 #------------------------- DEFINE FUNCTION -------------------#
 ######################################################################
-get_AUCs <- function(dataset, models, split_number){
+
+get_AUCs <- function(dataset, models, split_number, path){
   for(ml in models){
-    
+
     # Save results of the modeling pipeline as a list
-    results <- pipeline(dataset, ml) 
-    
-    # ------------------------------------------------------------------ 
+    results <- pipeline(dataset, ml)
+
+    # ------------------------------------------------------------------
     # Create a matrix with cv_aucs and test_aucs from 100 data splits
-    aucs <- matrix(c(results[[1]], results[[2]]), ncol=2) 
+    aucs <- matrix(c(results[[1]], results[[2]]), ncol=2)
     # Convert to dataframe and add a column noting the model name
-    aucs_dataframe <- data.frame(aucs) %>% 
-      rename(cv_aucs=X1, test_aucs=X2) %>% 
-      mutate(model=ml) %>% 
-      write.csv(file=paste0("data/temp/best_hp_results_", ml,"_", split_number, ".csv"), row.names=F)
-    # ------------------------------------------------------------------   
-    
-    # ------------------------------------------------------------------   
+    aucs_dataframe <- data.frame(aucs) %>%
+      rename(cv_aucs=X1, test_aucs=X2) %>%
+      mutate(model=ml) %>%
+      write_csv(file=paste0(path, "/best_hp_results_", ml,"_", split_number, ".csv"))
+    # ------------------------------------------------------------------
+
+    # ------------------------------------------------------------------
     # Save all tunes from 100 data splits and corresponding AUCs
     all_results <- results[3]
     # Convert to dataframe and add a column noting the model name
-    dataframe <- data.frame(all_results) %>% 
-      mutate(model=ml) %>% 
-      write.csv(file=paste0("data/temp/all_hp_results_", ml,"_", split_number, ".csv"), row.names=F)
-    # ------------------------------------------------------------------ 
+    dataframe <- data.frame(all_results) %>%
+      mutate(model=ml) %>%
+      write_csv(file=paste0(path, "/all_hp_results_", ml,"_", split_number, ".csv"))
+    # ------------------------------------------------------------------
   }
 }
-
