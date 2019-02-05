@@ -4,8 +4,7 @@ TABLES = data/process/tables
 PROC = data/process
 FINAL = submission/
 RAW = data/raw
-PLATES = plate1 plate2 plate3 plate4 plate5 plate6 plate7 plate8
-SCFA = acetate butyrate propionate
+MOTHUR = data/mothur
 
 # utility function to print various variables. For example, running the
 # following at the command line:
@@ -34,191 +33,119 @@ print-%:
 # We will use the SEED v. 123, which contain 12,083 bacterial sequences. This
 # also contains the reference taxonomy. We will limit the databases to only
 # include bacterial sequences.
-
 $(REFS)/silva.seed.align :
-	wget -N http://mothur.org/w/images/1/15/Silva.seed_v123.tgz
-	tar xvzf Silva.seed_v123.tgz silva.seed_v123.align silva.seed_v123.tax
-	mothur "#get.lineage(fasta=silva.seed_v123.align, taxonomy=silva.seed_v123.tax, taxon=Bacteria);degap.seqs(fasta=silva.seed_v123.pick.align, processors=8)"
-	mv silva.seed_v123.pick.align $(REFS)/silva.seed.align
-	rm Silva.seed_v123.tgz silva.seed_v123.*
+	wget -N https://mothur.org/w/images/7/71/Silva.seed_v132.tgz
+	tar xvzf Silva.seed_v132.tgz silva.seed_v132.align silva.seed_v132.tax
+	mothur "#get.lineage(fasta=silva.seed_v132.align, taxonomy=silva.seed_v132.tax, taxon=Bacteria);degap.seqs(fasta=silva.seed_v132.pick.align, processors=8)"
+	mv silva.seed_v132.pick.align $(REFS)/silva.seed.align
+	rm Silva.seed_v132.tgz silva.seed_v132.*
 
 $(REFS)/silva.v4.align : $(REFS)/silva.seed.align
 	mothur "#pcr.seqs(fasta=$(REFS)/silva.seed.align, start=11894, end=25319, keepdots=F, processors=8)"
 	mv $(REFS)/silva.seed.pcr.align $(REFS)/silva.v4.align
 
+
 # Next, we want the RDP reference taxonomy. The current version is v10 and we
 # use a "special" pds version of the database files, which are described at
 # http://blog.mothur.org/2014/10/28/RDP-v10-reference-files/
+$(REFS)/trainset16_022016.% :
+	wget -N https://mothur.org/w/images/c/c3/Trainset16_022016.pds.tgz
+	tar xvzf Trainset16_022016.pds.tgz trainset16_022016.pds/trainset16_022016.pds.*
+	mv trainset16_022016.pds/* $(REFS)/
+	rmdir trainset16_022016.pds
+	rm Trainset16_022016.pds.tgz
 
-$(REFS)/trainset14_032015.% :
-	wget -N http://www.mothur.org/w/images/8/88/Trainset14_032015.pds.tgz
-	tar xvzf Trainset14_032015.pds.tgz trainset14_032015.pds/trainset14_032015.pds.*
-	mv trainset14_032015.pds/* $(REFS)/
-	rmdir trainset14_032015.pds
-	rm Trainset14_032015.pds.tgz
 
-# Grab greengenes reference files for picrust
-
-$(REFS)/gg_13_5_99.align :
+# Grab greengenes reference files for picrust - used old version because mappings are available
+$(REFS)/97_otu_map.txt $(REFS)/gg_13_5_99.gg.fasta $(REFS)/gg_13_5_99.gg.tax  :
 	wget -N http://www.mothur.org/w/images/b/be/GG_13_5_otuMapTable.zip
 	unzip GG_13_5_otuMapTable.zip
 	mv GG_13_5_otuMapTable/*.txt $(REFS)/
-	rmdir GG_13_5_otuMapTable
-	rm GG_13_5_otuMapTable.zip
+	rm -rf GG_13_5_otuMapTable*
 	wget -N http://www.mothur.org/w/images/9/9d/Gg_13_5_99.taxonomy.tgz
 	tar xvzf Gg_13_5_99.taxonomy.tgz
 	mv gg_13_5_99* $(REFS)/
-	rm -r Gg_13_5_99.taxonomy.tgz ._gg_13_5_99.pds.tax ._pds.notes __MACOSX/ pds.notes
-	wget -N http://www.mothur.org/w/images/c/cd/Gg_13_5_99.refalign.tgz
-	tar xvzf Gg_13_5_99.refalign.tgz
-	mv gg_13_5_99.align $(REFS)/
-	rm pds.notes Gg_13_5_99.refalign.tgz
-
+	rm -rf Gg_13_5_99.taxonomy.tgz ._gg_13_5_99.pds.tax ._pds.notes __MACOSX/ pds.notes
+	mv $(REFS)/gg_13_5_99.fasta $(REFS)/gg_13_5_99.gg.fasta
 
 
 ################################################################################
 #
-# Part 2: Run data through mothur
+# Part 2: Get raw data and curate
 #
-#	Process fastq data through the generation of files that will be used in the
-# overall analysis.
+#	Process data through the generation of files that will be used in the overall
+# analyses.
 #
 ################################################################################
 
+# Process the SCFA data
+PLATES = plate1 plate2 plate3 plate4 plate5 plate6 plate7 plate8
+SCFA = acetate butyrate isobutyrate propionate
+PLATE_FILES = $(foreach A, $(SCFA), $(foreach S, $(PLATES),data/raw/scfa/$(A)/$(S)_scfa_crc_$(A).txt))
 
-# Run initial mothur 16S Sequecning and OTU Clustering
-$(PROC)/final.0.03.subsample.shared\
-$(PROC)/final.groups.ave-std.summary\
-$(PROC)/final.groups.summary\
-$(PROC)/final.rep.count_table\
-$(PROC)/final.rep.seqs\
-$(PROC)/final.sharedsobs.0.03.lt.ave.dist\
-$(PROC)/final.sharedsobs.0.03.lt.dist\
-$(PROC)/final.sharedsobs.0.03.lt.std.dist\
-$(PROC)/final.taxonomy\
-$(PROC)/final.thetayc.0.03.lt.ave.dist\
-$(PROC)/final.thetayc.0.03.lt.dist\
-$(PROC)/final.thetayc.0.03.lt.std.dist\
-$(PROC)/final.shared : code/mothurCluster.batch code/mothur.batch\
-					$(PROC)/unmatched.file $(PROC)/unmatched.dist\
-					$(PROC)/unmatched.taxonomy $(PROC)/unmatched.fasta\
-					data/references/silva.v4.align\
-					data/references/trainset14_032015.pds.fasta\
-					data/references/trainset14_032015.pds.tax\
-					data/process/stability.files
+data/scfa/scfa_composite.tsv : $(PLATE_FILES) data/raw/metadata/scfa_plate_metadata.csv\
+									code/scfa_process_plates.R code/scfa_combine_plates.R
+	Rscript code/scfa_process_plates.R
+	Rscript code/scfa_combine_plates.R
+
+
+# Download files from SRA, run mothur pipeline
+$(MOTHUR)/crc.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.opti_mcc.0.03.subsample.shared $(MOTHUR)/crc.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.opti_mcc.0.03.cons_gg.taxonomy $(MOTHUR)/crc.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.opti_mcc.0.03.cons_rdp.taxonomy :	code/mothur.batch\
+				data/references/silva.v4.align\
+				data/references/trainset16_022016.pds.fasta\
+				data/references/trainset16_022016.pds.tax\
+				data/references/gg_13_5_99.gg.fasta\
+				data/references/gg_13_5_99.gg.tax
 	bash code/mothur.batch
-	bash code/mothurCluster.batch
-
-
-# Run the greengenes formated file mothur 16S Sequecning and OTU Clustering
-$(PROC)/gg_final.0.03.biom\
-$(PROC)/gg_final.0.03.biom_shared\
-$(PROC)/gg_final.0.03.subsample.shared\
-$(PROC)/gg_final.groups.ave-std.summary\
-$(PROC)/gg_final.groups.summary\
-$(PROC)/gg_final.rep.count_table\
-$(PROC)/gg_final.rep.seqs\
-$(PROC)/gg_final.sharedsobs.0.03.lt.ave.dist\
-$(PROC)/gg_final.sharedsobs.0.03.lt.dist\
-$(PROC)/gg_final.sharedsobs.0.03.lt.std.dist\
-$(PROC)/gg_final.taxonomy\
-$(PROC)/gg_final.thetayc.0.03.lt.ave.dist\
-$(PROC)/gg_final.thetayc.0.03.lt.dist\
-$(PROC)/gg_final.thetayc.0.03.lt.std.dist\
-$(PROC)/gg_final.shared : code/gg_mothurCluster.batch code/gg_mothur.batch\
-					code/align_metadata_picrust.R\
-					$(PROC)/unmatched.file $(PROC)/unmatched.dist\
-					$(PROC)/unmatched.taxonomy $(PROC)/unmatched.fasta\
-					data/references/silva.v4.align\
-					data/references/trainset14_032015.pds.fasta\
-					data/references/trainset14_032015.pds.tax\
-					data/process/stability.files
-	bash code/gg_mothur.batch
-	R -e "source('code/align_metadata_picrust.R')"
-	bash code/gg_mothurCluster.batch
 
 
 # Run the picrust prediction algorithm on the gg generated file
-$(PROC)/nsti.txt\
-$(PROC)/gg_corr_OTU_table.biom\
-$(PROC)/gg_corr_normalized_otus.biom\
-$(PROC)/predicted_metagenomes.biom : code/run_picrust.sh
+data/picrust/crc.metagenomes.tsv data/picrust/crc.metadata : code/picrust.sh\
+		code/picrust_align_metadata.R\
+		$(MOTHUR)/crc.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.opti_mcc.0.03.subsample.shared\
+		$(MOTHUR)/crc.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.opti_mcc.0.03.cons_gg.taxonomy\
+		data/raw/metadata/cross_section.csv\
+		data/raw/metadata/follow_up.csv
 	bash code/run_picrust.sh
 
 
-# Create the needed contig fasta file
-$(RAW)/all_contigs.fasta : code/module.sh\
-		code/qual_trim.py code/rm_human_seqs.py code/create_contigs.py\
-		code/create_master_contig_file.py code/create_contig_length_table.py
-	source code/module.sh
-	python code/qual_trim.py -s "data/raw/whole_metagenome_samples.txt"
-	python code/rm_human_seqs.py -s "data/raw/whole_metagenome_samples.txt"
-	python code/create_contigs.py -s "data/raw/whole_metagenome_samples.txt"
-	python code/create_master_contig_file.py -s "data/raw/whole_metagenome_samples.txt"
-#	python code/create_contig_length_table.py -cf "data/raw/all_contigs.fasta"
+# Create the opf shared file
+data/metagenome/opf.tidy_shared.tsv : data/references/genes.pep.format.fasta\
+																			code/metagenomics.sh\
+																			code/metagenomics_get_shared.R
+	bash code/metagenome.sh
 
 
-# Create the needed OPFs with contigs 1kb or greater
-$(RAW)/all_contigs_1kbto10kb.fasta\
-$(PROC)/orf_gene_alignment.tsv\
-$(RAW)/diamond_analysis/orf_abund.tsv : code/remove_short_contigs.py\
-		code/concoct_scripts/cut_up_fasta.py code/prodigal_wrap.py\
-		code/diamond_wrap.py code/run_create_OPF_abund_table.R\
-		$(RAW)/mmseq2_opf_run/resultDB.m8\
-		$(RAW)/all_contigs.fasta
-	python code/remove_short_contigs.py -s "data/raw/whole_metagenome_samples.txt"
-	python2 code/concoct_scripts/cut_up_fasta.py -c 10000 -o 0 -m $(RAW)/all_contigs_greater1kb.fasta > $(RAW)/all_contigs_1kbto10kb.fasta
-	python code/prodigal_wrap.py
-	cp data/raw/mmseq2_opf_run/resultDB.m8 data/process/orf_gene_alignment.tsv
-	python code/diamond_wrap.py
-	Rscript code/run_create_OPF_abund_table.R $(RAW)/mmseq2_opf_run/clu.tsv $(RAW)/diamond_analysis/orf_abund.tsv
+
+# Get specific OPF SCFA KEGG matches
+# Nothing seems to depend on theis target
+# $(PROC)/select_scfa_opf_matches.tsv : code/kegg_parse.py $(PROC)/scfa_kegg_ids.txt\
+# 		$(PROC)/orf_gene_alignment.tsv
+# 	python code/kegg_parse.py -iko "data/process/scfa_kegg_ids.txt" -gad "data/process/orf_gene_alignment.tsv" -o "data/process/select_scfa_opf_matches.tsv"
 
 
-# Set up the variables for SCFA processing
-ACETATE = $(foreach S, $(PLATES), $(RAW)/Raw_hplc_files/acetate/$(S))
-ACETATE_PLATES = $(addsuffix _scfa_crc_acetate.txt,$(ACETATE))
-TR_ACETATE = $(foreach S, $(PLATES), $(RAW)/Raw_hplc_files/acetate/transformed_$(S))
-TR_ACETATE_PLATES = $(addsuffix _scfa_crc_acetate.csv,$(TR_ACETATE))
-
-BUTYRATE = $(foreach S, $(PLATES), $(RAW)/Raw_hplc_files/butyrate/$(S))
-BUTYRATE_PLATES = $(addsuffix _scfa_crc_butyrate.txt,$(BUTYRATE))
-TR_BUTYRATE = $(foreach S, $(PLATES), $(RAW)/Raw_hplc_files/butyrate/transformed_$(S))
-TR_BUTYRATE_PLATES = $(addsuffix _scfa_crc_butyrate.csv,$(TR_BUTYRATE))
-
-PROPIONATE = $(foreach S, $(PLATES), $(RAW)/Raw_hplc_files/propionate/$(S))
-PROPIONATE_PLATES = $(addsuffix _scfa_crc_propionate.txt,$(PROPIONATE))
-TR_PROPIONATE = $(foreach S, $(PLATES), $(RAW)/Raw_hplc_files/propionate/transformed_$(S))
-TR_PROPIONATE_PLATES = $(addsuffix _scfa_crc_propionate.csv,$(TR_PROPIONATE))
-
-SCFA_PROCESSING_CODE = $(foreach S, $(PLATES), code/run_$(S)_convert_scfa_concentrations.R)
-
-FINAL_SCFA_DATA = $(foreach S, $(SCFA), $(TABLES)/$(S)_final_data.csv)
+# Run specific SCFA OPF analysis
+# Nothing seems to depend on these targets and they are redundant with the previous rule
+# $(PROC)/select_scfa_opf_matches.tsv\
+# $(PROC)/opf_shared.tsv\
+# $(PROC)/sra_meta_conversion.txt : $(TABLES)/select_scfa_opf_kruskal_summary.csv\
+# 		$(TABLES)/select_scfa_opf_data.csv code/run_opf_select_scfa_analysis.R
+# 	Rscript code/run_opf_select_scfa_analysis.R
 
 
-# Process the SCFA data
-$(TR_ACETATE) $(TR_BUTYRATE)\
-$(TR_PROPIONATE) $(FINAL_SCFA_DATA) : $(ACETATE_PLATES) $(BUTYRATE_PLATES)\
-$(PROPIONATE_PLATES) $(SCFA_PROCESSING_CODE) code/combine_plates.R
-	Rscript code/run_plate1_convert_scfa_concentrations.R
-	Rscript code/run_plate2_convert_scfa_concentrations.R
-	Rscript code/run_plate3_convert_scfa_concentrations.R
-	Rscript code/run_plate4_convert_scfa_concentrations.R
-	Rscript code/run_plate5_convert_scfa_concentrations.R
-	Rscript code/run_plate6_convert_scfa_concentrations.R
-	Rscript code/run_plate7_convert_scfa_concentrations.R
-	Rscript code/run_plate8_convert_scfa_concentrations.R
-	Rscript code/combine_plates.R
+
+
 
 
 # Run the SCFA analysis for cross-sectional and pre/post-treatment
-SCFA_KRUSKAL_DATA = $(foreach S, $(SCFA), $(TABLES)/$(S)_kruskal_crc_groups.csv)
+$(PROC)/scfa_cross_section_stats.tsv $(PROC)/scfa_pre_post_stats.tsv : \
+										data/scfa/scfa_composite.tsv\
+										data/raw/metadata/cross_section.csv\
+										data/raw/metadata/follow_up.csv\
+										code/scfa_stat_analysis.R
+	Rscript code/scfa_stat_analysis.R
 
-$(SCFA_KRUSKAL_DATA)\
-$(TABLES)/scfa_treatment_comparison_pvalues.csv : $(FINAL_SCFA_DATA)\
-		$(RAW)/metadata/metaI_final.csv $(RAW)/metadata/good_metaf_final.csv\
-		code/Run_scfa_analysis.R code/Run_treatment_scfa_analysis.R
-	Rscript code/Run_scfa_analysis.R
-	Rscript code/Run_treatment_scfa_analysis.R
+
 
 
 # Run the random forest analysis for combined Adenoma classifications
@@ -308,21 +235,6 @@ $(TABLES)/selected_scfa_treatment_picrust_gene_data.csv : $(RAW)/metadata/metaI_
 	Rscript code/align_metadata_picrust.R
 	Rscript code/run_targeted_scfa_picrust.R
 
-
-# Get specific OPF SCFA KEGG matches
-# Nothing seems to depend on theis target
-# $(PROC)/select_scfa_opf_matches.tsv : code/kegg_parse.py $(PROC)/scfa_kegg_ids.txt\
-# 		$(PROC)/orf_gene_alignment.tsv
-# 	python code/kegg_parse.py -iko "data/process/scfa_kegg_ids.txt" -gad "data/process/orf_gene_alignment.tsv" -o "data/process/select_scfa_opf_matches.tsv"
-
-
-# Run specific SCFA OPF analysis
-# Nothing seems to depend on these targets and they are redundant with the previous rule
-# $(PROC)/select_scfa_opf_matches.tsv\
-# $(PROC)/opf_shared.tsv\
-# $(PROC)/sra_meta_conversion.txt : $(TABLES)/select_scfa_opf_kruskal_summary.csv\
-# 		$(TABLES)/select_scfa_opf_data.csv code/run_opf_select_scfa_analysis.R
-# 	Rscript code/run_opf_select_scfa_analysis.R
 
 # Run RF model classifications of SCFA high/low and regression of SCFA concentrations
 SCFA_RF_C_DATA = $(foreach S, $(SCFA), $(TABLES)/$(S)_classification_RF_summary.csv)

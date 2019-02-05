@@ -16,6 +16,9 @@ data/process/orf_gene_alignment.tsv
 *.fasta
 kraken_db/
 
+
+head.batch
+tail.batch
 *.qsub*
 mothur*logfile
 *temp*
