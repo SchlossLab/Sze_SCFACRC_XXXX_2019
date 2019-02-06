@@ -17,11 +17,12 @@ data/process/orf_gene_alignment.tsv
 kraken_db/
 
 
-head.batch
+*head.batch
 tail.batch
 mothur*logfile
 *temp*
 *.docx
+*.pbs
 *.pbs.o*
 *.fastq
 *.sra
