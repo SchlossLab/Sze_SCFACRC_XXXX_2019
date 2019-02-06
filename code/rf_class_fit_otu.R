@@ -32,7 +32,7 @@
 
 ################### IMPORT LIBRARIES and FUNCTIONS ###################
 # The dependinces for this script are consolidated in the first part
-deps = c("reshape2", "kernlab","LiblineaR", "doParallel","pROC", "caret", "gtools", "tidyverse");
+deps = c("randomForest", "reshape2", "kernlab","LiblineaR", "doParallel","pROC", "caret", "gtools", "tidyverse");
 for (dep in deps){
   if (dep %in% installed.packages()[,"Package"] == FALSE){
     install.packages(as.character(dep), quiet=TRUE, repos = "http://cran.us.r-project.org");
@@ -63,13 +63,14 @@ shared <- read_tsv('data/mothur/crc.trim.contigs.good.unique.good.filter.unique.
 # Group advanced adenomas and cancers together as cancer and normal, high risk normal and non-advanced adenomas as normal
 # Then remove the sample ID column
 data <- inner_join(meta, shared, by=c("sample"="Group")) %>%
-  mutate(state = case_when(
-		dx== "normal" ~ "normal",
-    dx== "adenoma" ~ "lesion",
-    dx== "cancer" ~ "lesion"
+  mutate(classes = case_when(
+		dx == "normal" ~ "control",
+    dx == "adenoma" ~ "case",#lesion
+    dx == "cancer" ~ "case",#lesion
+		TRUE ~ "fail"
   )) %>%
-	mutate(state = factor(state, levels=c("normal", "lesion"))) %>%
-	select(-sample, -dx, state, fit_result, everything()) %>%
+	mutate(classes = factor(classes, levels=c("control", "case"))) %>%
+	select(classes, fit_result, starts_with("Otu")) %>%
   drop_na()
 
 ###################################################################

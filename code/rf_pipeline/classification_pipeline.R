@@ -37,10 +37,25 @@ pipeline <- function(dataset, model){
   cv_aucs <- c()
   # Do the 80-20 data-split
 
-  # Stratified data partitioning %80 training - %20 testing
-  inTraining <- createDataPartition(data$dx, p = .80, list = FALSE)
+  # Stratified data partitioning 80% training - 20% testing
+  inTraining <- createDataPartition(data$classes, p = 0.80, list = FALSE)
+
+
   training <- dataset[ inTraining,]
   testing  <- dataset[-inTraining,]
+
+	# remove columns that have no variance within the training set. These are likely to be all zero
+	# and will not enter into the model
+	zero_variance <- training %>%
+		gather(starts_with("Otu"), key="otu", value="count") %>%
+		group_by(otu) %>%
+		summarize(v=var(count)) %>%
+		filter(v == 0) %>%
+		pull(otu)
+
+	training <- training %>% select(-zero_variance)
+	testing <- testing %>% select(-zero_variance)
+
 
   # Scale all features between 0-1
   preProcValues <- preProcess(training, method = "range")
@@ -55,7 +70,7 @@ pipeline <- function(dataset, model){
 	# Train the model
   if(model=="Random_Forest"){
     print(model)
-    trained_model <-  train(dx ~ .,
+    trained_model <-  train(classes ~ .,
                             data=trainTransformed,
                             method = method,
                             trControl = cv,
@@ -69,7 +84,7 @@ pipeline <- function(dataset, model){
 
 	# Predict on the test set and get predicted probabilities
   rpartProbs <- predict(trained_model, testTransformed, type="prob")
-  test_roc <- roc(ifelse(testTransformed$dx == "cancer", 1, 0),
+  test_roc <- roc(ifelse(testTransformed$classes == "case", 1, 0),
                   rpartProbs[[2]])
   test_auc <- test_roc$auc
 

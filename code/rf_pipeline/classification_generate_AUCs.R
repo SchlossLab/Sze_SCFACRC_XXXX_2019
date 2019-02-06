@@ -24,15 +24,13 @@
 #----------------- Read in necessary libraries -------------------#
 ######################################################################
 
-library(tidyverse)
-
-# deps = c("reshape2", "kernlab","LiblineaR", "doParallel","pROC", "caret", "gtools", "tidyverse", "ggpubr", "ggplot2","vegan");
-# for (dep in deps){
-#   if (dep %in% installed.packages()[,"Package"] == FALSE){
-#     install.packages(as.character(dep), quiet=TRUE);
-#   }
-#   library(dep, verbose=FALSE, character.only=TRUE)
-# }
+deps = c("reshape2", "kernlab","LiblineaR", "doParallel","pROC", "caret", "gtools", "tidyverse", "ggpubr", "ggplot2","vegan");
+for (dep in deps){
+  if (dep %in% installed.packages()[,"Package"] == FALSE){
+    install.packages(as.character(dep), quiet=TRUE);
+  }
+  library(dep, verbose=FALSE, character.only=TRUE)
+}
 
 ######################################################################
 #------------------------- DEFINE FUNCTION -------------------#
@@ -40,6 +38,12 @@ library(tidyverse)
 
 get_AUCs <- function(dataset, models, split_number, path){
   for(ml in models){
+
+		split_number <- case_when(
+			split_number < 10 ~ paste0("00", split_number),
+			split_number < 100 ~ paste0("0", split_number),
+			TRUE ~ as.character(split_number)
+		)
 
     # Save results of the modeling pipeline as a list
     results <- pipeline(dataset, ml)
