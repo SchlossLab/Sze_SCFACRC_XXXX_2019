@@ -25,7 +25,7 @@ seed=$(($PBS_ARRAYID - 1))
 echo Using "Random Forest"
 
 # Using $PBS_ARRAYID to select parameter set
-Rscript code/rf_pipeline/classification_main.R $seed data/rf/fit_otu
+Rscript code/rf_class_otu.R $seed data/rf/lesion_fit
 
 echo "Script complete"
 echo "qsub working directory absolute is"

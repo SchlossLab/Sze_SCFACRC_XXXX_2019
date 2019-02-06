@@ -39,11 +39,11 @@ for (dep in deps){
 get_AUCs <- function(dataset, models, split_number, path){
   for(ml in models){
 
-		split_number <- case_when(
-			split_number < 10 ~ paste0("00", split_number),
-			split_number < 100 ~ paste0("0", split_number),
-			TRUE ~ as.character(split_number)
-		)
+#		split_number <- case_when(
+#			split_number < 10 ~ paste0("00", split_number),
+#			split_number < 100 ~ paste0("0", split_number),
+#			TRUE ~ as.character(split_number)
+#		)
 
     # Save results of the modeling pipeline as a list
     results <- pipeline(dataset, ml)
