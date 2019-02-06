@@ -55,15 +55,22 @@ source('code/rf_pipeline/classification_generate_AUCs.R')
 meta <- read_csv('data/raw/metadata/cross_section.csv', col_types=cols(sample=col_character())) %>%
   select(sample, dx, fit_result)
 
-data <- meta %>%
+# Read in SCFAs spread columns
+scfa <- read_tsv('data/scfa/scfa_composite.tsv', col_types=cols(study_id=col_character())) %>%
+	spread(key=scfa, value=mmol_kg)
+
+# Merge metadata and OTU table.
+# Group advanced adenomas and cancers together as cancer and normal, high risk normal and non-advanced adenomas as normal
+# Then remove the sample ID column
+data <- inner_join(meta, scfa, by=c("sample"="study_id")) %>%
   mutate(classes = case_when(
 		dx == "normal" ~ "control",
     dx == "adenoma" ~ "case",#lesion
-    dx == "cancer" ~ "case",#lesion
-		TRUE ~ "fail"
+		dx == "cancer" ~ "NA",#lesion
+		TRUE ~ "NA"
   )) %>%
 	mutate(classes = factor(classes, levels=c("control", "case"))) %>%
-	select(classes, fit_result) %>%
+	select(classes, fit_result, acetate, butyrate, isobutyrate, propionate) %>%
   drop_na()
 
 ###################################################################

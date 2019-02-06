@@ -55,15 +55,22 @@ source('code/rf_pipeline/classification_generate_AUCs.R')
 meta <- read_csv('data/raw/metadata/cross_section.csv', col_types=cols(sample=col_character())) %>%
   select(sample, dx, fit_result)
 
-data <- meta %>%
+# Read in OTU table and remove label and numOtus columns
+shared <- read_tsv('data/mothur/crc.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.opti_mcc.0.03.subsample.shared', col_types=cols(Group=col_character())) %>%
+  select(-label, -numOtus)
+
+# Merge metadata and OTU table.
+# Group advanced adenomas and cancers together as cancer and normal, high risk normal and non-advanced adenomas as normal
+# Then remove the sample ID column
+data <- inner_join(meta, shared, by=c("sample"="Group")) %>%
   mutate(classes = case_when(
 		dx == "normal" ~ "control",
     dx == "adenoma" ~ "case",#lesion
-    dx == "cancer" ~ "case",#lesion
-		TRUE ~ "fail"
+		dx == "cancer" ~ "NA",#lesion
+		TRUE ~ "NA"
   )) %>%
 	mutate(classes = factor(classes, levels=c("control", "case"))) %>%
-	select(classes, fit_result) %>%
+	select(classes, fit_result, starts_with("Otu")) %>%
   drop_na()
 
 ###################################################################

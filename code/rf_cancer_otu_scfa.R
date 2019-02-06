@@ -55,15 +55,27 @@ source('code/rf_pipeline/classification_generate_AUCs.R')
 meta <- read_csv('data/raw/metadata/cross_section.csv', col_types=cols(sample=col_character())) %>%
   select(sample, dx, fit_result)
 
-data <- meta %>%
+# Read in SCFAs spread columns
+scfa <- read_tsv('data/scfa/scfa_composite.tsv', col_types=cols(study_id=col_character())) %>%
+	spread(key=scfa, value=mmol_kg)
+
+# Read in OTU table and remove label and numOtus columns
+shared <- read_tsv('data/mothur/crc.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.opti_mcc.0.03.subsample.shared', col_types=cols(Group=col_character())) %>%
+  select(-label, -numOtus)
+
+# Merge metadata and OTU table.
+# Group advanced adenomas and cancers together as cancer and normal, high risk normal and non-advanced adenomas as normal
+# Then remove the sample ID column
+data <- inner_join(meta, scfa, by=c("sample"="study_id")) %>%
+	inner_join(., shared, by=c("sample"="Group")) %>%
   mutate(classes = case_when(
 		dx == "normal" ~ "control",
-    dx == "adenoma" ~ "case",#lesion
+		dx == "adenoma" ~ "NA",#lesion
     dx == "cancer" ~ "case",#lesion
-		TRUE ~ "fail"
+		TRUE ~ "NA"
   )) %>%
 	mutate(classes = factor(classes, levels=c("control", "case"))) %>%
-	select(classes, fit_result) %>%
+	select(classes, acetate, butyrate, isobutyrate, propionate, starts_with("Otu")) %>%
   drop_na()
 
 ###################################################################

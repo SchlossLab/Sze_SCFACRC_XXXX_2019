@@ -58,9 +58,9 @@ meta <- read_csv('data/raw/metadata/cross_section.csv', col_types=cols(sample=co
 data <- meta %>%
   mutate(classes = case_when(
 		dx == "normal" ~ "control",
-    dx == "adenoma" ~ "case",#lesion
+		dx == "adenoma" ~ "NA",#lesion
     dx == "cancer" ~ "case",#lesion
-		TRUE ~ "fail"
+		TRUE ~ "NA"
   )) %>%
 	mutate(classes = factor(classes, levels=c("control", "case"))) %>%
 	select(classes, fit_result) %>%

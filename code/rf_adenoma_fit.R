@@ -59,8 +59,8 @@ data <- meta %>%
   mutate(classes = case_when(
 		dx == "normal" ~ "control",
     dx == "adenoma" ~ "case",#lesion
-    dx == "cancer" ~ "case",#lesion
-		TRUE ~ "fail"
+		dx == "cancer" ~ "NA",#lesion
+		TRUE ~ "NA"
   )) %>%
 	mutate(classes = factor(classes, levels=c("control", "case"))) %>%
 	select(classes, fit_result) %>%
