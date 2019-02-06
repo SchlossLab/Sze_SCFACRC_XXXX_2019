@@ -30,7 +30,7 @@
 #------------------------- DEFINE FUNCTION -------------------#
 ######################################################################
 
-tuning_grid <- function(model){
+tuning_grid <- function(model, n_features){
 
   # Cross-validation method
   cv <- trainControl(method="repeatedcv",
@@ -41,10 +41,17 @@ tuning_grid <- function(model){
                      summaryFunction=twoClassSummary,
                      indexFinal=NULL,
                      savePredictions = TRUE)
-										 
+
   # Grid and caret method defined for random forest classification model
   if(model=="Random_Forest"){
-    grid <-  expand.grid(mtry = c(80,500,1000,1500))
+		if(n_features > 1000) {powers <- 5^(0:10)
+		} else if(n_features > 30){powers <- 4^(0:10)
+		} else if(n_features > 15){powers <- 2^(0:10)
+		}	else if(n_features > 7)	{ powers <- seq(1, 15, by=2)
+		} else { powers <- 1:7 }
+
+		powers <- powers[powers <= n_features]
+    grid <-  expand.grid(mtry = powers)
     method = "rf"
   }
   else {

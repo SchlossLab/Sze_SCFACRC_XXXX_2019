@@ -55,7 +55,7 @@ get_AUCs <- function(dataset, models, split_number, path){
     aucs_dataframe <- data.frame(aucs) %>%
       rename(cv_aucs=X1, test_aucs=X2) %>%
       mutate(model=ml) %>%
-      write_csv(file=paste0(path, "/best_hp_results_", ml,"_", split_number, ".csv"))
+      write_csv(path=paste0(path, "/best_hp_results_", ml,"_", split_number, ".csv"))
     # ------------------------------------------------------------------
 
     # ------------------------------------------------------------------
@@ -64,7 +64,7 @@ get_AUCs <- function(dataset, models, split_number, path){
     # Convert to dataframe and add a column noting the model name
     dataframe <- data.frame(all_results) %>%
       mutate(model=ml) %>%
-      write_csv(file=paste0(path, "/all_hp_results_", ml,"_", split_number, ".csv"))
+      write_csv(path=paste0(path, "/all_hp_results_", ml,"_", split_number, ".csv"))
     # ------------------------------------------------------------------
   }
 }
