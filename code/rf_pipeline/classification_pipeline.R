@@ -47,11 +47,11 @@ pipeline <- function(dataset, model){
 	# remove columns that have no variance within the training set. These are likely to be all zero
 	# and will not enter into the model
 	zero_variance <- training %>%
-		gather(starts_with("Otu"), key="otu", value="count") %>%
-		group_by(otu) %>%
-		summarize(v=var(count)) %>%
+		gather(-classes, key="feature", value="value") %>%
+		group_by(feature) %>%
+		summarize(v=var(value)) %>%
 		filter(v == 0) %>%
-		pull(otu)
+		pull(feature)
 
 	training <- training %>% select(-zero_variance)
 	testing <- testing %>% select(-zero_variance)
