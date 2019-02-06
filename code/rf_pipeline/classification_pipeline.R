@@ -63,7 +63,8 @@ pipeline <- function(dataset, model){
   testTransformed <- predict(preProcValues, testing)
 
 	# Define hyper-parameter tuning grid and the training method
-	tuning <- tuning_grid(model, ncol(training))
+	n_features <- ncol(training) - 1
+	tuning <- tuning_grid(model, n_features)
   grid <- tuning[[1]]
   method <- tuning[[2]]
   cv <- tuning[[3]]
