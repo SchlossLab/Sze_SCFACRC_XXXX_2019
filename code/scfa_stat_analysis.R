@@ -1,11 +1,7 @@
 library(tidyverse)
 library(broom)
 
-scfa <- read_tsv("data/scfa/scfa_composite.tsv") %>%
-				group_by(study_id, scfa) %>% # there are duplicate readings, average to get a single read
-				summarize(mmol_kg = mean(mmol_kg)) %>%
-				ungroup()
-
+scfa <- read_tsv("data/scfa/scfa_composite.tsv",  col_type = cols(study_id = col_character()))
 
 #cross section analysis
 get_mean_dx <- function(x){

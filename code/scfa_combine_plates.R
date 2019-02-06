@@ -48,4 +48,7 @@ sapply(scfas,
            read_in_data(x, plates = plates, path = path) %>%
            bind_rows(), simplify = F) %>%
 			bind_rows() %>%
+			group_by(study_id, scfa) %>%
+			summarize(mmol_kg = mean(mmol_kg)) %>%
+			ungroup() %>%
 			write_tsv("data/scfa/scfa_composite.tsv")
