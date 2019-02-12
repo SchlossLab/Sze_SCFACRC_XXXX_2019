@@ -168,6 +168,17 @@ get_data <- function(path) {
 		 inner_join(data, ., by=c("sample"="Group"))
 	}
 
+	tax_levels <- c("kingdom", "phylum", "class", "order", "family", "genus")
+	if(any(feature_sources %in% tax_levels)){
+		taxon <- feature_sources[which(feature_sources %in% tax_levels)]
+		shared_taxon <- paste0('data/mothur/', taxon, ".shared")
+
+		data <- read_tsv(shared_taxon, col_types=cols(Group=col_character())) %>%
+			select(-label, -numOtus) %>%
+			inner_join(data, ., by=c("sample"="Group"))
+	}
+
+
 	if(classify %in% c("adenoma", "cancer")){
 		data <- data %>%
 			mutate(classes = case_when(

@@ -120,15 +120,15 @@ get_data <- function(path){
 
 
 	# Read in metadata
-	meta <- read_csv('data/raw/metadata/cross_section.csv',
-									col_types=cols(sample=col_character())) %>%
-	  select(sample, dx, fit_result)
+	data <- read_csv('data/raw/metadata/cross_section.csv',
+									col_types=cols(sample=col_character()))
 
-	# Read in SCFAs spread columns
-	scfa <- read_tsv('data/scfa/scfa_composite.tsv', col_types=cols(study_id=col_character())) %>%
-		spread(key=scfa, value=mmol_kg)
+	if("fit" %in% feature_sources){
+		data <- data %>% select(sample, fit_result)
+	} else {
+		data <- data %>% select(sample)
+	}
 
-	data <- inner_join(meta, scfa, by=c("sample"="study_id"))
 
 	if("otu" %in% feature_sources){
 	# Read in OTU table and remove label and numOtus columns
@@ -137,17 +137,24 @@ get_data <- function(path){
 			inner_join(data,., by=c("sample"="Group"))
 	}
 
-	if(setequal(feature_sources, c("otu", "fit"))){
-		data <- data %>% select(target_scfa, fit_result, starts_with("Otu"))
-	} else if(setequal(feature_sources, "fit")){
-		data <- data %>% select(target_scfa, fit_result)
-	} else if(setequal(feature_sources, "otu")){
-		data <- data %>% select(target_scfa, starts_with("Otu"))
+	tax_levels <- c("kingdom", "phylum", "class", "order", "family", "genus")
+	if(any(feature_sources %in% tax_levels)){
+		taxon <- feature_sources[which(feature_sources %in% tax_levels)]
+		shared_taxon <- paste0('data/mothur/', taxon, ".shared")
+
+		data <- read_tsv(shared_taxon, col_types=cols(Group=col_character())) %>%
+			select(-label, -numOtus) %>%
+			inner_join(data, ., by=c("sample"="Group"))
 	}
 
-	data %>%
+	# Read in SCFAs spread columns
+	read_tsv('data/scfa/scfa_composite.tsv', col_types=cols(study_id=col_character())) %>%
+		spread(key=scfa, value=mmol_kg) %>%
+		select(study_id, target_scfa) %>%
+		inner_join(., data, by=c("study_id" = "sample")) %>%
 		rename(regress = target_scfa) %>%
-	  drop_na()
+		drop_na() %>%
+		select(-study_id)
 }
 
 ######################## RUN PIPELINE #############################
