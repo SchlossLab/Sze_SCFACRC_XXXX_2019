@@ -91,10 +91,10 @@ mkdir -p $WORKDIR/mmseq2/result
 mmseqs createdb $WORKDIR/all_contigs.aa.fasta $WORKDIR/mmseq2/target_DB
 
 ## Create index
-mmseqs createindex $WORKDIR/mmseq2/target_DB $WORKDIR/mmseq2/tmp
+mmseqs createindex $WORKDIR/mmseq2/target_DB $WORKDIR/mmseq2/temp
 
 ## Cluster the target DB
-mmseqs cluster $WORKDIR/mmseq2/target_DB $WORKDIR/mmseq2/target_clu $WORKDIR/mmseq2/tmp -e 0.001 --min-seq-id 0.4
+mmseqs cluster $WORKDIR/mmseq2/target_DB $WORKDIR/mmseq2/target_clu $WORKDIR/mmseq2/temp -e 0.001 --min-seq-id 0.4
 
 ## Create a target clustered sequence file
 mmseqs createseqfiledb $WORKDIR/mmseq2/target_DB $WORKDIR/mmseq2/target_clu $WORKDIR/mmseq2/clu_seq
@@ -108,17 +108,15 @@ mmseqs createtsv $WORKDIR/mmseq2/target_DB $WORKDIR/mmseq2/target_DB $WORKDIR/mm
 #result2repseq ???
 
 
-# Reference based-clustering
+# Get annotation for ORFs - Marc had the databases switched, which doesn't make sense to me - PDS
 ## Set up query DB
 mmseqs createdb data/references/genes.pep.format.fasta $WORKDIR/mmseq2/query_DB
 
 ## Create alignment
-mmseqs search $WORKDIR/mmseq2/query_DB $WORKDIR/mmseq2/target_DB $WORKDIR/mmseq2/resultDB $WORKDIR/mmseq2/tmp
+mmseqs search $WORKDIR/mmseq2/target_DB $WORKDIR/mmseq2/query_DB $WORKDIR/mmseq2/resultDB $WORKDIR/mmseq2/temp --max-seqs 50 --min-seq-id 0.4
 
 ## Create BLAST formatted file of Result DB (tsv based file)
-mmseqs convertalis $WORKDIR/mmseq2/query_DB $WORKDIR/mmseq2/target_DB $WORKDIR/mmseq2/resultDB $WORKDIR/mmseq2/resultDB.m8
-
-# cp $WORKDIR/mmseq2/resultDB.m8 data/process/orf_gene_alignment.tsv
+mmseqs convertalis $WORKDIR/mmseq2/target_DB $WORKDIR/mmseq2/query_DB $WORKDIR/mmseq2/resultDB $WORKDIR/mmseq2/resultDB.m8
 
 
 
