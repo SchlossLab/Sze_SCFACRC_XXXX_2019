@@ -154,4 +154,4 @@ done
 
 
 #synthesize to make shared file
-Rscript code/metagenomics_get_shared.R $WORKDIR/mmseq2/clu.tsv $WORKDIR/diamond/orf_abund.tsv
+Rscript code/metagenomics_get_shared.R
