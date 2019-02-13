@@ -25,5 +25,28 @@ orf_count_data <- read_tsv(orf_filename, col_names=c("count", "seq_name", "sampl
 combined_data <- inner_join(orf_count_data, opf_clusters, by = "seq_name") %>%
   group_by(sample_id, opf_cluster) %>%
   summarise(total_counts = sum(count)) %>%
-	ungroup() %>%
+	ungroup()
+
+#	combined_data %>% group_by(sample_id) %>% summarize(N=sum(total_counts)) %>% arrange(N)
+#	combined_data %>% group_by(sample_id) %>% summarize(N=sum(total_counts)) %>% arrange(desc(N))
+#	These commands show ~10-fold difference in the number of OPFs across the 85 samples. Will
+# remove samples with fewer than 300,000 hits to OPFs and will subsample to that many hits/reads
+
+subsample <- function(n, df){
+	unroll <- rep(df$opf_cluster, df$total_counts)
+	sample(unroll, n) %>% table() %>% as_tibble(.name_repair=function(x){c("opf", "count")})
+}
+
+min_hits <- 300000
+
+combined_data %>%
+	group_by(sample_id) %>%
+	summarize(hits = sum(total_counts)) %>%
+	filter(hits > min_hits) %>%
+	select(sample_id) %>%
+	inner_join(., combined_data, by="sample_id") %>%
+	group_by(sample_id) %>%
+	nest() %>%
+	mutate(sub = map(data, ~subsample(min_hits, .x))) %>%
+	unnest(sub) %>%
 	write_tsv("data/metagenome/opf.tidy_shared.tsv")
