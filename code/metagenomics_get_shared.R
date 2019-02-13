@@ -52,7 +52,7 @@ annotated_reads <- left_join(opf_clusters, kegg_data, by="seq_name") %>%
 	mutate(annotation = map(data, ~get_consensus(.x))) %>%
 	unnest(annotation) %>%
 	select(opf_cluster, k) %>%
-	write_tsv("data/metagenome/opf_k.annotations.tsv")
+	write_tsv("data/metagenome/metag.ko_lookup.tsv")
 
 
 # Create a tidy OPF abundance table
@@ -84,5 +84,27 @@ subsampled_data <- combined_data %>%
 	mutate(sub = map(data, ~subsample(min_hits, .x))) %>%
 	unnest(sub) %>%
 	inner_join(., annotated_reads, by=c("opf"="opf_cluster")) %>%
-	select(sample_id, opf, k, count) %>%
-	write_tsv("data/metagenome/opf_k.tidy_shared.tsv")
+	select(sample_id, opf, k, count)
+
+
+#output opf shared file
+opf_shared <- subsampled_data %>%
+	select(-k) %>%
+	spread(opf, count, fill=0) %>%
+	mutate(label="opf", numOtus=ncol(.)-1) %>%
+	select(label, sample_id, numOtus, everything()) %>%
+	rename(Group = sample_id) %>%
+	write_tsv("data/metagenome/metag.opf.shared")
+
+
+#output kegg shared file
+kegg_shared <- subsampled_data %>%
+	select(-opf) %>%
+	group_by(sample_id, k) %>%
+	summarize(count = sum(count)) %>%
+	ungroup() %>%
+	spread(k, count, fill=0) %>%
+	mutate(label="kegg", numOtus=ncol(.)-1) %>%
+	select(label, sample_id, numOtus, everything()) %>%
+	rename(Group = sample_id) %>%
+	write_tsv("data/metagenome/metag.kegg.shared")

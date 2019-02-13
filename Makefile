@@ -128,8 +128,8 @@ data/picrust2/crc.metagenomes.tsv : data/asv/crc.asv.shared data/asv/crc.asv.fas
 	bash code/picrust2.sh
 
 
-# Create the opf shared file
-data/metagenome/opf_k.%.tsv : data/references/genes.pep.format.fasta\
+# Create the opf and kegg shared file
+data/metagenome/metag.*.shared data/metagenome/metag.ko_lookup.tsv : $(REFS)/genes.pep.format.fasta\
 																			code/metagenomics.sh\
 																			code/metagenomics_get_shared.R
 	bash code/metagenomics.sh
