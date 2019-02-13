@@ -56,7 +56,7 @@ $(REFS)/trainset16_022016.% :
 	rm Trainset16_022016.pds.tgz
 
 
-# Grab greengenes reference files for picrust - used old version because mappings are available
+# Grab greengenes reference files for picrust1 - used old version because mappings are available
 $(REFS)/97_otu_map.txt $(REFS)/gg_13_5_99.gg.fasta $(REFS)/gg_13_5_99.gg.tax  :
 	wget -N http://www.mothur.org/w/images/b/be/GG_13_5_otuMapTable.zip
 	unzip GG_13_5_otuMapTable.zip
@@ -90,23 +90,42 @@ data/scfa/scfa_composite.tsv : $(PLATE_FILES) data/raw/metadata/scfa_plate_metad
 
 
 # Download files from SRA, run mothur pipeline
-$(MOTHUR)/crc.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.opti_mcc.0.03.subsample.shared $(MOTHUR)/crc.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.opti_mcc.0.03.cons_gg.taxonomy $(MOTHUR)/crc.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.opti_mcc.0.03.cons_rdp.taxonomy :	code/mothur.batch\
+$(MOTHUR)/crc.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.opti_mcc.0.03.subsample.shared $(MOTHUR)/crc.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.opti_mcc.0.03.cons_gg.taxonomy $(MOTHUR)/crc.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.opti_mcc.0.03.cons_rdp.taxonomy $(MOTHUR)/crc.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.fasta $(MOTHUR)/crc.trim.contigs.good.unique.good.filter.unique.precluster.denovo.uchime.pick.pick.pick.count_table $(MOTHUR)/crc.trim.contigs.good.unique.good.filter.unique.precluster.pick.pds.wang.pick.pick.taxonomy :	code/mothur.sh\
 				data/references/silva.v4.align\
 				data/references/trainset16_022016.pds.fasta\
 				data/references/trainset16_022016.pds.tax\
 				data/references/gg_13_5_99.gg.fasta\
 				data/references/gg_13_5_99.gg.tax
-	bash code/mothur.batch
+	bash code/mothur.sh
 
 
-# Run the picrust prediction algorithm on the gg generated file
-data/picrust/crc.metagenomes.tsv data/picrust/crc.metadata : code/picrust.sh\
-		code/picrust_align_metadata.R\
+
+# Pool OTUs into phylotypes
+data/phylotype/crc.%.shared data/phylotype/crc.%.taxonomy :\
+		$(MOTHUR)/crc.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.opti_mcc.0.03.cons_rdp.taxonomy\
+		$(MOTHUR)/crc.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.opti_mcc.0.03.subsample.shared
+	code/phylotype.R $*
+
+
+# Output a shared, taxonomy, and count file based on screened preclustered sequences in mothur
+# pipeline
+data/asv/crc.asv.% : $(MOTHUR)/crc.trim.contigs.good.unique.good.filter.unique.precluster.denovo.uchime.pick.pick.pick.count_table\
+			$(MOTHUR)/crc.trim.contigs.good.unique.good.filter.unique.precluster.pick.pds.wang.pick.pick.taxonomy\
+			code/asv.sh
+	bash code/asv.sh
+
+
+# Run the picrust1 prediction algorithm on the gg generated file
+data/picrust1/crc.metagenomes.tsv : code/picrust1.sh\
+		code/picrust1_clean_tax.R\
 		$(MOTHUR)/crc.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.opti_mcc.0.03.subsample.shared\
-		$(MOTHUR)/crc.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.opti_mcc.0.03.cons_gg.taxonomy\
-		data/raw/metadata/cross_section.csv\
-		data/raw/metadata/follow_up.csv
-	bash code/run_picrust.sh
+		$(MOTHUR)/crc.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.opti_mcc.0.03.cons_gg.taxonomy
+	bash code/picrust1.sh
+
+
+# Run the picrust2 prediction algorithm on the gg generated file
+data/picrust2/crc.metagenomes.tsv : data/asv/crc.asv.shared data/asv/crc.asv.fasta code/picrust2.sh
+	bash code/picrust2.sh
 
 
 # Create the opf shared file
@@ -148,127 +167,12 @@ $(PROC)/scfa_cross_section_stats.tsv $(PROC)/scfa_pre_post_stats.tsv : \
 
 
 
-# Run the random forest analysis for combined Adenoma classifications
-$(TABLES)/adn_full_eighty_twenty_splits.csv\
-$(TABLES)/adn_full_test_data.csv\
-$(TABLES)/adn_full_AUC_model_summary.csv\
-$(TABLES)/adn_full_raw_mda_values.csv\
-$(TABLES)/adn_full_MDA_Summary.csv : $(PROC)/final.0.03.subsample.shared\
-		$(RAW)/metadata/metaI_final.csv $(RAW)/good_metaf_final.csv $(FINAL_SCFA_DATA)\
-		code/Run_full_adn_RF_data_setup.R code/Run_full_adn_RF_reference.R\
-		code/Run_aggregate_full_adn_model.R
-	Rscript code/Run_full_adn_RF_data_setup.R
-	for ((i=1;i<=100;i++));
-	do
-		Rscript code/Run_full_adn_RF_reference.R $i
-	done
-	Rscript code/Run_aggregate_full_adn_model.R
-
-
-# Run the random forest analysis for combined Carcinoma classifications
-$(TABLES)/crc_full_eighty_twenty_splits.csv\
-$(TABLES)/crc_full_test_data.csv\
-$(TABLES)/crc_full_AUC_model_summary.csv\
-$(TABLES)/crc_full_raw_mda_values.csv\
-$(TABLES)/crc_full_MDA_Summary.csv : $(PROC)/final.0.03.subsample.shared\
-		$(RAW)/metadata/metaI_final.csv $(RAW)/good_metaf_final.csv $(FINAL_SCFA_DATA)\
-		code/Run_full_crc_RF_data_setup.R code/Run_full_crc_RF_reference.R\
-		code/Run_aggregate_full_crc_model.R
-	Rscript code/Run_full_crc_RF_data_setup.R
-	for ((i=1;i<=100;i++));
-	do
-		Rscript code/Run_full_crc_RF_reference.R $i
-	done
-	Rscript code/Run_aggregate_full_crc_model.R
 
 
 
-# Run the random forest analysis for OTU only Adenoma classifications
-$(TABLES)/adn_OTU_only_eighty_twenty_splits.csv\
-$(TABLES)/adn_OTU_only_full_test_data.csv\
-$(TABLES)/adn_otu_only_AUC_model_summary.csv\
-$(TABLES)/adn_otu_only_raw_mda_values.csv\
-$(TABLES)/adn_otu_only_MDA_Summary.csv : $(PROC)/final.0.03.subsample.shared\
-		$(RAW)/metadata/metaI_final.csv $(RAW)/good_metaf_final.csv $(FINAL_SCFA_DATA)\
-		code/Run_OTU_only_adn_RF_data_setup.R code/Run_OTU_only_adn_RF_reference.R\
-		code/Run_aggregate_otu_only_adn_model.R
-	Rscript code/Run_OTU_only_adn_RF_data_setup.R
-	for ((i=1;i<=100;i++));
-	do
-		Rscript code/Run_OTU_only_adn_RF_reference.R $i
-	done
-	Rscript code/Run_aggregate_otu_only_adn_model.R
 
 
-# Run the random forest analysis for OTU only Carcinoma classifications
-$(TABLES)/crc_OTU_only_eighty_twenty_splits.csv\
-$(TABLES)/crc_OTU_only_test_data.csv\
-$(TABLES)/crc_otu_only_AUC_model_summary.csv\
-$(TABLES)/crc_otu_only_raw_mda_values.csv\
-$(TABLES)/crc_otu_only_MDA_Summary.csv : $(PROC)/final.0.03.subsample.shared\
-		$(RAW)/metadata/metaI_final.csv $(RAW)/good_metaf_final.csv $(FINAL_SCFA_DATA)\
-		code/Run_OTU_only_crc_RF_data_setup.R code/Run_OTU_only_crc_RF_reference.R\
-		code/Run_aggregate_otu_only_crc_model.R
-	Rscript code/Run_OTU_only_crc_RF_data_setup.R
-	for ((i=1;i<=100;i++));
-	do
-		Rscript code/Run_OTU_only_crc_RF_reference.R $i
-	done
-	Rscript code/Run_aggregate_otu_only_crc_model.R
 
-# Run the AUC model analysis
-$(TABLES)/rf_model_ttest_comparisons.csv : $(TABLES)/adn_full_AUC_model_summary.csv\
-		$(TABLES)/crc_full_AUC_model_summary.csv\
-		$(TABLES)/adn_otu_only_AUC_model_summary.csv\
-		$(TABLES)/crc_otu_only_AUC_model_summary.csv code/Run_rf_model_analysis.R
-	Rscript code/Run_rf_model_analysis.R
-
-# Run the PICRUSt analysis
-$(PROC)/picrust_metadata\
-$(TABLES)/specific_scfa_kruskal_picrust_summary.csv\
-$(TABLES)/selected_scfa_gene_data.csv\
-$(TABLES)/specific_scfa_wilcox_picrust_treatment_summary.csv\
-$(TABLES)/selected_scfa_treatment_picrust_gene_data.csv : $(RAW)/metadata/metaI_final.csv\
-		$(RAW)/metadata/good_metaf_final.csv $(PROC)/final.shared\
-		$(PROC)/predicted_metagenomes.biom\
-		code/align_metadata_picrust.R code/run_targeted_scfa_picrust.R
-	Rscript code/align_metadata_picrust.R
-	Rscript code/run_targeted_scfa_picrust.R
-
-
-# Run RF model classifications of SCFA high/low and regression of SCFA concentrations
-SCFA_RF_C_DATA = $(foreach S, $(SCFA), $(TABLES)/$(S)_classification_RF_summary.csv)
-SCFA_RF_C_IMP = $(foreach S, $(SCFA), $(TABLES)/$(S)_imp_otus_classification_RF_summary.csv)
-SCFA_RF_C_TRAIN = $(foreach S, $(SCFA), $(TABLES)/$(S)_classification_RF_train_probs_summary.csv)
-SCFA_RF_C_TEST = $(foreach S, $(SCFA), $(TABLES)/$(S)_classification_RF_test_probs_summary.csv)
-
-SCFA_RF_R_DATA = $(foreach S, $(SCFA), $(TABLES)/$(S)_regression_RF_summary.csv)
-SCFA_RF_R_IMP = $(foreach S, $(SCFA), $(TABLES)/$(S)_imp_otus_regression_RF_summary.csv)
-SCFA_RF_R_TRAIN = $(foreach S, $(SCFA), $(TABLES)/$(S)_regression_RF_train_conc_summary.csv)
-SCFA_RF_R_TEST = $(foreach S, $(SCFA), $(TABLES)/$(S)_regression_RF_test_conc_summary.csv)
-
-SCFA_RF_LR_DATA = $(foreach S, $(SCFA), $(TABLES)/log_$(S)_regression_RF_summary.csv)
-SCFA_RF_LR_IMP = $(foreach S, $(SCFA), $(TABLES)/log_$(S)_imp_otus_regression_RF_summary.csv)
-SCFA_RF_LR_TRAIN = $(foreach S, $(SCFA), $(TABLES)/log_$(S)_regression_RF_train_conc_summary.csv)
-SCFA_RF_LR_TEST = $(foreach S, $(SCFA), $(TABLES)/log_$(S)_regression_RF_test_conc_summary.csv)
-
-
-$(SCFA_RF_C_DATA) $(SCFA_RF_C_IMP) $(SCFA_RF_C_TRAIN) $(SCFA_RF_C_TEST)\
-$(SCFA_RF_R_DATA) $(SCFA_RF_R_IMP) $(SCFA_RF_R_TRAIN) $(SCFA_RF_R_TEST)\
-$(SCFA_RF_LR_DATA) $(SCFA_RF_LR_IMP)\
-$(SCFA_RF_LR_TRAIN)\
-$(SCFA_RF_LR_TEST) : $(PROC)/picrust_metadata $(RAW)/metadata/good_metaf_final.csv\
-		$(PROC)/final.0.03.subsample.shared $(FINAL_SCFA_DATA)\
-		code/run_rf_scfa_predictions.R
-	Rscript code/run_rf_scfa_predictions.R
-
-
-# Aggregate and run the analysis on the RF models
-$(TABLES)/full_model_class_group_results.csv\
-$(TABLES)/full_model_reg_group_results.csv : $(SCFA_RF_C_TRAIN) $(SCFA_RF_C_TEST)\
-		$(SCFA_RF_R_TRAIN) $(SCFA_RF_R_TEST) $(SCFA_RF_LR_TRAIN) $(SCFA_RF_LR_TEST)\
-		code/run_aggregate_summarize_rf.R
-	Rscript code/run_aggregate_summarize_rf.R
 
 
 # Get significant correlations with high/low SCFAs or concentration SCFA
