@@ -78,6 +78,7 @@ $(REFS)/97_otu_map.txt $(REFS)/gg_13_5_99.gg.fasta $(REFS)/gg_13_5_99.gg.tax  :
 #
 ################################################################################
 
+# Targets build correctly
 # Process the SCFA data
 PLATES = plate1 plate2 plate3 plate4 plate5 plate6 plate7 plate8
 SCFA = acetate butyrate isobutyrate propionate
@@ -89,7 +90,9 @@ data/scfa/scfa_composite.tsv : $(PLATE_FILES) data/raw/metadata/scfa_plate_metad
 	Rscript code/scfa_combine_plates.R
 
 
-# Download files from SRA, run mothur pipeline
+# Targets build correctly
+# Download files from SRA, run mothur pipeline to generate files for ASV, phylotype, and OTU-based
+# analyses as well as for picrust
 $(MOTHUR)/crc.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.opti_mcc.0.03.subsample.shared $(MOTHUR)/crc.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.opti_mcc.0.03.cons_gg.taxonomy $(MOTHUR)/crc.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.opti_mcc.0.03.cons_rdp.taxonomy $(MOTHUR)/crc.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.fasta $(MOTHUR)/crc.trim.contigs.good.unique.good.filter.unique.precluster.denovo.uchime.pick.pick.pick.count_table $(MOTHUR)/crc.trim.contigs.good.unique.good.filter.unique.precluster.pick.pds.wang.pick.pick.taxonomy :	code/mothur.sh\
 				data/references/silva.v4.align\
 				data/references/trainset16_022016.pds.fasta\
@@ -99,15 +102,16 @@ $(MOTHUR)/crc.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.p
 	bash code/mothur.sh
 
 
-
+# Targets build correctly
 # Pool OTUs into phylotypes
 data/phylotype/crc.%.shared data/phylotype/crc.%.taxonomy :\
 		$(MOTHUR)/crc.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.opti_mcc.0.03.cons_rdp.taxonomy\
 		$(MOTHUR)/crc.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.opti_mcc.0.03.subsample.shared
-	code/phylotype.R $*
+	Rscript code/phylotype.R $*
 
 
-# Output a shared, taxonomy, and count file based on screened preclustered sequences in mothur
+# Targets build correctly
+# Output a shared and taxonomy, and fasta file based on screened preclustered sequences in mothur
 # pipeline
 data/asv/crc.asv.% : $(MOTHUR)/crc.trim.contigs.good.unique.good.filter.unique.precluster.denovo.uchime.pick.pick.pick.count_table\
 			$(MOTHUR)/crc.trim.contigs.good.unique.good.filter.unique.precluster.pick.pds.wang.pick.pick.taxonomy\
@@ -115,9 +119,10 @@ data/asv/crc.asv.% : $(MOTHUR)/crc.trim.contigs.good.unique.good.filter.unique.p
 	bash code/asv.sh
 
 
+# Targets build correctly
 # Run the picrust1 prediction algorithm on the gg generated file
-data/picrust1/crc.metagenomes.tsv : code/picrust1.sh\
-		code/picrust1_clean_tax.R\
+data/picrust1/crc.picrust1.% : code/picrust1.sh\
+		code/picrust1_utilities.R\
 		$(MOTHUR)/crc.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.opti_mcc.0.03.subsample.shared\
 		$(MOTHUR)/crc.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.opti_mcc.0.03.cons_gg.taxonomy
 	bash code/picrust1.sh
@@ -128,8 +133,11 @@ data/picrust2/crc.metagenomes.tsv : data/asv/crc.asv.shared data/asv/crc.asv.fas
 	bash code/picrust2.sh
 
 
+# Targets building
 # Create the opf and kegg shared file
-data/metagenome/metag.*.shared data/metagenome/metag.ko_lookup.tsv : $(REFS)/genes.pep.format.fasta\
+# * can be opf or kegg
+MGSHARED = data/metagenome/metag.opf.shared data/metagenome/metag.kegg.shared
+$(MGSHARED) data/metagenome/metag.ko_lookup.tsv : $(REFS)/genes.pep.format.fasta\
 																			code/metagenomics.sh\
 																			code/metagenomics_get_shared.R
 	bash code/metagenomics.sh
@@ -167,29 +175,6 @@ $(PROC)/scfa_cross_section_stats.tsv $(PROC)/scfa_pre_post_stats.tsv : \
 
 
 
-
-
-
-
-
-
-
-
-# Get significant correlations with high/low SCFAs or concentration SCFA
-$(TABLES)/significant_class_otu_comp_summary.csv\
-$(TABLES)/significant_reg_otu_comp_summary.csv : $(PROC)/final.taxonomy\
-		$(PROC)/picrust_metadata $(RAW)/metadata/good_metaf_final.csv\
-		$(PROC)/final.0.03.subsample.shared $(FINAL_SCFA_DATA)\
-		code/run_id_sig_changes_by_group_and_scfa.R
-	Rscript code/run_id_sig_changes_by_group_and_scfa.R
-
-
-# Run a comparision of significantly correlated OTUs and those in RF models
-$(TABLES)/sig_association_and_RF_top10.csv : $(TABLES)/significant_reg_otu_comp_summary.csv\
-		$(PROC)/final.taxonomy $(TABLES)/adn_full_MDA_Summary.csv\
-		$(TABLES)/crc_full_MDA_Summary.csv $(TABLES)/adn_otu_only_MDA_Summary.csv\
-		$(TABLES)/crc_otu_only_MDA_Summary.csv code/run_rf_sig_reg_comparison.R
-	Rscript code/run_rf_sig_reg_comparison.R
 
 
 ################################################################################
