@@ -5,13 +5,15 @@ module load sickle/1.33.6
 module load megahit/1.0.6
 module load prodigal/2.6.3
 module load diamond/0.8.34
-
+module load R/3.5.1
 
 #Set local variables
 RAWDIR=data/raw/metagenome
+rm -rf $RAWDIR
 mkdir -p $RAWDIR
 
 WORKDIR=data/metagenome
+rm -rf $WORKDIR
 mkdir -p $WORKDIR
 
 
@@ -22,8 +24,11 @@ wget -O $RAWDIR/SRP108915_info.csv 'http://trace.ncbi.nlm.nih.gov/Traces/sra/sra
 URLS=`cut -f 10 -d , $RAWDIR/SRP108915_info.csv | grep "http"`
 for sample in $URLS
 do
-	fastq-dump --split-3 $sample -O $RAWDIR
 	echo $sample
+	SRR=`echo $sample | sed -e "s_.*/__"`
+	wget -O $RAWDIR/$SRR $sample
+	fastq-dump --split-3 $RAWDIR/$SRR -O $RAWDIR
+	rm $RAWDIR/$SRR $RAWDIR/${SRR}.fastq
 done
 
 #Extract the list of SRR files
