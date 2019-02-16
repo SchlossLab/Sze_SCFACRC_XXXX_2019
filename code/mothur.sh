@@ -5,29 +5,37 @@ module load sratoolkit/2.8.2-1
 
 #Set local variables
 # mothurRv=/nfs/turbo/schloss-lab/bin/mothur_src/mothur
-mkdir data/raw/16S
-DOWNDIR=data/raw/16S
+RAWDIR=data/raw/16S
+rm -rf $RAWDIR
+mkdir -p $RAWDIR
+
 WORKDIR=data/mothur
+rm -rf $WORKDIR
+mkdir -p $WORKDIR
+
 REF=data/references
 
 #Get list of files to download
-wget -O $DOWNDIR/SRP062005_info.csv 'http://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?save=efetch&db=sra&rettype=runinfo&term=SRP062005'
+wget -O $RAWDIR/SRP062005_info.csv 'http://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?save=efetch&db=sra&rettype=runinfo&term=SRP062005'
 
-wget -O $DOWNDIR/SRP096978_info.csv 'http://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?save=efetch&db=sra&rettype=runinfo&term=SRP096978'
+wget -O $RAWDIR/SRP096978_info.csv 'http://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?save=efetch&db=sra&rettype=runinfo&term=SRP096978'
 
 #Split sra files into fastq files
-URLS=`cut -f 10 -d , $DOWNDIR/*_info.csv | grep "http"`
+URLS=`cut -f 10 -d , $RAWDIR/*_info.csv | grep "http"`
 for sample in $URLS
 do
-	fastq-dump --split-files $sample -O $DOWNDIR
 	echo $sample
+	SRR=`echo $sample | sed -e "s_.*/__"`
+	wget -O $RAWDIR/$SRR $sample
+	fastq-dump --split-files $RAWDIR/$SRR -O $RAWDIR
+	rm $RAWDIR/$SRR
 done
 
 # make files file
-cut -d , -f 1,12 data/raw/16S/SRP0* | grep "SRR" | sed -E "s/(^SRR.*),([^_]*)_.*/\2\t\\1_1.fastq\t\\1_2.fastq/" > $DOWNDIR/crc.files
+cut -d , -f 1,12 data/raw/16S/SRP0* | grep "SRR" | sed -E "s/(^SRR.*),([^_]*)_.*/\2\t\\1_1.fastq\t\\1_2.fastq/" > $RAWDIR/crc.files
 
 #Run mothur process
-mothur "#make.contigs(file=crc.files, inputdir=$DOWNDIR/16S, outputdir=$WORKDIR, processors=12);
+mothur "#make.contigs(file=crc.files, inputdir=$RAWDIR, outputdir=$WORKDIR, processors=12);
 	screen.seqs(fasta=current, group=current, maxambig=0, maxlength=275);
 	unique.seqs(fasta=current);
 	count.seqs(name=current, group=current);
@@ -45,7 +53,7 @@ mothur "#make.contigs(file=crc.files, inputdir=$DOWNDIR/16S, outputdir=$WORKDIR,
 	make.shared(list=current, count=current, label=0.03);
 	sub.sample(shared=current);
 	classify.otu(list=current, count=current, taxonomy=current, label=0.03);
-	system(mv data/mothur/crc.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.opti_mcc.0.03.cons.taxonomy data/mothur/crc.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.opti_mcc.0.03.cons_rdp.taxonomy)
+	system(mv data/mothur/crc.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.opti_mcc.0.03.cons.taxonomy data/mothur/crc.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.opti_mcc.0.03.cons_rdp.taxonomy);
 	classify.seqs(fasta=current, count=current, reference=$REF/gg_13_5_99.gg.fasta, taxonomy=$REF/gg_13_5_99.gg.tax, cutoff=80);
 	classify.otu(list=current, count=current, taxonomy=current, label=0.03);
 	system(mv data/mothur/crc.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.opti_mcc.0.03.cons.taxonomy data/mothur/crc.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.opti_mcc.0.03.cons_gg.taxonomy)"
