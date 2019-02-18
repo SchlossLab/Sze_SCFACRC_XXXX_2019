@@ -1,16 +1,21 @@
+THREADS=12
+
 WORKDIR=data/picrust2
+rm -rf $WORKDIR
 mkdir -p $WORKDIR
 
 #dependencies
-FASTA=data/asv/crc.asv.fasta
-SHARED=data/asv/crc.asv.shared
-
+FASTA=$WORKDIR/crc.asv.fasta
 BIOM=$WORKDIR/crc.asv.biom
 
+R -e "source('code/picrust2_utilities.R'); sort_and_unalign_sequences()"
 
-mothur "#make.biom(shared=$SHARED, outputdir=$WORKDIR)"
+mothur "#make.biom(shared=data/asv/crc.asv.shared, outputdir=$WORKDIR)"
 
 mv $WORKDIR/crc.asv.ASV.biom $BIOM
+
+
+source activate picrust2
 
 # Comments on whether this is an acceptable biom format
 biom validate-table -i $BIOM
@@ -18,11 +23,19 @@ biom validate-table -i $BIOM
 # Convert to an acceptable biom format for picrust
 # http://biom-format.org/documentation/biom_conversion.html
 biom convert -i $BIOM -o $WORKDIR/temp_OTU_table.txt --table-type="OTU table" --to-tsv
-biom convert -i $WORKDIR/temp_OTU_table.txt -o $BIOM.json --table-type="OTU table" --to-json
-biom convert -i $WORKDIR/temp_OTU_table.txt -o $BIOM.hdf5 --table-type="OTU table" --to-hdf5
+biom convert -i $WORKDIR/temp_OTU_table.txt -o $BIOM --table-type="OTU table" --to-hdf5
 
-# Double check that it is now the right format
-biom validate-table -i $BIOM.json
-biom validate-table -i $BIOM.hdf5
+# Double check that it is now the correct format
+biom validate-table -i $BIOM
 
 rm $WORKDIR/temp_OTU_table.txt
+
+picrust2_pipeline.py -s $FASTA -i $BIOM -o $WORKDIR/output --threads $THREADS
+
+source deactivate
+
+PC_OUTPUT=$WORKDIR/output
+
+R -e "source('code/picrust2_utilities.R');convert_tsv_to_shared('$PC_OUTPUT/pathways_out/path_abun_unstrat.tsv')"
+R -e "source('code/picrust2_utilities.R');convert_tsv_to_shared('$PC_OUTPUT/KO_metagenome_out/pred_metagenome_unstrat.tsv')"
+R -e "source('code/picrust2_utilities.R');convert_tsv_to_shared('$PC_OUTPUT/EC_metagenome_out/pred_metagenome_unstrat.tsv')"

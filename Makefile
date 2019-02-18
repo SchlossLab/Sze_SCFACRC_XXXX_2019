@@ -111,8 +111,8 @@ data/phylotype/crc.%.shared data/phylotype/crc.%.taxonomy :\
 
 
 # Targets build correctly
-# Output a shared and taxonomy, and fasta file based on screened preclustered sequences in mothur
-# pipeline
+# Output crc.asv.shared and crc.asv.taxonomy, and crc.asv.fasta file based on screened preclustered
+#	sequences in mothur pipeline
 data/asv/crc.asv.% : $(MOTHUR)/crc.trim.contigs.good.unique.good.filter.unique.precluster.denovo.uchime.pick.pick.pick.count_table\
 			$(MOTHUR)/crc.trim.contigs.good.unique.good.filter.unique.precluster.pick.pds.wang.pick.pick.taxonomy\
 			code/asv.sh
@@ -128,14 +128,17 @@ data/picrust1/crc.picrust1.% : code/picrust1.sh\
 	bash code/picrust1.sh
 
 
-# Run the picrust2 prediction algorithm on the gg generated file
-data/picrust2/crc.metagenomes.tsv : data/asv/crc.asv.shared data/asv/crc.asv.fasta code/picrust2.sh
+#	Run the picrust2 prediction algorithm on the ASV data to generate crc.ec.shared, crc.ko.shared,
+#	and crc.pathways.shared
+data/picrust2/crc.%.shared : data/asv/crc.asv.shared\
+														data/asv/crc.asv.fasta\
+														code/picrust2_utilities.R\
+														code/picrust2.sh
 	bash code/picrust2.sh
 
 
-# Targets building
-# Create the opf and kegg shared file
-# * can be opf or kegg
+# Targets build correctly
+# Create the metag.opf.shared and metag.kegg.shared shared file along wiht the ko/opf look up file
 MGSHARED = data/metagenome/metag.opf.shared data/metagenome/metag.kegg.shared
 $(MGSHARED) data/metagenome/metag.ko_lookup.tsv : $(REFS)/genes.pep.format.fasta\
 																			code/metagenomics.sh\
