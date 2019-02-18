@@ -84,7 +84,7 @@ PLATES = plate1 plate2 plate3 plate4 plate5 plate6 plate7 plate8
 SCFA = acetate butyrate isobutyrate propionate
 PLATE_FILES = $(foreach A, $(SCFA), $(foreach S, $(PLATES),data/raw/scfa/$(A)/$(S)_scfa_crc_$(A).txt))
 
-data/scfa/scfa_composite.tsv : $(PLATE_FILES) data/raw/metadata/scfa_plate_metadata.csv\
+data/scfa/scfa_composite.tsv : $(PLATE_FILES) data/metadata/scfa_plate_metadata.csv\
 									code/scfa_process_plates.R code/scfa_combine_plates.R
 	Rscript code/scfa_process_plates.R
 	Rscript code/scfa_combine_plates.R
@@ -170,8 +170,8 @@ $(MGSHARED) data/metagenome/metag.ko_lookup.tsv : $(REFS)/genes.pep.format.fasta
 # Run the SCFA analysis for cross-sectional and pre/post-treatment
 $(PROC)/scfa_cross_section_stats.tsv $(PROC)/scfa_pre_post_stats.tsv : \
 										data/scfa/scfa_composite.tsv\
-										data/raw/metadata/cross_section.csv\
-										data/raw/metadata/follow_up.csv\
+										data/metadata/cross_section.csv\
+										data/metadata/follow_up.csv\
 										code/scfa_stat_analysis.R
 	Rscript code/scfa_stat_analysis.R
 

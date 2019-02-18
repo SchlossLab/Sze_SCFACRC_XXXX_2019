@@ -143,7 +143,7 @@ get_data <- function(path) {
 	classify <- parse_path[1]
 	feature_sources <- parse_path[-1]
 
-	data <- read_csv('data/raw/metadata/cross_section.csv',
+	data <- read_csv('data/metadata/cross_section.csv',
 									col_types=cols(sample=col_character()))
 
 	if("fit" %in% feature_sources){

@@ -11,7 +11,7 @@ get_mean_dx <- function(x){
 															spread(key=dx, value=mean)
 													}
 
-read_csv("data/raw/metadata/cross_section.csv", col_type=cols(sample=col_character())) %>%
+read_csv("data/metadata/cross_section.csv", col_type=cols(sample=col_character())) %>%
 	inner_join(scfa, ., by=c("study_id"="sample")) %>%
 	select(scfa, dx, mmol_kg) %>%
 	group_by(scfa) %>%
@@ -33,7 +33,7 @@ read_csv("data/raw/metadata/cross_section.csv", col_type=cols(sample=col_charact
 
 
 #pre-post analysis
-read_csv("data/raw/metadata/follow_up.csv",
+read_csv("data/metadata/follow_up.csv",
 				col_type=cols(initial=col_character(), followUp=col_character(), EDRN=col_character())) %>%
 	gather(sample, study_id, initial, followUp) %>%
 	select(sample, study_id, EDRN, dx) %>%

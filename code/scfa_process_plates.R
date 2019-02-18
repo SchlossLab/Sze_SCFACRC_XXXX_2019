@@ -22,7 +22,7 @@ if(!dir.exists(output_path)){
 }
 
 # Set up plate mapping path
-platemap_path <- "data/raw/metadata/"
+platemap_path <- "data/metadata/"
 
 # Set up final data name differentiator
 final_name <- "transformed"
