@@ -22,7 +22,7 @@ tail.batch
 mothur*logfile
 *temp*
 *.docx
-*.pbs.o*
+*.pbs*
 *.fastq
 *.sra
 *.RData
