@@ -13,16 +13,42 @@
 library(tidyverse)
 library(data.table)
 
+
+# Need to match sample ids between the SRA and EDRN
+hannigan_metadata_filename <- "data/metadata/hannigan_metadata.tsv"
+sra_metadata_filename <- "data/raw/metagenome/SRP108915_info.csv"
+
+#	generate table containing Hannigan's MG file names and Zackular sample ID
+hannigan <- read_tsv(hannigan_metadata_filename, col_type=cols(LibraryDate=col_character())) %>%
+	select(MetaID, SampleID) %>%
+	mutate(SampleID = str_replace(SampleID, "^(.)0(.)$", "\\1\\2"))
+
+# generate table containing the SRA sample ID and the Hannigan MG file name
+sra <- read_csv(sra_metadata_filename) %>% select(Run, SampleName)
+
+# merge the three tables so we can convert between the SRA sample ID and the EDRN
+metadata_lookup <- inner_join(sra, hannigan, by=c("SampleName"="MetaID")) %>%
+										rename(sample_id=Run) %>%
+										select(-SampleName)
+
+
+
+
+#Need to read in various data files for merging and generating output
 opf_filename <- "data/metagenome/mmseq2/clu.tsv"
 orf_filename <- "data/metagenome/diamond/orf_abund.tsv"
 kegg_filename <- "data/metagenome/mmseq2/resultDB.m8"
 
-# Load in needed data
+
+# Load in needed data. The three following files that I read in need column names added.
 opf_clusters <- fread(opf_filename, header=FALSE) %>%
 		as_tibble(.name_repair=function(x){c("opf_cluster", "seq_name")})
 
 orf_count_data <- fread(orf_filename, header=FALSE) %>%
-		as_tibble(.name_repair=function(x){c("count", "seq_name", "sample_id")})
+		as_tibble(.name_repair=function(x){c("count", "seq_name", "sample_id")}) %>%
+		inner_join(., metadata_lookup, by="sample_id") %>%
+		select(-sample_id) %>%
+		rename(sample_id=SampleID)
 
 kegg_data <- fread(kegg_filename, header=FALSE) %>%
 		as_tibble(.name_repair=function(x){c("seq_name", "target", "identity", "aligment_length",

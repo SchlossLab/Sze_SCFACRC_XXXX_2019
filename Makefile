@@ -141,6 +141,7 @@ data/picrust2/crc.%.shared : data/asv/crc.asv.shared\
 # Create the metag.opf.shared and metag.kegg.shared shared file along wiht the ko/opf look up file
 MGSHARED = data/metagenome/metag.opf.shared data/metagenome/metag.kegg.shared
 $(MGSHARED) data/metagenome/metag.ko_lookup.tsv : $(REFS)/genes.pep.format.fasta\
+																			data/metadata/hannigan_metadata.tsv\
 																			code/metagenomics.sh\
 																			code/metagenomics_get_shared.R
 	bash code/metagenomics.sh
