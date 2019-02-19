@@ -30,7 +30,7 @@ biom validate-table -i $BIOM
 
 rm $WORKDIR/temp_OTU_table.txt
 
-picrust2_pipeline.py -s $FASTA -i $BIOM -o $WORKDIR/output --threads $THREADS
+picrust2_pipeline.py -s $FASTA -i $BIOM -o $WORKDIR/output --threads $THREADS --verbose > picrust2.output
 
 source deactivate
 
