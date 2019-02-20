@@ -148,11 +148,25 @@ $(MGSHARED) data/metagenome/metag.ko_lookup.tsv : $(REFS)/genes.pep.format.fasta
 
 
 
-# Get specific OPF SCFA KEGG matches
-# Nothing seems to depend on theis target
-# $(PROC)/select_scfa_opf_matches.tsv : code/kegg_parse.py $(PROC)/scfa_kegg_ids.txt\
-# 		$(PROC)/orf_gene_alignment.tsv
-# 	python code/kegg_parse.py -iko "data/process/scfa_kegg_ids.txt" -gad "data/process/orf_gene_alignment.tsv" -o "data/process/select_scfa_opf_matches.tsv"
+# Targets build correctly
+# Get specific SCFA KEGG matches
+SCFA_SHARED=data/metagenome/metag.keggscfa.shared data/picrust1/crc.picrust1scfa.shared data/picrust2/crc.picrust2scfa.shared
+
+.SECONDEXPANSION:
+$(SCFA_SHARED) : $$(subst scfa,,$$@) code/scfa_genes.R
+	R -e "source('code/scfa_genes.R'); get_scfa_keggs('$<')"
+
+data/metagenome/metag.opfscfa.shared : data/metagenome/metag.opf.shared\
+																				data/metagenome/metag.ko_lookup.tsv\
+																				code/scfa_genes.R
+	R -e "source('code/scfa_genes.R'); get_scfa_keggs('data/metagenome/metag.opf.shared', 'data/metagenome/metag.ko_lookup.tsv')"
+
+
+
+
+
+
+
 
 
 # Run specific SCFA OPF analysis
