@@ -21,7 +21,7 @@ cp data/mothur/crc.trim.contigs.good.unique.good.filter.unique.precluster.pick.p
 mothur "#list.otus(shared=$WORKDIR/crc.shared);get.otus(constaxonomy=$WORKDIR/crc.cons.taxonomy, accnos=$WORKDIR/crc.0.03.otulabels);make.biom(shared=current, constaxonomy=current, label=0.03, reftaxonomy=$REF/gg_13_5_99.gg.tax, picrust=$REF/97_otu_map.txt)"
 
 
-source activate picrust1
+conda activate picrust1
 
 
 # Comments on whether this is an acceptable biom format
@@ -38,6 +38,6 @@ biom validate-table -i $BIOM
 normalize_by_copy_number.py -i $BIOM -o $WORKDIR/crc.normalized.biom
 predict_metagenomes.py -f -i $WORKDIR/crc.normalized.biom -o $WORKDIR/crc.metagenomes.tsv -a $WORKDIR/crc.nsti
 
-source deactivate
+conda deactivate
 
 R -e "source('code/picrust1_utilities.R');get_shared_annotation()"
