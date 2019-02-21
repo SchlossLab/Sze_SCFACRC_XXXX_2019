@@ -1,6 +1,4 @@
-THREADS=12
-
-rm -rf ./output
+THREADS=6
 
 WORKDIR=data/picrust2
 rm -rf $WORKDIR
@@ -32,13 +30,11 @@ biom validate-table -i $BIOM
 
 rm $WORKDIR/temp_OTU_table.txt
 
-picrust2_pipeline.py -s $FASTA -i $BIOM -o output --threads $THREADS --verbose
+picrust2_pipeline.py -s $FASTA -i $BIOM -o $WORKDIR/output --threads $THREADS --verbose
 
-condao deactivate
+conda deactivate
 
 PC_OUTPUT=$WORKDIR/output
-
-mv output $PC_OUTPUT
 
 R -e "source('code/picrust2_utilities.R');convert_tsv_to_shared('$PC_OUTPUT/pathways_out/path_abun_unstrat.tsv')"
 R -e "source('code/picrust2_utilities.R');convert_tsv_to_shared('$PC_OUTPUT/KO_metagenome_out/pred_metagenome_unstrat.tsv')"
