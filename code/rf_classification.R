@@ -12,7 +12,7 @@
 
 ################### IMPORT LIBRARIES and FUNCTIONS ###################
 # The dependinces for this script are consolidated in the first part
-deps = c("randomForest", "pROC", "caret", "tidyverse");
+deps = c("randomForest", "pROC", "caret", "tidyverse", "data.table");
 for (dep in deps){
   if (dep %in% installed.packages()[,"Package"] == FALSE){
     install.packages(as.character(dep), quiet=TRUE, repos = "http://cran.us.r-project.org");
@@ -65,6 +65,10 @@ pipeline <- function(dataset){
                      summaryFunction=twoClassSummary,
                      indexFinal=NULL,
                      savePredictions = TRUE)
+
+
+	# seems like max mtry value should be less than the nubmer of samples
+	if(n_features > 20000) n_features <- 20000
 
 	if(n_features < 19){ mtry <- 1:6
 	} else { mtry <- floor(seq(1, n_features/3, length=6)) }
@@ -129,22 +133,33 @@ get_AUCs <- function(dataset, split_number, path){
   # ------------------------------------------------------------------
 }
 
-######################################################################
-
-get_data <- function(path) {
 ######################## DATA PREPARATION #############################
 # Features: Hemoglobin levels and 16S rRNA gene sequences in the stool
 # Labels: - Colorectal lesions of 490 patients.
 #         - Defined as lesion or not.(lesin here means: adenoma and cancer)
-# Read in metadata
-# Read in metadata
+#######################################################################
+
+get_data <- function(path) {
 
 	parse_path <- unlist(str_split(unlist(str_split(path, '/'))[3], "_"))
 	classify <- parse_path[1]
 	feature_sources <- parse_path[-1]
 
-	data <- read_csv('data/metadata/cross_section.csv',
-									col_types=cols(sample=col_character()))
+	metagenomics <- c("opf", "kegg", "opfscfa", "keggscfa")
+	tax_levels <- c("kingdom", "phylum", "class", "order", "family", "genus")
+	picrust <- c("picrust1", "picrust2", "picrust1scfa", "picrust2scfa")
+
+	if(any(feature_sources %in% metagenomics)){
+		data <- read_tsv('data/metadata/zackular_metadata.tsv') %>%
+						mutate(sample=str_replace(sample, "(\\d{1,2})", " \\1")) %>%
+						separate(sample, into=c("disease", "subject")) %>%
+						mutate(disease=str_replace(disease, "^(.).*", "\\1"),
+										dx=tolower(dx)) %>%
+						unite(sample, disease, subject, sep="") %>%
+						select(sample, fit_result, dx)
+	} else {
+		data <- read_csv('data/metadata/cross_section.csv', col_types=cols(sample=col_character()))
+	}
 
 	if("fit" %in% feature_sources){
 		data <- data %>% select(sample, dx, fit_result)
@@ -160,6 +175,13 @@ get_data <- function(path) {
 		inner_join(data, ., by=c("sample"="study_id"))
 	}
 
+	if("asv" %in% feature_sources){
+		data <- fread('data/asv/crc.asv.shared', header=T, colClasses=c(Group="character")) %>%
+						as_tibble()
+		 select(-label, -numOtus) %>%
+		 inner_join(data, ., by=c("sample"="Group"))
+	}
+
 	# Read in OTU table and remove label and numOtus columns
 	if("otu" %in% feature_sources){
 		data <- read_tsv('data/mothur/crc.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.opti_mcc.0.03.subsample.shared',
@@ -168,16 +190,38 @@ get_data <- function(path) {
 		 inner_join(data, ., by=c("sample"="Group"))
 	}
 
-	tax_levels <- c("kingdom", "phylum", "class", "order", "family", "genus")
+	# Read in phylotype data
 	if(any(feature_sources %in% tax_levels)){
 		taxon <- feature_sources[which(feature_sources %in% tax_levels)]
-		shared_taxon <- paste0('data/mothur/', taxon, ".shared")
+		shared_taxon <- paste0('data/phylotype/crc.', taxon, ".shared")
 
 		data <- read_tsv(shared_taxon, col_types=cols(Group=col_character())) %>%
 			select(-label, -numOtus) %>%
 			inner_join(data, ., by=c("sample"="Group"))
 	}
 
+	if(any(feature_sources %in% picrust)){
+		pc_tag <- feature_sources[which(feature_sources %in% picrust)]
+		pc_path <- str_replace(pc_tag, "scfa", "")
+
+		picrust_file_name <- paste0("data/", pc_path, "/crc.", pc_tag, ".shared")
+
+		data <- fread(picrust_file_name, header=T) %>%
+			as_tibble() %>%
+			mutate(Group=as.character(Group)) %>%
+			select(-label, -numOtus) %>%
+			inner_join(data, ., by=c("sample"="Group"))
+	}
+
+	if(any(feature_sources %in% metagenomics)){
+		mg_tag <- feature_sources[which(feature_sources %in% metagenomics)]
+		mg_file_name <- paste0("data/metagenome/metag.", mg_tag, ".shared")
+
+		data <- fread(mg_file_name, header=T, colClasses=c(Group="character")) %>%
+			as_tibble() %>%
+			select(-label, -numOtus) %>%
+			inner_join(data, ., by=c("sample"="Group"))
+	}
 
 	if(classify %in% c("adenoma", "cancer")){
 		data <- data %>%

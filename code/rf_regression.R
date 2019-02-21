@@ -3,6 +3,7 @@ library("tidyverse")
 library("caret")
 library("pROC")
 library("randomForest")
+library("data.table")
 
 # Function to run Begum's pipeline
 pipeline <- function(dataset){
@@ -118,10 +119,22 @@ get_data <- function(path){
 	target_scfa <- parse_path[1]
 	feature_sources <- parse_path[-1]
 
+	metagenomics <- c("opf", "kegg", "opfscfa", "keggscfa")
+	tax_levels <- c("kingdom", "phylum", "class", "order", "family", "genus")
+	picrust <- c("picrust1", "picrust2", "picrust1scfa", "picrust2scfa")
 
 	# Read in metadata
-	data <- read_csv('data/metadata/cross_section.csv',
-									col_types=cols(sample=col_character()))
+	if(any(feature_sources %in% metagenomics)){
+		data <- read_tsv('data/metadata/zackular_metadata.tsv') %>%
+						mutate(sample=str_replace(sample, "(\\d{1,2})", " \\1")) %>%
+						separate(sample, into=c("disease", "subject")) %>%
+						mutate(disease=str_replace(disease, "^(.).*", "\\1"),
+										dx=tolower(dx)) %>%
+						unite(sample, disease, subject, sep="") %>%
+						select(sample, fit_result, dx)
+	} else {
+		data <- read_csv('data/metadata/cross_section.csv', col_types=cols(sample=col_character()))
+	}
 
 	if("fit" %in% feature_sources){
 		data <- data %>% select(sample, fit_result)
@@ -129,20 +142,48 @@ get_data <- function(path){
 		data <- data %>% select(sample)
 	}
 
+	if("asv" %in% feature_sources){
+		data <- fread('data/asv/crc.asv.shared', header=T, colClasses=c(Group="character")) %>%
+						as_tibble()
+		 select(-label, -numOtus) %>%
+		 inner_join(data, ., by=c("sample"="Group"))
+	}
 
-	if("otu" %in% feature_sources){
 	# Read in OTU table and remove label and numOtus columns
+	if("otu" %in% feature_sources){
 		data <- read_tsv('data/mothur/crc.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.opti_mcc.0.03.subsample.shared', col_types=cols(Group=col_character())) %>%
 		  select(-label, -numOtus) %>%
 			inner_join(data,., by=c("sample"="Group"))
 	}
 
-	tax_levels <- c("kingdom", "phylum", "class", "order", "family", "genus")
 	if(any(feature_sources %in% tax_levels)){
 		taxon <- feature_sources[which(feature_sources %in% tax_levels)]
-		shared_taxon <- paste0('data/mothur/', taxon, ".shared")
+		shared_taxon <- paste0('data/phylotype/crc.', taxon, ".shared")
 
 		data <- read_tsv(shared_taxon, col_types=cols(Group=col_character())) %>%
+			select(-label, -numOtus) %>%
+			inner_join(data, ., by=c("sample"="Group"))
+	}
+
+	if(any(feature_sources %in% picrust)){
+		pc_tag <- feature_sources[which(feature_sources %in% picrust)]
+		pc_path <- str_replace(pc_tag, "scfa", "")
+
+		picrust_file_name <- paste0("data/", pc_path, "/crc.", pc_tag, ".shared")
+
+		data <- fread(picrust_file_name, header=T) %>%
+			as_tibble() %>%
+			mutate(Group=as.character(Group)) %>%
+			select(-label, -numOtus) %>%
+			inner_join(data, ., by=c("sample"="Group"))
+	}
+
+	if(any(feature_sources %in% metagenomics)){
+		mg_tag <- feature_sources[which(feature_sources %in% metagenomics)]
+		mg_file_name <- paste0("data/metagenome/metag.", mg_tag, ".shared")
+
+		data <- fread(mg_file_name, header=T, colClasses=c(Group="character")) %>%
+			as_tibble() %>%
 			select(-label, -numOtus) %>%
 			inner_join(data, ., by=c("sample"="Group"))
 	}
@@ -150,6 +191,7 @@ get_data <- function(path){
 	# Read in SCFAs spread columns
 	read_tsv('data/scfa/scfa_composite.tsv', col_types=cols(study_id=col_character())) %>%
 		spread(key=scfa, value=mmol_kg) %>%
+		mutate(pooled = 4*butyrate + 4*isobutyrate + 3*propionate + 2*acetate) %>%
 		select(study_id, target_scfa) %>%
 		inner_join(., data, by=c("study_id" = "sample")) %>%
 		rename(regress = target_scfa) %>%
