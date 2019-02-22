@@ -32,7 +32,8 @@ pipeline <- function(dataset){
 
 	n_features <- ncol(training) - 1
 
-	# powers <- 1
+
+	if(n_features > 20000) n_features <- 20000
 
 	if(n_features < 19){ mtry <- 1:6
 	} else { mtry <- floor(seq(1, n_features/3, length=6)) }
@@ -119,9 +120,9 @@ get_data <- function(path){
 	target_scfa <- parse_path[1]
 	feature_sources <- parse_path[-1]
 
-	metagenomics <- c("opf", "kegg", "opfscfa", "keggscfa")
+	metagenomics <- c("opf", "kegg", "opf", "kegg")
 	tax_levels <- c("kingdom", "phylum", "class", "order", "family", "genus")
-	picrust <- c("picrust1", "picrust2", "picrust1scfa", "picrust2scfa")
+	picrust2 <- c("pc2ko", "pc2ec", "pc2pathways")
 
 	# Read in metadata
 	if(any(feature_sources %in% metagenomics)){
@@ -165,11 +166,22 @@ get_data <- function(path){
 			inner_join(data, ., by=c("sample"="Group"))
 	}
 
-	if(any(feature_sources %in% picrust)){
-		pc_tag <- feature_sources[which(feature_sources %in% picrust)]
-		pc_path <- str_replace(pc_tag, "scfa", "")
+	if(any("picrust1" %in% feature_sources)){
 
-		picrust_file_name <- paste0("data/", pc_path, "/crc.", pc_tag, ".shared")
+		picrust_file_name <- "data/picrust1/crc.picrust1.shared"
+
+		data <- fread(picrust_file_name, header=T) %>%
+			as_tibble() %>%
+			mutate(Group=as.character(Group)) %>%
+			select(-label, -numOtus) %>%
+			inner_join(data, ., by=c("sample"="Group"))
+	}
+
+	if(any(feature_sources %in% picrust2)){
+		pc_tag <- feature_sources[which(feature_sources %in% picrust2)]
+		tag <- str_replace(pc_tag, "pc2", "")
+
+		picrust_file_name <- paste0("data/picrust2/crc.", tag, ".shared")
 
 		data <- fread(picrust_file_name, header=T) %>%
 			as_tibble() %>%
