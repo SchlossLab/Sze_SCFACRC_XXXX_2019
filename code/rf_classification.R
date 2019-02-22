@@ -9,6 +9,7 @@
 #
 ######################################################################
 
+start_time <- Sys.time()
 
 ################### IMPORT LIBRARIES and FUNCTIONS ###################
 # The dependinces for this script are consolidated in the first part
@@ -32,7 +33,6 @@ pipeline <- function(dataset){
   # Stratified data partitioning 80% training - 20% testing
   inTraining <- createDataPartition(dataset$classes, p = 0.80, list = FALSE)
 
-
   training <- dataset[ inTraining,]
   testing  <- dataset[-inTraining,]
 
@@ -42,12 +42,11 @@ pipeline <- function(dataset){
 		gather(-classes, key="feature", value="value") %>%
 		group_by(feature) %>%
 		summarize(v=var(value)) %>%
-		filter(v == 0) %>%
+		filter(v != 0) %>%
 		pull(feature)
 
-	training <- training %>% select(-zero_variance)
-	testing <- testing %>% select(-zero_variance)
-
+	training <- training %>% select(classes, zero_variance)
+	testing <- testing %>% select(classes, zero_variance)
 
   # Scale all features between 0-1
   preProcValues <- preProcess(training, method = "range")
@@ -262,13 +261,12 @@ get_data <- function(path) {
 
 ######################## RUN PIPELINE #############################
 
-start_time <- Sys.time()
-
-input <- commandArgs(trailingOnly=TRUE) # recieve input from model
 # Get variables from command line
+input <- commandArgs(trailingOnly=TRUE) # recieve input from model
 seed <- as.numeric(input[1])
 path <- input[2]
 
+# require that the output directory exist before we start the analysis
 if(!dir.exists(path)){
 	dir.create(path, recursive=TRUE)
 }

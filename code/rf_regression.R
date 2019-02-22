@@ -24,11 +24,11 @@ pipeline <- function(dataset){
 		gather(-regress, key="feature", value="value") %>%
 		group_by(feature) %>%
 		summarize(v=var(value)) %>%
-		filter(v == 0) %>%
+		filter(v != 0) %>%
 		pull(feature)
 
-	training <- training %>% select(-zero_variance)
-	testing <- testing %>% select(-zero_variance)
+	training <- training %>% select(regress, zero_variance)
+	testing <- testing %>% select(regress, zero_variance)
 
 	n_features <- ncol(training) - 1
 
