@@ -120,7 +120,7 @@ get_data <- function(path){
 	target_scfa <- parse_path[1]
 	feature_sources <- parse_path[-1]
 
-	metagenomics <- c("opf", "kegg", "opf", "kegg")
+	metagenomics <- c("opf", "kegg")
 	tax_levels <- c("kingdom", "phylum", "class", "order", "family", "genus")
 	picrust2 <- c("pc2ko", "pc2ec", "pc2pathways")
 
