@@ -152,7 +152,7 @@ get_data <- function(path){
 
 	# Read in OTU table and remove label and numOtus columns
 	if("otu" %in% feature_sources){
-		data <- read_tsv('data/mothur/crc.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.opti_mcc.0.03.subsample.shared', col_types=cols(Group=col_character())) %>%
+		data <- read_tsv('data/mothur/crc.otu.shared', col_types=cols(Group=col_character())) %>%
 		  select(-label, -numOtus) %>%
 			inner_join(data,., by=c("sample"="Group"))
 	}

@@ -57,3 +57,5 @@ mothur "#make.contigs(file=crc.files, inputdir=$RAWDIR, outputdir=$WORKDIR, proc
 	classify.seqs(fasta=current, count=current, reference=$REF/gg_13_5_99.gg.fasta, taxonomy=$REF/gg_13_5_99.gg.tax, cutoff=80);
 	classify.otu(list=current, count=current, taxonomy=current, label=0.03);
 	system(mv data/mothur/crc.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.opti_mcc.0.03.cons.taxonomy data/mothur/crc.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.opti_mcc.0.03.cons_gg.taxonomy)"
+
+cp data/mothur/crc.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.opti_mcc.0.03.subsample.shared data/mothur/crc.otu.shared
