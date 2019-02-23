@@ -26,3 +26,4 @@ mothur*logfile
 *.RData
 
 *models*
+pbs_scripts/
