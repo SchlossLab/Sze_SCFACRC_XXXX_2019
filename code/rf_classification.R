@@ -175,10 +175,21 @@ get_data <- function(path) {
 	}
 
 	if("asv" %in% feature_sources){
-		data <- fread('data/asv/crc.asv.shared', header=T, colClasses=c(Group="character")) %>%
-						as_tibble()
-		 select(-label, -numOtus) %>%
-		 inner_join(data, ., by=c("sample"="Group"))
+		asv_data <- fread('data/asv/crc.asv.shared', header=T, colClasses=c(Group="character")) %>%
+						as_tibble() %>%
+		 select(-label, -numOtus)
+
+	 	no_singletons <- asv_data %>%
+	 		gather(-Group, key="feature", value="value") %>%
+	 		group_by(feature) %>%
+	 		summarize(s=sum(value)) %>%
+	 		filter(s > 1) %>%
+	 		pull(feature)
+
+		data <- asv_data %>%
+			select(Group, no_singletons) %>%
+			inner_join(data, ., by=c("sample"="Group"))
+
 	}
 
 	# Read in OTU table and remove label and numOtus columns
@@ -227,10 +238,21 @@ get_data <- function(path) {
 		mg_tag <- feature_sources[which(feature_sources %in% metagenomics)]
 		mg_file_name <- paste0("data/metagenome/metag.", mg_tag, ".shared")
 
-		data <- fread(mg_file_name, header=T, colClasses=c(Group="character")) %>%
+		mg_data <- fread(mg_file_name, header=T, colClasses=c(Group="character")) %>%
 			as_tibble() %>%
-			select(-label, -numOtus) %>%
+			select(-label, -numOtus)
+
+	 	no_singletons <- mg_data %>%
+	 		gather(-Group, key="feature", value="value") %>%
+	 		group_by(feature) %>%
+	 		summarize(s=sum(value)) %>%
+	 		filter(s > 1) %>%
+	 		pull(feature)
+
+		data <- mg_data %>%
+			select(Group, no_singletons) %>%
 			inner_join(data, ., by=c("sample"="Group"))
+
 	}
 
 	if(classify %in% c("adenoma", "cancer")){
