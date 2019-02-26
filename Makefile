@@ -166,22 +166,6 @@ data/metagenome/metag.opfscfa.shared : data/metagenome/metag.opf.shared\
 
 
 
-
-
-
-# Run specific SCFA OPF analysis
-# Nothing seems to depend on these targets and they are redundant with the previous rule
-# $(PROC)/select_scfa_opf_matches.tsv\
-# $(PROC)/opf_shared.tsv\
-# $(PROC)/sra_meta_conversion.txt : $(TABLES)/select_scfa_opf_kruskal_summary.csv\
-# 		$(TABLES)/select_scfa_opf_data.csv code/run_opf_select_scfa_analysis.R
-# 	Rscript code/run_opf_select_scfa_analysis.R
-
-
-
-
-
-
 # Run the SCFA analysis for cross-sectional and pre/post-treatment
 $(PROC)/scfa_cross_section_stats.tsv $(PROC)/scfa_pre_post_stats.tsv : \
 										data/scfa/scfa_composite.tsv\

@@ -242,16 +242,16 @@ get_data <- function(path) {
 			as_tibble() %>%
 			select(-label, -numOtus)
 
-	 	no_singletons <- mg_data %>%
-	 		gather(-Group, key="feature", value="value") %>%
-	 		group_by(feature) %>%
-	 		summarize(s=sum(value)) %>%
-	 		filter(s > 1) %>%
-	 		pull(feature)
-
-		data <- mg_data %>%
-			select(Group, no_singletons) %>%
-			inner_join(data, ., by=c("sample"="Group"))
+    no_rare <- mg_data %>%
+      gather(-Group, key="feature", value="value") %>% 
+      group_by(feature) %>%
+      summarize(s=sum(value)) %>% 
+      filter(s > 5) %>%
+      pull(feature)
+  
+    data <- mg_data %>%
+      select(Group, no_rare) %>%
+      inner_join(data, ., by=c("sample"="Group"))
 
 	}
 
