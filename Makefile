@@ -366,6 +366,26 @@ $(KEGG_OR) $(KEGG_MR) : data/scfa/scfa_composite.tsv data/metadata/zackular_meta
 	Rscript code/rf_regression.R $(subst .,,$(suffix $(basename $@))) $(dir $@)
 
 
+# Pool relevant files to each other
+.SECONDEXPANSION:
+%/cv_test_compare.tsv : $$(foreach S,$$(SEED),$$*/optimum_mtry.$$(S).csv) code/rf_pool_optimum_mtry.R
+	Rscript code/rf_pool_optimum_mtry.R $*
+
+
+# Make monster pool files for classification and RF analysis
+CLASSIFICATION_TAGS = fit scfa fit_scfa $(MICROBIOME) $(foreach M,$(MICROBIOME),fit_$M) $(foreach M,$(MICROBIOME),scfa_$M) $(foreach M,$(MICROBIOME),fit_scfa_$M)
+CLASSIFICATION_POOLS = $(foreach C,$(CLASSIFICATION_TAGS),$(foreach D,$(DX),data/rf/$D_$C/cv_test_compare.tsv))
+
+data/rf/classification_summary.tsv : $(CLASSIFICATION_POOLS) code/rf_pool_pools.R
+	Rscript code/rf_pool_pools.R $@ $(CLASSIFICATION_POOLS)
+
+
+REGRESSION_TAGS = fit $(MICROBIOME) $(foreach M,$(MICROBIOME),fit_$M)
+REGRESSION_POOLS = $(foreach C,$(REGRESSION_TAGS),$(foreach S,$(SCFA),data/rf/$S_$C/cv_test_compare.tsv))
+
+data/rf/regression_summary.tsv : $(REGRESSION_POOLS) code/rf_pool_pools.R
+	Rscript code/rf_pool_pools.R $@ $(REGRESSION_POOLS)
+
 
 ################################################################################
 #
