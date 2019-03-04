@@ -164,7 +164,11 @@ data/metagenome/metag.opfscfa.shared : data/metagenome/metag.opf.shared\
 
 
 
-
+################################################################################
+#
+# Part 3: Compare SCFA concentrations across diagnosis groups
+#
+################################################################################
 
 # Run the SCFA analysis for cross-sectional and pre/post-treatment
 $(PROC)/scfa_cross_section_stats.tsv $(PROC)/scfa_pre_post_stats.tsv : \
@@ -176,12 +180,108 @@ $(PROC)/scfa_cross_section_stats.tsv $(PROC)/scfa_pre_post_stats.tsv : \
 
 
 
+################################################################################
+#
+# Part 5: Build Random Forest algorithms to predict diagnosis groups and SCFA
+# concentrations
+#
+################################################################################
+
+DX = adenoma cancer lesion
+MICROBIOME = asv otu genus family phylum picrust1 pc2ko pc2ec pc2pathways opf kegg
+SEED = $(shell seq 0 99)
+
+CLASS_O_RF = $(foreach T,$(1),$(foreach D,$(DX),$(foreach S,$(SEED),data/rf/$D_$T/optimum_mtry.$S.csv)))
+
+
+ANALYTE_O=$(call CLASS_O_RF,fit scfa fit_scfa)
+ANALYTE_M=$(subst optimum,all,$(ANALYTE_O))
+
+$(ANALYTE_O) $(ANALYTE_M) : data/scfa/scfa_composite.tsv data/metadata/cross_section.csv code/rf_classification.R
+	Rscript code/rf_classification.R $(subst .,,$(suffix $(basename $@))) $(dir $@)
+
+## add paths to shared files
+ASV_O=$(call CLASS_O_RF,asv fit_asv scfa_asv fit_scfa_asv)
+ASV_M=$(subst optimum,all,$(ASV_O))
+
+$(ASV_O) $(ASV_M) : data/scfa/scfa_composite.tsv data/metadata/cross_section.csv data/asv/crc.asv.shared code/rf_classification.R
+	Rscript code/rf_classification.R $(subst .,,$(suffix $(basename $@))) $(dir $@)
+
+
+OTU_O=$(call CLASS_O_RF,otu fit_otu scfa_otu fit_scfa_otu)
+OTU_M=$(subst optimum,all,$(OTU_O))
+
+$(OTU_O) $(OTU_M) : data/scfa/scfa_composite.tsv data/metadata/cross_section.csv data/mothur/crc.otu.shared code/rf_classification.R
+	Rscript code/rf_classification.R $(subst .,,$(suffix $(basename $@))) $(dir $@)
+
+
+GENUS_O=$(call CLASS_O_RF,genus fit_genus scfa_genus fit_scfa_genus)
+GENUS_M=$(subst optimum,all,$(GENUS_O))
+
+$(GENUS_O) $(GENUS_M) : data/scfa/scfa_composite.tsv data/metadata/cross_section.csv data/phylotype/crc.genus.shared code/rf_classification.R
+	Rscript code/rf_classification.R $(subst .,,$(suffix $(basename $@))) $(dir $@)
+
+
+FAMILY_O=$(call CLASS_O_RF,family fit_family scfa_family fit_scfa_family)
+FAMILY_M=$(subst optimum,all,$(FAMILY_O))
+
+$(FAMILY_O) $(FAMILY_M) : data/scfa/scfa_composite.tsv data/metadata/cross_section.csv data/phylotype/crc.family.shared code/rf_classification.R
+	Rscript code/rf_classification.R $(subst .,,$(suffix $(basename $@))) $(dir $@)
+
+
+PHYLUM_O=$(call CLASS_O_RF,phylum fit_phylum scfa_phylum fit_scfa_phylum)
+PHYLUM_M=$(subst optimum,all,$(PHYLUM_O))
+
+$(PHYLUM_O) $(PHYLUM_M) : data/scfa/scfa_composite.tsv data/metadata/cross_section.csv data/phylotype/crc.phylum.shared code/rf_classification.R
+	Rscript code/rf_classification.R $(subst .,,$(suffix $(basename $@))) $(dir $@)
+
+
+PICRUST1_O=$(call CLASS_O_RF,picrust1 fit_picrust1 scfa_picrust1 fit_scfa_picrust1)
+PICRUST1_M=$(subst optimum,all,$(PICRUST1_O))
+
+$(PICRUST1_O) $(PICRUST1_M) : data/scfa/scfa_composite.tsv data/metadata/cross_section.csv data/picrust1/crc.picrust1.shared code/rf_classification.R
+	Rscript code/rf_classification.R $(subst .,,$(suffix $(basename $@))) $(dir $@)
+
+
+PC2KO_O=$(call CLASS_O_RF,pc2ko fit_pc2ko scfa_pc2ko fit_scfa_pc2ko)
+PC2KO_M=$(subst optimum,all,$(PC2KO_O))
+
+$(PC2KO_O) $(PC2KO_M) : data/scfa/scfa_composite.tsv data/metadata/cross_section.csv data/picrust2/crc.ko.shared code/rf_classification.R
+	Rscript code/rf_classification.R $(subst .,,$(suffix $(basename $@))) $(dir $@)
+
+
+PC2EC_O=$(call CLASS_O_RF,pc2ec fit_pc2ec scfa_pc2ec fit_scfa_pc2ec)
+PC2EC_M=$(subst optimum,all,$(PC2EC_O))
+
+$(PC2EC_O) $(PC2EC_M) : data/scfa/scfa_composite.tsv data/metadata/cross_section.csv data/picrust2/crc.ec.shared code/rf_classification.R
+	Rscript code/rf_classification.R $(subst .,,$(suffix $(basename $@))) $(dir $@)
+
+
+PC2PATHWAYS_O=$(call CLASS_O_RF,pc2pathways fit_pc2pathways scfa_pc2pathways fit_scfa_pc2pathway)
+PC2PATHWAYS_M=$(subst optimum,all,$(PC2PATHWAYS_O))
+
+$(PC2PATHWAYS_O) $(PC2PATHWAYS_M) : data/scfa/scfa_composite.tsv data/metadata/cross_section.csv data/picrust2/crc.pathways.shared code/rf_classification.R
+	Rscript code/rf_classification.R $(subst .,,$(suffix $(basename $@))) $(dir $@)
+
+
+OPF_O=$(call CLASS_O_RF,opf fit_opf scfa_opf fit_scfa_opf)
+OPF_M=$(subst optimum,all,$(OPF_O))
+
+$(OPF_O) $(OPF_M) : data/scfa/scfa_composite.tsv data/metadata/zackular_metadata.tsv data/metagenome/metag.opf.shared code/rf_classification.R
+	Rscript code/rf_classification.R $(subst .,,$(suffix $(basename $@))) $(dir $@)
+
+
+KEGG_O=$(call CLASS_O_RF,kegg fit_kegg scfa_kegg fit_scfa_kegg)
+KEGG_M=$(subst optimum,all,$(KEGG_O))
+
+$(KEGG_O) $(KEGG_M) : data/scfa/scfa_composite.tsv data/metadata/zackular_metadata.tsv data/metagenome/metag.kegg.shared code/rf_classification.R
+	Rscript code/rf_classification.R $(subst .,,$(suffix $(basename $@))) $(dir $@)
 
 
 
 ################################################################################
 #
-# Part 3: Figure and table generation
+# Part 5: Figure and table generation
 #
 #	Run scripts to generate figures and tables
 #
@@ -228,7 +328,7 @@ $(FIGS)/FigureS2.pdf : $(SCFA_RF_C_TRAIN) $(SCFA_RF_C_TEST) $(SCFA_RF_C_DATA)\
 
 ################################################################################
 #
-# Part 4: Pull it all together
+# Part 6: Pull it all together
 #
 # Render the manuscript
 #
