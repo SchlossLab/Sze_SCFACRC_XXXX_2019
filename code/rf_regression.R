@@ -67,44 +67,43 @@ pipeline <- function(dataset){
                           ntree=1000)
 
   # RMSE value over repeats of the best mtry parameter during training
-  cv_RMSE <- getTrainPerf(trained_model)$TrainRMSE
+	cv_best <- getTrainPerf(trained_model)
 
   # Training results for all the mtry parameters
-  model_results <- trained_model$results
+  cv_results <- trained_model$results
 
   # Predictions with the best mtry parameter for 1 data-split
   predictions <- predict(trained_model, testTransformed, type = "raw")
-  realval_predictions <- cbind(predictions, actual = testTransformed$regress)
 
-  # RMSE values for test data from 1 datasplit
-  test_RMSE <- RMSE(predictions,testTransformed$regress)
+  # quality values for test data from 1 datasplit
+	test_results <- postResample(testTransformed$regress, predictions)
 
-  results <- list(cv_RMSE, test_RMSE, model_results)
+  results <- list(cv_best=cv_best, cv_all=cv_results, test=test_results)
   return(results)
 }
 
 # Function to save the RMSE values and save them as .csv
-get_RMSE <- function(dataset, split_number, dir){
+get_RMSE_R2 <- function(dataset, split_number, dir){
 
   # Save results of the modeling pipeline as a list
   results <- pipeline(dataset)
 
   # ------------------------------------------------------------------
   # Create a matrix with cv_aucs and test_aucs from 100 data splits
-  RMSE_results <- matrix(c(results[[1]], results[[2]]), ncol=2)
+	colnames(results$cv_best) <- str_replace(colnames(results$cv_best), "Train", "train_")
+	names(results$test) <- paste0("test_", names(results$test))
+
 
   # Convert to dataframe and add a column noting the model name
-  RMSE_results_dataframe <- data.frame(RMSE_results) %>%
-    rename(cv_RMSE=X1, test_RMSE=X2) %>%
+  enframe(unlist(c(results$cv_best[1, -4], results$test))) %>%
+		spread(name, value) %>%
     write_csv(path=paste0(dir, "/optimum_mtry.", split_number, ".csv"))
+
   # ------------------------------------------------------------------
 
   # ------------------------------------------------------------------
   # Save all tunes from 100 data splits and corresponding AUCs
-  all_results <- results[3]
-
-	# Convert to dataframe and add a column noting the model name
-  dataframe <- data.frame(all_results) %>%
+  results$cv_all %>%
     write_csv(path=paste0(dir, "/all_mtry.", split_number, ".csv"))
   # ------------------------------------------------------------------
 
@@ -148,16 +147,17 @@ get_data <- function(path){
 						as_tibble() %>%
 		 select(-label, -numOtus)
 
-	 	no_singletons <- asv_data %>%
-	 		gather(-Group, key="feature", value="value") %>%
-	 		group_by(feature) %>%
-	 		summarize(s=sum(value)) %>%
-	 		filter(s > 1) %>%
-	 		pull(feature)
+		no_rare <- asv_data %>%
+			gather(-Group, key="feature", value="value") %>%
+			group_by(feature) %>%
+			summarize(s=sum(value)) %>%
+			filter(s > 5) %>%
+			pull(feature)
 
 		data <- asv_data %>%
-			select(Group, no_singletons) %>%
+			select(Group, no_rare) %>%
 			inner_join(data, ., by=c("sample"="Group"))
+
 	}
 
 	# Read in OTU table and remove label and numOtus columns
@@ -247,7 +247,7 @@ if(!dir.exists(path)){
 
 set.seed(seed)
 data <- get_data(path)
-get_RMSE(data, seed, path) # model will be "Random_Forest"
+get_RMSE_R2(data, seed, path) # model will be "Random_Forest"
 
 end_time <- Sys.time()
 print(end_time - start_time)
