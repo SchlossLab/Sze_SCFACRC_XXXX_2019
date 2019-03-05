@@ -18,21 +18,14 @@ pipeline <- function(dataset){
   training <- dataset[ inTraining,]
   testing  <- dataset[-inTraining,]
 
-	# remove columns that have no variance within the training set. These are likely to be all zero
-	# and will not enter into the model
-	zero_variance <- training %>%
-		gather(-regress, key="feature", value="value") %>%
-		group_by(feature) %>%
-		summarize(v=var(value)) %>%
-		filter(v != 0) %>%
-		pull(feature)
+	# remove columns that only appear within one or fewer samples of the training set. These are
+	# likely to be all zero and will not enter into the model
+	frequent <- names(which(apply(training[, -1] > 0, 2, sum) > 1))
 
-	training <- training %>% select(regress, zero_variance)
-	testing <- testing %>% select(regress, zero_variance)
+	training <- training %>% select(regress, frequent)
+	testing <- testing %>% select(regress, frequent)
 
 	n_features <- ncol(training) - 1
-
-
 	if(n_features > 20000) n_features <- 20000
 
 	if(n_features < 19){ mtry <- 1:6
@@ -55,7 +48,7 @@ pipeline <- function(dataset){
                      savePredictions = TRUE)
 
   # Hyper-parameter tuning budget
-  grid <-  expand.grid(mtry = mtry)
+	grid <-  expand.grid(mtry = mtry[mtry <= n_features])
 
   # Train model for 1 data-split but with 10fold-10repeat CV
   trained_model <-  train(regress ~ .,
@@ -83,7 +76,7 @@ pipeline <- function(dataset){
 }
 
 # Function to save the RMSE values and save them as .csv
-get_RMSE_R2 <- function(dataset, split_number, dir){
+get_RMSE_R2_MAE <- function(dataset, split_number, dir){
 
   # Save results of the modeling pipeline as a list
   results <- pipeline(dataset)
@@ -112,6 +105,21 @@ get_RMSE_R2 <- function(dataset, split_number, dir){
 ##############################################################################################
 ############### Run the actual programs to get the data ######################################
 ##############################################################################################
+
+read_shared <- function(shared_file_name, min_samples=2, min_abundance=1){
+
+	data <- fread(shared_file_name, header=T, colClasses=c(Group="character"))[, -c(1,3)]
+
+	if(min_abundance != 1){
+		abundant <- names(which(apply(data[,-1], 2, sum) >= min_abundance))
+		data <- select(data, Group, abundant)
+	}
+
+	frequent <- names(which(apply(data[, -1] > 0, 2, sum) >= min_samples))
+
+	select(data, Group, frequent)
+
+}
 
 get_data <- function(path){
 
@@ -143,48 +151,34 @@ get_data <- function(path){
 	}
 
 	if("asv" %in% feature_sources){
-		asv_data <- fread('data/asv/crc.asv.shared', header=T, colClasses=c(Group="character")) %>%
-						as_tibble() %>%
-		 select(-label, -numOtus)
 
-		no_rare <- asv_data %>%
-			gather(-Group, key="feature", value="value") %>%
-			group_by(feature) %>%
-			summarize(s=sum(value)) %>%
-			filter(s > 5) %>%
-			pull(feature)
-
-		data <- asv_data %>%
-			select(Group, no_rare) %>%
+		data <- read_shared('data/asv/crc.asv.shared') %>%
 			inner_join(data, ., by=c("sample"="Group"))
 
 	}
 
 	# Read in OTU table and remove label and numOtus columns
 	if("otu" %in% feature_sources){
-		data <- read_tsv('data/mothur/crc.otu.shared', col_types=cols(Group=col_character())) %>%
-		  select(-label, -numOtus) %>%
-			inner_join(data,., by=c("sample"="Group"))
+
+		data <- read_shared('data/mothur/crc.otu.shared') %>%
+			inner_join(data, ., by=c("sample"="Group"))
+
 	}
 
 	if(any(feature_sources %in% tax_levels)){
 		taxon <- feature_sources[which(feature_sources %in% tax_levels)]
-		shared_taxon <- paste0('data/phylotype/crc.', taxon, ".shared")
+		shared_taxon_file <- paste0('data/phylotype/crc.', taxon, ".shared")
 
-		data <- read_tsv(shared_taxon, col_types=cols(Group=col_character())) %>%
-			select(-label, -numOtus) %>%
+		data <- read_shared(shared_taxon_file) %>%
 			inner_join(data, ., by=c("sample"="Group"))
+
 	}
 
 	if(any("picrust1" %in% feature_sources)){
 
-		picrust_file_name <- "data/picrust1/crc.picrust1.shared"
-
-		data <- fread(picrust_file_name, header=T) %>%
-			as_tibble() %>%
-			mutate(Group=as.character(Group)) %>%
-			select(-label, -numOtus) %>%
+		data <- read_shared("data/picrust1/crc.picrust1.shared") %>%
 			inner_join(data, ., by=c("sample"="Group"))
+
 	}
 
 	if(any(feature_sources %in% picrust2)){
@@ -193,30 +187,16 @@ get_data <- function(path){
 
 		picrust_file_name <- paste0("data/picrust2/crc.", tag, ".shared")
 
-		data <- fread(picrust_file_name, header=T) %>%
-			as_tibble() %>%
-			mutate(Group=as.character(Group)) %>%
-			select(-label, -numOtus) %>%
+		data <- read_shared(picrust_file_name) %>%
 			inner_join(data, ., by=c("sample"="Group"))
+
 	}
 
 	if(any(feature_sources %in% metagenomics)){
 		mg_tag <- feature_sources[which(feature_sources %in% metagenomics)]
 		mg_file_name <- paste0("data/metagenome/metag.", mg_tag, ".shared")
 
-		mg_data <- fread(mg_file_name, header=T, colClasses=c(Group="character")) %>%
-			as_tibble() %>%
-			select(-label, -numOtus)
-
-	 	no_rare <- mg_data %>%
-	 		gather(-Group, key="feature", value="value") %>%
-	 		group_by(feature) %>%
-	 		summarize(s=sum(value)) %>%
-	 		filter(s > 5) %>%
-	 		pull(feature)
-
-		data <- mg_data %>%
-			select(Group, no_rare) %>%
+		data <- read_shared(mg_file_name, min_abundance=30) %>%
 			inner_join(data, ., by=c("sample"="Group"))
 
 	}
@@ -224,7 +204,6 @@ get_data <- function(path){
 	# Read in SCFAs spread columns
 	read_tsv('data/scfa/scfa_composite.tsv', col_types=cols(study_id=col_character())) %>%
 		spread(key=scfa, value=mmol_kg) %>%
-		mutate(pooled = 4*butyrate + 4*isobutyrate + 3*propionate + 2*acetate) %>%
 		select(study_id, target_scfa) %>%
 		inner_join(., data, by=c("study_id" = "sample")) %>%
 		rename(regress = target_scfa) %>%
@@ -234,7 +213,6 @@ get_data <- function(path){
 
 ######################## RUN PIPELINE #############################
 # Get the cv and test AUCs for 100 data-splits
-start_time <- Sys.time()
 
 input <- commandArgs(trailingOnly=TRUE) # recieve input from model
 # Get variables from command line
@@ -245,9 +223,11 @@ if(!dir.exists(path)){
 	dir.create(path, recursive=TRUE)
 }
 
+start_time <- Sys.time()
+
 set.seed(seed)
 data <- get_data(path)
-get_RMSE_R2(data, seed, path) # model will be "Random_Forest"
+get_RMSE_R2_MAE(data, seed, path) # model will be "Random_Forest"
 
 end_time <- Sys.time()
 print(end_time - start_time)

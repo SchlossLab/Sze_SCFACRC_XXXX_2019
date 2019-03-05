@@ -7,11 +7,8 @@
 # Usage in command-line:
 #   Rscript code/main_RF.R $seed data/rf/cancer_otu_fit
 #
-######################################################################
-
-start_time <- Sys.time()
-
 ################### IMPORT LIBRARIES and FUNCTIONS ###################
+
 # The dependinces for this script are consolidated in the first part
 deps = c("randomForest", "pROC", "caret", "tidyverse", "data.table");
 for (dep in deps){
@@ -36,17 +33,20 @@ pipeline <- function(dataset){
   training <- dataset[ inTraining,]
   testing  <- dataset[-inTraining,]
 
-	# remove columns that have no variance within the training set. These are likely to be all zero
-	# and will not enter into the model
-	zero_variance <- training %>%
-		gather(-classes, key="feature", value="value") %>%
-		group_by(feature) %>%
-		summarize(v=var(value)) %>%
-		filter(v != 0) %>%
-		pull(feature)
+	# remove columns that only appear within one or fewer samples of the training set. These are
+	# likely to be all zero and will not enter into the model
+	frequent <- names(which(apply(training[, -1] > 0, 2, sum) > 1))
 
-	training <- training %>% select(classes, zero_variance)
-	testing <- testing %>% select(classes, zero_variance)
+	training <- training %>% select(classes, frequent)
+	testing <- testing %>% select(classes, frequent)
+
+	n_features <- ncol(training) - 1
+	if(n_features > 20000) n_features <- 20000
+
+	if(n_features < 19){ mtry <- 1:6
+	} else { mtry <- floor(seq(1, n_features/3, length=6)) }
+
+	mtry <- mtry[mtry <= n_features]
 
   # Scale all features between 0-1
   preProcValues <- preProcess(training, method = "range")
@@ -54,8 +54,6 @@ pipeline <- function(dataset){
   testTransformed <- predict(preProcValues, testing)
 
 	# Define hyper-parameter tuning grid and the training method
-	n_features <- ncol(training) - 1
-
 	cv <- trainControl(method="repeatedcv",
                      repeats = 100,
                      number=5,
@@ -65,12 +63,6 @@ pipeline <- function(dataset){
                      indexFinal=NULL,
                      savePredictions = TRUE)
 
-
-	# seems like max mtry value should be less than the nubmer of samples
-	if(n_features > 20000) n_features <- 20000
-
-	if(n_features < 19){ mtry <- 1:6
-	} else { mtry <- floor(seq(1, n_features/3, length=6)) }
 
   grid <-  expand.grid(mtry = mtry[mtry <= n_features])
 
@@ -138,6 +130,23 @@ get_AUCs <- function(dataset, split_number, path){
 #         - Defined as lesion or not.(lesin here means: adenoma and cancer)
 #######################################################################
 
+read_shared <- function(shared_file_name, min_samples=2, min_abundance=1){
+
+	data <- fread(shared_file_name, header=T, colClasses=c(Group="character"))[, -c(1,3)]
+
+	if(min_abundance != 1){
+		abundant <- names(which(apply(data[,-1], 2, sum) >= min_abundance))
+		data <- select(data, Group, abundant)
+	}
+
+	frequent <- names(which(apply(data[, -1] > 0, 2, sum) >= min_samples))
+
+	select(data, Group, frequent)
+
+}
+
+
+
 get_data <- function(path) {
 
 	parse_path <- unlist(str_split(unlist(str_split(path, '/'))[3], "_"))
@@ -175,50 +184,35 @@ get_data <- function(path) {
 	}
 
 	if("asv" %in% feature_sources){
-		asv_data <- fread('data/asv/crc.asv.shared', header=T, colClasses=c(Group="character")) %>%
-						as_tibble() %>%
-		 select(-label, -numOtus)
 
-	 	no_singletons <- asv_data %>%
-	 		gather(-Group, key="feature", value="value") %>%
-	 		group_by(feature) %>%
-	 		summarize(s=sum(value)) %>%
-	 		filter(s > 1) %>%
-	 		pull(feature)
-
-		data <- asv_data %>%
-			select(Group, no_singletons) %>%
+		data <- read_shared('data/asv/crc.asv.shared') %>%
 			inner_join(data, ., by=c("sample"="Group"))
 
 	}
 
 	# Read in OTU table and remove label and numOtus columns
 	if("otu" %in% feature_sources){
-		data <- read_tsv('data/mothur/crc.otu.shared',
-									col_types=cols(Group=col_character())) %>%
-		 select(-label, -numOtus) %>%
-		 inner_join(data, ., by=c("sample"="Group"))
+
+		data <- read_shared('data/mothur/crc.otu.shared') %>%
+			inner_join(data, ., by=c("sample"="Group"))
+
 	}
 
 	# Read in phylotype data
 	if(any(feature_sources %in% tax_levels)){
 		taxon <- feature_sources[which(feature_sources %in% tax_levels)]
-		shared_taxon <- paste0('data/phylotype/crc.', taxon, ".shared")
+		shared_taxon_file <- paste0('data/phylotype/crc.', taxon, ".shared")
 
-		data <- read_tsv(shared_taxon, col_types=cols(Group=col_character())) %>%
-			select(-label, -numOtus) %>%
+		data <- read_shared(shared_taxon_file) %>%
 			inner_join(data, ., by=c("sample"="Group"))
+
 	}
 
 	if(any("picrust1" %in% feature_sources)){
 
-		picrust_file_name <- "data/picrust1/crc.picrust1.shared"
-
-		data <- fread(picrust_file_name, header=T) %>%
-			as_tibble() %>%
-			mutate(Group=as.character(Group)) %>%
-			select(-label, -numOtus) %>%
+		data <- read_shared("data/picrust1/crc.picrust1.shared") %>%
 			inner_join(data, ., by=c("sample"="Group"))
+
 	}
 
 	if(any(feature_sources %in% picrust2)){
@@ -227,31 +221,17 @@ get_data <- function(path) {
 
 		picrust_file_name <- paste0("data/picrust2/crc.", tag, ".shared")
 
-		data <- fread(picrust_file_name, header=T) %>%
-			as_tibble() %>%
-			mutate(Group=as.character(Group)) %>%
-			select(-label, -numOtus) %>%
+		data <- read_shared(picrust_file_name) %>%
 			inner_join(data, ., by=c("sample"="Group"))
+
 	}
 
 	if(any(feature_sources %in% metagenomics)){
 		mg_tag <- feature_sources[which(feature_sources %in% metagenomics)]
 		mg_file_name <- paste0("data/metagenome/metag.", mg_tag, ".shared")
 
-		mg_data <- fread(mg_file_name, header=T, colClasses=c(Group="character")) %>%
-			as_tibble() %>%
-			select(-label, -numOtus)
-
-    no_rare <- mg_data %>%
-      gather(-Group, key="feature", value="value") %>% 
-      group_by(feature) %>%
-      summarize(s=sum(value)) %>% 
-      filter(s > 5) %>%
-      pull(feature)
-  
-    data <- mg_data %>%
-      select(Group, no_rare) %>%
-      inner_join(data, ., by=c("sample"="Group"))
+		data <- read_shared(mg_file_name, min_abundance=30) %>%
+			inner_join(data, ., by=c("sample"="Group"))
 
 	}
 
@@ -292,6 +272,8 @@ path <- input[2]
 if(!dir.exists(path)){
 	dir.create(path, recursive=TRUE)
 }
+
+start_time <- Sys.time()
 
 set.seed(seed)
 data <- get_data(path)
