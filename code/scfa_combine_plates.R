@@ -51,4 +51,7 @@ sapply(scfas,
 			group_by(study_id, scfa) %>%
 			summarize(mmol_kg = mean(mmol_kg)) %>%
 			ungroup() %>%
+			spread(scfa, mmol_kg, fill=0) %>%
+			mutate(pooled = 4*butyrate + 4*isobutyrate + 3*propionate + 2*acetate) %>%
+			gather(scfa, mmol_kg, -study_id) %>%
 			write_tsv("data/scfa/scfa_composite.tsv")
