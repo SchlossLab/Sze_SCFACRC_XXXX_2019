@@ -25,22 +25,25 @@ pipeline <- function(dataset){
   results_total <-  data.frame()
   test_aucs <- c()
   cv_aucs <- c()
-  # Do the 80-20 data-split
 
-  # Stratified data partitioning 80% training - 20% testing
-  inTraining <- createDataPartition(dataset$classes, p = 0.80, list = FALSE)
+# We are doing the pre-processing to the full dataset and then splitting 80-20
+# Scale all features between 0-1
+	preProcValues <- preProcess(dataset, method = "range")
+	dataTransformed <- predict(preProcValues, dataset)
 
-  training <- dataset[ inTraining,]
-  testing  <- dataset[-inTraining,]
+# Do the 80-20 data-split
+# Stratified data partitioning %80 training - %20 testing
+	inTraining <- createDataPartition(dataTransformed$classes, p = .80, list = FALSE)
+	trainTransformed <- dataTransformed[ inTraining,]
+	testTransformed  <- dataTransformed[-inTraining,]
 
-	# remove columns that only appear within one or fewer samples of the training set. These are
-	# likely to be all zero and will not enter into the model
-	frequent <- names(which(apply(training[, -1] > 0, 2, sum) > 1))
+# remove columns that only appear within one or fewer samples of the training set. These are
+# likely to be all zero and will not enter into the model
+	frequent <- names(which(apply(dataTransformed[, -1] > 0, 2, sum) > 1))
+	trainTransformed <- trainTransformed %>% select(classes, frequent)
+	testTransformed <- testTransformed %>% select(classes, frequent)
 
-	training <- training %>% select(classes, frequent)
-	testing <- testing %>% select(classes, frequent)
-
-	n_features <- ncol(training) - 1
+	n_features <- ncol(trainTransformed) - 1
 	if(n_features > 20000) n_features <- 20000
 
 	if(n_features < 19){ mtry <- 1:6
@@ -48,23 +51,21 @@ pipeline <- function(dataset){
 
 	mtry <- mtry[mtry <= n_features]
 
-  # Scale all features between 0-1
-  preProcValues <- preProcess(training, method = "range")
-  trainTransformed <- predict(preProcValues, training)
-  testTransformed <- predict(preProcValues, testing)
+# cv index to make sure the internal 5-folds are stratified for diagnosis classes and also resampled 100 times.
+# 100 repeat internally is necessary to get robust readings of hyperparameter setting performance
+  folds <- 5
+	cvIndex <- createMultiFolds(factor(trainTransformed$classes), folds, times=100) #returnTrain = T default for multifolds
 
-	# Define hyper-parameter tuning grid and the training method
-	cv <- trainControl(method="repeatedcv",
-                     repeats = 100,
-                     number=5,
+  cv <- trainControl(method="repeatedcv",
+                     number= folds,
+                     index = cvIndex,
                      returnResamp="final",
                      classProbs=TRUE,
                      summaryFunction=twoClassSummary,
                      indexFinal=NULL,
                      savePredictions = TRUE)
 
-
-  grid <-  expand.grid(mtry = mtry[mtry <= n_features])
+  grid <-  expand.grid(mtry = mtry)
 
 	# Train the model
   trained_model <-  train(classes ~ .,

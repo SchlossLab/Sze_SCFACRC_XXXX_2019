@@ -8,24 +8,30 @@ library("data.table")
 # Function to run Begum's pipeline
 pipeline <- function(dataset){
 
-	# Create vectors to save cv and test AUC values for every data-split
-  results_total <-  data.frame()
-  test_aucs <- c()
-  cv_aucs <- c()
+# Create vectors to save cv and test AUC values for every data-split
+results_total <-  data.frame()
+test_aucs <- c()
+cv_aucs <- c()
 
-	# Stratified data partitioning %80 training - %20 testing
-  inTraining <- createDataPartition(dataset$regress, p = 0.80, list = FALSE)
-  training <- dataset[ inTraining,]
-  testing  <- dataset[-inTraining,]
+# We are doing the pre-processing to the full dataset and then splitting 80-20
+# Scale all features between 0-1
+preProcValues <- preProcess(dataset, method = "range")
+dataTransformed <- predict(preProcValues, dataset)
 
-	# remove columns that only appear within one or fewer samples of the training set. These are
-	# likely to be all zero and will not enter into the model
-	frequent <- names(which(apply(training[, -1] > 0, 2, sum) > 1))
+# remove columns that only appear within one or fewer samples of the training set. These are
+# likely to be all zero and will not enter into the model
+frequent <- names(which(apply(dataTransformed[, -1] > 0, 2, sum) > 1))
 
-	training <- training %>% select(regress, frequent)
-	testing <- testing %>% select(regress, frequent)
+dataTransformed <- dataTransformed %>% select(regress, frequent)
 
-	n_features <- ncol(training) - 1
+# Do the 80-20 data-split
+# Stratified data partitioning %80 training - %20 testing
+
+inTraining <- createDataPartition(dataTransformed$regress, p = .80, list = FALSE)
+trainTransformed <- dataTransformed[ inTraining,]
+testTransformed  <- dataTransformed[-inTraining,]
+
+	n_features <- ncol(trainTransformed) - 1
 	if(n_features > 20000) n_features <- 20000
 
 	if(n_features < 19){ mtry <- 1:6
@@ -33,22 +39,20 @@ pipeline <- function(dataset){
 
 	mtry <- mtry[mtry <= n_features]
 
-  # Scale all features between 0-1
-  preProcValues <- preProcess(training, method = "range")
-  trainTransformed <- predict(preProcValues, training)
-  testTransformed <- predict(preProcValues, testing)
-
-  # Cross-validation method
+# cv index to make sure the internal 5-folds are stratified for diagnosis classes and also resampled 100 times.
+# 100 repeat internally is necessary to get robust readings of hyperparameter setting performance
+  folds <- 5
+	cvIndex <- createMultiFolds(factor(trainTransformed$classes), folds, times=100) #returnTrain = T default for multifolds
   cv <- trainControl(method="repeatedcv",
-                     repeats = 10,
-                     number=10,
+                     number= folds,
+                     index = cvIndex,
                      returnResamp="final",
                      classProbs=FALSE,
                      indexFinal=NULL,
                      savePredictions = TRUE)
 
   # Hyper-parameter tuning budget
-	grid <-  expand.grid(mtry = mtry[mtry <= n_features])
+	grid <-  expand.grid(mtry = mtry)
 
   # Train model for 1 data-split but with 10fold-10repeat CV
   trained_model <-  train(regress ~ .,
