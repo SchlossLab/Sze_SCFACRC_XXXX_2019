@@ -70,13 +70,16 @@ Dependencies:
 * picrust v.1.53.0 (in path)
 * R packages
 	- tidyverse v.1.2.1
+* Other
+	- Need KEGG's genes.pep.format.fasta in data/references
+	- Analysis assumes the use of 12 processors
 
-Need KEGG's genes.pep.format.fasta in data/references
-Analysis assumes the use of 12 processors
 
 #### Running analysis
 
+Don't do this, but you'll get the idea...
+
 ```
-git clone https://github.com/SchlossLab/Sze_scfa_crc_XXXX_2017.git
+git clone https://github.com/SchlossLab/Sze_SCFACRC_XXXX_2019.git
 make write.paper
 ```
