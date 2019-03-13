@@ -395,43 +395,11 @@ data/rf/regression_summary.tsv : $(REGRESSION_POOLS) code/rf_pool_pools.R
 #
 ################################################################################
 
-$(FIGS)/Figure1.pdf : $(RAW)/metadata/good_metaf_final.csv\
-		$(RAW)/metadata/metaI_final.csv $(FINAL_SCFA_DATA)
-	Rscript code/make_scfa_measures_hplc_figure.R
-
-
-$(FIGS)/Figure2.pdf : $(TABLES)/selected_scfa_gene_data.csv\
-		$(TABLES)/select_scfa_opf_data.csv code/make_pi_opf_combined_graph.R
-	Rscript code/make_pi_opf_combined_graph.R
-
-
-$(FIGS)/Figure3.pdf : $(PROC)/final.taxonomy $(TABLES)/significant_reg_otu_comp_summary.csv\
-		code/make_reg_group_scfa_sig_graph.R
-	Rscript code/make_reg_group_scfa_sig_graph.R
-
-
-$(FIGS)/Figure4.pdf : $(TABLES)/adn_full_AUC_model_summary.csv\
-		$(TABLES)/adn_otu_only_AUC_model_summary.csv\
-		$(TABLES)/crc_full_AUC_model_summary.csv\
-		$(TABLES)/crc_otu_only_AUC_model_summary.csv\
-		code/make_rf_auc_graphs.R
-	Rscript code/make_rf_auc_graphs.R
-
-
-$(FIGS)/Figure5.pdf : $(SCFA_RF_R_TRAIN) $(SCFA_RF_R_TEST) $(SCFA_RF_R_DATA)\
-		$(SCFA_RF_R_IMP) code/figure5.R
-	Rscript code/figure5.R
-
-
-$(FIGS)/FigureS1.pdf : $(PROC)/final.taxonomy $(TABLES)/significant_class_otu_comp_summary.csv\
-		code/make_class_group_scfa_sig_graph.R
-	Rscript code/make_class_group_scfa_sig_graph.R
-
-$(FIGS)/FigureS2.pdf : $(SCFA_RF_C_TRAIN) $(SCFA_RF_C_TEST) $(SCFA_RF_C_DATA)\
-		$(SCFA_RF_C_IMP) code/figureS2.R
-	Rscript code/figureS2.R
-
-
+results/figures/scfa_abundance.pdf : code/figure_1.R\
+																		data/scfa/scfa_composite.tsv\
+																		data/metadata/cross_section.csv\
+																		data/metadata/follow_up.csv
+	Rscript code/figure_1.R
 
 
 ################################################################################
@@ -442,10 +410,11 @@ $(FIGS)/FigureS2.pdf : $(SCFA_RF_C_TRAIN) $(SCFA_RF_C_TEST) $(SCFA_RF_C_DATA)\
 #
 ################################################################################
 
+submission/Figure1.ps : results/figures/scfa_abundance.pdf
+	pdf2ps $^ $@
+
+
 write.paper : $(FINAL)/manuscript.Rmd $(FINAL)/supplement.Rmd\
 		$(FINAL)/references.bib $(FINAL)/mbio.csl $(FINAL)/header.tex\
-		$(FIGS)/Figure1.pdf $(FIGS)/Figure2.pdf\
-		$(FIGS)/Figure3.pdf $(FIGS)/Figure4.pdf\
-		$(FIGS)/Figure5.pdf $(FIGS)/FigureS1.pdf\
-		$(FIGS)/FigureS2.pdf code/Run_render_paper.R
+		$(FINAL)/Figure1.ps
 	R -e "source('code/Run_render_paper.R')"
