@@ -410,11 +410,15 @@ results/figures/scfa_abundance.pdf : code/figure_1.R\
 #
 ################################################################################
 
-submission/Figure1.ps : results/figures/scfa_abundance.pdf
+submission/figure_1.ps : results/figures/scfa_abundance.pdf
 	pdf2ps $^ $@
 
+figures : submission/figure_1.ps
 
-write.paper : $(FINAL)/manuscript.Rmd $(FINAL)/supplement.Rmd\
-		$(FINAL)/references.bib $(FINAL)/mbio.csl $(FINAL)/header.tex\
-		$(FINAL)/Figure1.ps
-	R -e "source('code/Run_render_paper.R')"
+write.paper : \
+		figures\
+		$(FINAL)/manuscript.Rmd\
+		$(FINAL)/references.bib $(FINAL)/mbio.csl $(FINAL)/header.tex
+	R -e 'library(rmarkdown); render("submission/manuscript.Rmd", clean=FALSE)'
+	mv submission/manuscript.knit.md submission/manuscript.md
+	rm submission/manuscript.utf8.md
