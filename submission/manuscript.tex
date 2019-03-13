@@ -124,13 +124,17 @@ Hershey Medical Center, Hershey, PA
 \newpage
 \linenumbers
 
-\hypertarget{abstract}{%
-\subsection{Abstract}\label{abstract}}
+\hypertarget{abstract-250-words}{%
+\subsection{Abstract (250 words)}\label{abstract-250-words}}
+
+Something clever
+
+\hypertarget{importance-150-words}{%
+\subsection{Importance (150 words)}\label{importance-150-words}}
+
+Something clever
 
 \newpage
-
-\hypertarget{introduction-400-words}{%
-\subsection{Introduction (400 words)}\label{introduction-400-words}}
 
 Colorectal cancer is the third leading cancer-related cause of death
 within the United States (1, 2). Less than 10\% of cases can be
@@ -169,69 +173,88 @@ been inconsistently associated with protection against tumor formation
 and recurrence (32--36). These findings temper enthusiasm for treatments
 that aim to use SCFAs as biomarkers or protection against tumorigenesis.
 
-To better understand the connection between colorectal cancer, the
-microbiome, and SCFAs, we quantified the concentration of SCFAs in feces
-of previously characterized individuals with normal colons, adenomas,
-and carcinomas and subset of those individuals after they underwent
-treatment for their lesions (14, 16). Our goals included: (1) testing
-whether there was an association between SCFA concentration and tumor
-status, (2) determining whether SCFA concentrations could be used as
-biomarkers to improve the detection of colonic lesions, and (3)
-predicting SCFA concentrations based on the relative abundance of fecal
-bacteria and their genes.
+\textbf{SCFA concentrations do not meaningfully vary with diagnosis or
+treatment.} To quantify the associations between colorectal cancer, the
+microbiome, and SCFAs, we quantified the concentration of acetate,
+propionate, isobutyrate, and butyrate in feces of previously
+characterized individuals with normal colons (N=172) and those with
+colonic adenomas (N=198) or carcinomas (N=120) (14). The only SCFA that
+had a significantly different concentration across the diagnoses was
+isobutyrate (P=0.0091; Figure 1A). The median concentration of
+isobutyrate was 3.30 mmol/kg in people with normal colons and it was
+3.00 and 3.84 mmol/kg in people with colonic adenomas or carcinomas. The
+difference in isobutyrate concentration between people with adenomas and
+carcinomas was significantly different (P=0.0065); however, the
+differences between people with normal colons and those with adenomas or
+carcinomas was not significant (P=0.19 and P=0.11). The median
+concentration of isobutyrate in people with normal colons (3.30 mmol/kg)
+was between those with adenomas (3.00 mmol/kg) and carcinomas (3.84
+mmol/kg). Among the subjects with adenomas and carcinomas, a subset
+(N\textsubscript{adenoma}=41, N\textsubscript{carcinoma}=26) were
+treated and sampled a year later (37). The only SCFA that changed
+following treatment was isobutyrate, which decreased by 0.99 mmol/kg
+(P=0.002; Figure 1B). For both the pre-treatment cross-sectional data
+and the pre/post treatment data, we pooled the SCFA concentrations on a
+per molecule of carbon basis and again failed to see any significant
+differences (P\textgreater{}0.15). The low concentration of isobutyrate
+relative to the other SCFAs, inconsistent concentrations, and unexpected
+decrease in concentration with treatment makes it difficult to ascribe
+much biological relevance to this observation.
 
-\newpage
+\textbf{Combining SCFA and microbiome data does not improve the ability
+to diagnose individual as having adenomas or carcinomas.} We previously
+found that binning 16S rRNA gene sequence data into operational
+taxonomic units based on 97\% similarity or into genera enabled us to
+classify individuals as having adenomas or carcinomas using Random
+Forest machine learning models. We repeated that analysis but added the
+concentration of the individual or pooled SCFAs as possible features to
+train a model. A model trained on the individual or pool SCFAs alone had
+a median area under the receiver operator characteristic curve (AUROC)
+of \textbf{0.XX} (IQR=\textbf{0.XX}). When we trained the models with
+the SCFAs concentrations and OTU or genus-level relative abundances
+(AUROC\textsubscript{OTU+SCFA}=\textbf{0.XX},
+AUROC\textsubscript{genus+SCFA}=\textbf{0.XX}), the AUROC values were no
+different from the models trained without the SCFA concentrations
+(AUROC\textsubscript{OTU}=\textbf{0.XX},
+AUROC\textsubscript{genus}=\textbf{0.XX}; Figure 2A). We also trained
+models using a smaller dataset that generated shotgun metagenomic
+sequencing data from a subset of our cohort
+(N\textsubscript{normal}=\textbf{XX},
+N\textsubscript{adenoma}=\textbf{XX}, and
+N\textsubscript{cancer}=\textbf{XX}). We binned genes extracted from the
+assembled metagenomes into operational protein families (OPFs) or KEGG
+categories {[}\textbf{XXXXXX}{]}. Again, the performance of the models
+trained with the meteagenomic data did not improve when the SCFA
+concentrations were added as possible features when training the model
+(Figure 2A). These data demonstrate that knowledge of the SCFA profile
+from a patient's fecal sample does not improve the ability to diagnose a
+colonic lesion.
 
-\hypertarget{results-700-words}{%
-\subsection{Results (700 words)}\label{results-700-words}}
+\textbf{Knowledge of microbial community structure does not predict SCFA
+concentrations.} Regardless of a person's diagnosis, we next asked
+whether the fecal community structure was predictive of fecal SCFA
+concentrations. We trained Random Forest regression models using 16S
+rRNA gene sequence data binned into OTUs and genera to predict the
+concentration of the individual and pooled SCFAs. Regardless of the
+binning method or SCFA, the largest amount of variation that the model
+could explain was \textbf{0.XXXX} (Figure 2B). Next, we trained Random
+Forest regression models using metagenomic sequence data binned into
+OPFs and KEGG categories to predict the concentration of the individual
+and pooled SCFAs. Similar to the analysis using 16S rRNA gene sequence
+data, the metagenomic data was not predictive of SCFA concentration; the
+largest amount of variation that the models could explain was
+\textbf{0.XXXX} (Figure 2B). Because of the limited number of samples
+that we were able to generate metagenomic sequence data from, we used
+our 16S rRNA gene sequence data to impute metagenomes that were binned
+into metabolic pathways, enzyme commission numbers, or KEGG categories
+using picrust2. Again, SCFA concentrations could not be predicted based
+on the imputed metagenomic data; the largest amount of variation that
+the models could explain was \textbf{0.XXXX} (Figure 2B). The inability
+to model SCFA concentrations from microbiome data indicates that the
+knowledge of the abundance of organisms and genes is insufficient to
+predict SCFA concentrations.
 
-\begin{itemize}
-\tightlist
-\item
-  There is no association between presence of tumors and SCFA
-  concentration
-
-  \begin{itemize}
-  \tightlist
-  \item
-    Cross sectional
-  \item
-    Aggregating SCFAs does not improve association with CRC
-  \item
-    Lack of change pre and post treatment
-  \item
-    Aggregating SCFAs does not improve association with CRC
-  \end{itemize}
-\item
-  Adding SCFA data to diagnostic models does not improve performance
-
-  \begin{itemize}
-  \tightlist
-  \item
-    Combining 16S and SCFA does not improve prediction of CRC
-  \item
-    OTU, genus, OPF, kegg
-  \end{itemize}
-\item
-  Community structure is not predictive of SCFA production
-
-  \begin{itemize}
-  \tightlist
-  \item
-    Random forest regression
-  \item
-    16S
-  \item
-    picrust
-  \item
-    shotgun metagenomic data
-  \end{itemize}
-\end{itemize}
-
-\newpage
-
-\hypertarget{discussion-200-words}{%
-\subsection{Discussion (200 words)}\label{discussion-200-words}}
+\textbf{Conclusion.}
 
 \begin{itemize}
 \tightlist
@@ -322,13 +345,6 @@ MEGAHIT (45). Open Reading Frames (ORFs) were identified using Prodigal
 Operational Protein Families (OPFs) used mmseq2 (48), and OPF alignment
 used the KEGG database (49).
 
-\textbf{Pulling genes involved with SCFA synthesis.} Specific genes
-located near the end of the pathways involved in the synthesis of
-acetate, butyrate, and propionate were analyzed for any differences
-between individuals with normal colons and those with tumors. These
-genes were based on pathways from KEGG as well as previous research (8,
-49) and a list can be found in the supplemental material {[}Table S1{]}.
-
 \textbf{Random Forest models.} The model was first trained on 80\% of
 the data and then tested on the held out 20\% (80/20 split) using the
 Random Forest algorithm for classification and regression models via the
@@ -372,14 +388,11 @@ SCFAs) using the mean decrease in accuracy.
 
 The authors thank the Great Lakes-New England Early Detection Research
 Network for providing the fecal samples that were used in this study. We
-would also like to thank Kwi Kim and Thomas M Schmidt for their help in
-running the short-chain fatty acid analysis on the High-Performance
-Liquid Chromatography machine at the University of Michigan. We would
-also like to thank Ada Hagan for providing valuable feedback on earlier
-drafts of the manuscript. Salary support for Marc A. Sze came from the
-Canadian Institute of Health Research and NIH grant UL1TR002240. Salary
-support for Patrick D. Schloss came from NIH grants P30DK034933 and
-1R01CA215574.
+would thank the University of Michigan Center for Microbial Systems for
+enabling our short-chain fatty acid analysis. Support for MAS came from
+the Canadian Institute of Health Research and the National Institutes of
+Health (UL1TR002240). Support for PDS came from the National Institutes
+of Health (P30DK034933 and R01CA215574).
 
 \newpage
 
@@ -800,25 +813,26 @@ Austria.
 
 \newpage
 
-\textbf{Figure 1. No differences in SCFA measurements were observed
-between individuals with normal colons or those with adenoma or
-carcinomas before treatment (A) or due to treatment (B).} Concentrations
-of SCFAs did not differ among individuals in the different diagnosis
-categories (normal=\textbf{XXX}, adenoma=\textbf{XXX},
-carcinoma=\textbf{XXX}) except for isobutyrate, which was significantly
-higher among individuals with cancer than those with adenomas
-(P=\textbf{0.XXXX}), but no different from those with normal colons (all
-P\textgreater{}\textbf{0.XXX}) (A). The change in SCFA concentrations
-among individuals undergoing treatment who initially had adenoma
-(N=\textbf{XX}) and carcinoma (N=\textbf{XX}) was only significant for
-the isobutyrate concentration among individuals with carcinoma
-(P=\textbf{0.XXX}, all others P\textgreater{}\textbf{0.XXX}).
+\includegraphics{../results/figures/scfa_abundance.pdf}
+
+\textbf{Figure 1. SCFA concentrations did not vary meaningfully with
+diagnosis of colonic lesions or with treatment for adenomas or
+carcinomas.} (A) We measured the concentration of fecal SCFAs from
+individuals with normal colons (N=172) or those with adenoma (N=198) or
+carcinomas (N=120) was for isobutyrate. (B) A subset of individuals
+diagnosed with adenomas (N=41) or carcinomas (N=26) who underwent
+treatment were resampled a year after the initial sampling; one extreme
+propionate value (124.4 mmol/kg) was included in the adenoma analysis
+but censored from the visualization for clarity.
+
+\newpage
 
 \textbf{Figure 2. SCFA concentrations do not improve models for
-diagnosing the presence of adenomas, carcinomas, or all lesions.}
+diagnosing the presence of adenomas, carcinomas, or all lesions. 16S
+rRNA gene and metagenomic sequence data do not predict SCFAs
+concentrations.}
 
-\textbf{Figure 3. 16S rRNA gene and metagenomic sequence data do not
-predict SCFAs concentrations.}
+\newpage
 
 \textbf{Figure S1. Comparison of training and testing results.}
 
