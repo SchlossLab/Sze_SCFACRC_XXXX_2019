@@ -42,7 +42,7 @@ testTransformed  <- dataTransformed[-inTraining,]
 # cv index to make sure the internal 5-folds are stratified for diagnosis classes and also resampled 100 times.
 # 100 repeat internally is necessary to get robust readings of hyperparameter setting performance
   folds <- 5
-	cvIndex <- createMultiFolds(factor(trainTransformed$classes), folds, times=100) #returnTrain = T default for multifolds
+	cvIndex <- createMultiFolds(factor(trainTransformed$regress), folds, times=100) #returnTrain = T default for multifolds
   cv <- trainControl(method="repeatedcv",
                      number= folds,
                      index = cvIndex,
@@ -200,7 +200,7 @@ get_data <- function(path){
 		mg_tag <- feature_sources[which(feature_sources %in% metagenomics)]
 		mg_file_name <- paste0("data/metagenome/metag.", mg_tag, ".shared")
 
-		data <- read_shared(mg_file_name, min_abundance=30) %>%
+		data <- read_shared(mg_file_name, min_abundance=5*78) %>%
 			inner_join(data, ., by=c("sample"="Group"))
 
 	}

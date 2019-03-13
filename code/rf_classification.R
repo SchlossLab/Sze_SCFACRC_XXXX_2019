@@ -231,7 +231,7 @@ get_data <- function(path) {
 		mg_tag <- feature_sources[which(feature_sources %in% metagenomics)]
 		mg_file_name <- paste0("data/metagenome/metag.", mg_tag, ".shared")
 
-		data <- read_shared(mg_file_name, min_abundance=30) %>%
+		data <- read_shared(mg_file_name, min_abundance=5*78) %>%
 			inner_join(data, ., by=c("sample"="Group"))
 
 	}
