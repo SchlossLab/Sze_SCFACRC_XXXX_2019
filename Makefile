@@ -188,7 +188,7 @@ $(PROC)/scfa_cross_section_stats.tsv $(PROC)/scfa_pre_post_stats.tsv : \
 ################################################################################
 
 DX = adenoma cancer lesion
-SCFA = burtyrate isobutyrate propionate acetate pooled
+SCFA = butyrate isobutyrate propionate acetate pooled
 MICROBIOME = asv otu genus family phylum picrust1 pc2ko pc2ec pc2pathways opf kegg
 SEED = $(shell seq 0 99)
 
