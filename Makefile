@@ -258,7 +258,7 @@ $(PC2EC_OC) $(PC2EC_MC) : data/scfa/scfa_composite.tsv data/metadata/cross_secti
 	Rscript code/rf_classification.R $(subst .,,$(suffix $(basename $@))) $(dir $@)
 
 
-PC2PATHWAYS_OC=$(call CLASS_O_RF,pc2pathways fit_pc2pathways scfa_pc2pathways fit_scfa_pc2pathway)
+PC2PATHWAYS_OC=$(call CLASS_O_RF,pc2pathways fit_pc2pathways scfa_pc2pathways fit_scfa_pc2pathways)
 PC2PATHWAYS_MC=$(subst optimum,all,$(PC2PATHWAYS_OC))
 
 $(PC2PATHWAYS_OC) $(PC2PATHWAYS_MC) : data/scfa/scfa_composite.tsv data/metadata/cross_section.csv data/picrust2/crc.pathways.shared code/rf_classification.R
