@@ -146,6 +146,10 @@ $(MGSHARED) data/metagenome/metag.ko_lookup.tsv : $(REFS)/genes.pep.format.fasta
 																			code/metagenomics_get_shared.R
 	bash code/metagenomics.sh
 
+data/metagenome/metag.sample.counts : data/metagenome/metag.kegg.shared code/metagenomics_get_ns.R
+	Rscript code/metagenomics_get_ns.R
+
+
 
 
 # Targets build correctly
