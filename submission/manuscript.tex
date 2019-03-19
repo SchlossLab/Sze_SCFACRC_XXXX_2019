@@ -206,27 +206,28 @@ to diagnose individual as having adenomas or carcinomas.} We previously
 found that binning 16S rRNA gene sequence data into operational
 taxonomic units based on 97\% similarity or into genera enabled us to
 classify individuals as having adenomas or carcinomas using Random
-Forest machine learning models. We repeated that analysis but added the
-concentration of the individual or pooled SCFAs as possible features to
-train a model. A model trained on the individual or pool SCFAs alone had
-a median area under the receiver operator characteristic curve (AUROC)
-of \textbf{0.XX} (IQR=\textbf{0.XX}). When we trained the models with
-the SCFAs concentrations and OTU or genus-level relative abundances
-(AUROC\textsubscript{OTU+SCFA}=\textbf{0.XX},
-AUROC\textsubscript{genus+SCFA}=\textbf{0.XX}), the AUROC values were no
-different from the models trained without the SCFA concentrations
-(AUROC\textsubscript{OTU}=\textbf{0.XX},
-AUROC\textsubscript{genus}=\textbf{0.XX}; Figure 2A). We also trained
-models using a smaller dataset that generated shotgun metagenomic
-sequencing data from a subset of our cohort
-(N\textsubscript{normal}=\textbf{XX},
-N\textsubscript{adenoma}=\textbf{XX}, and
-N\textsubscript{cancer}=\textbf{XX}). We binned genes extracted from the
+Forest machine learning models (13, 14). We repeated that analysis but
+added the concentration of the individual or pooled SCFAs as possible
+features to train a model. Models trained using SCFAs to classify
+individuals as having adenomas or carcinomas rather than normal colons
+had median areas under the receiver operator characteristic curve
+(AUROC) that were significantly greater than 0.5
+(P\textsubscript{adenoma}\textless{}0.001 and
+P\textsubscript{carcinoma}\textless{}0.001); however, the AUROC values
+to detect the presence of adenomas or carcinomas were only 0.54 and
+0.55, respectively (Figure 2A). When we trained the models with the
+SCFAs concentrations and OTU or genus-level relative abundances the
+AUROC values were not significantly different from the models trained
+without the SCFA concentrations (P\textgreater{}0.21; Figure 2A). We
+also trained models using a smaller dataset that generated shotgun
+metagenomic sequencing data from a subset of our cohort
+(N\textsubscript{normal}=27, N\textsubscript{adenoma}=25, and
+N\textsubscript{cancer}=26) (16). We binned genes extracted from the
 assembled metagenomes into operational protein families (OPFs) or KEGG
-categories {[}\textbf{XXXXXX}{]}. Again, the performance of the models
-trained with the meteagenomic data did not improve when the SCFA
-concentrations were added as possible features when training the model
-(Figure 2A). These data demonstrate that knowledge of the SCFA profile
+categories. Again, the performance of the models trained with the
+meteagenomic data did not improve when the SCFA concentrations were
+added as possible features when training the model (P\textgreater{}0.24;
+Figure 2A). These data demonstrate that knowledge of the SCFA profile
 from a patient's fecal sample does not improve the ability to diagnose a
 colonic lesion.
 
@@ -254,30 +255,25 @@ to model SCFA concentrations from microbiome data indicates that the
 knowledge of the abundance of organisms and genes is insufficient to
 predict SCFA concentrations.
 
-\textbf{Conclusion.}
-
-\begin{itemize}
-\tightlist
-\item
-  Unlikely that SCFAs are the primary mechanism that limits
-  tumorigenesis
-\item
-  Limitations
-
-  \begin{itemize}
-  \tightlist
-  \item
-    Observing the community once the tumor is developed
-  \item
-    Not looking at mucosal communities
-  \end{itemize}
-\item
-  Need to identify other possible mechanisms that drive and prevent
-  tumorigenesis
-\item
-  Supports evidence that fiber consumption has a null effect on
-  tumorigenesis
-\end{itemize}
+\textbf{Conclusion.} Our data indicate that fecal SCFA concentrations
+are not associated with the presence of adenomas or carcinomas and that
+they provide weak predictive power to improve the ability to diagnose
+someone with one of these lesions. Furthermore, knowledge of the
+taxonomic and genetic structure of gut microbiota was not predictive of
+individual or pooled SCFA concentrations. These results complement
+existing literature that suggest that fiber consumption and the
+production of SCFAs are unable to prevent the risk of developing colonic
+tumors. It is important to note that our analysis concerned fecal SCFA
+concentrations and microbiome characterization and that observations
+along the mucosa near the site of lesions may provide a stronger
+association. Regardless, given the growing literature in this area, it
+is unlikely that SCFAs are the primary mechanism that limits
+tumorigenesis. This may be a cautionary result to temper enthusiasm for
+SCFAs as a biomarker of gut health more generally. Going forward it is
+critical to develop additional hypotheses for how the microbiome and
+host interact to drive tumorigenesis to better understand the disease
+process and identify biomarkers that will allow early detection of
+tumors.
 
 \newpage
 
