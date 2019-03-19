@@ -180,6 +180,7 @@ get_data <- function(path) {
 	if("scfa" %in% feature_sources){
 		data <- read_tsv('data/scfa/scfa_composite.tsv',
 										col_types=cols(study_id=col_character())) %>%
+		filter(scfa != "pooled") %>% 
 		spread(key=scfa, value=mmol_kg) %>%
 		inner_join(data, ., by=c("sample"="study_id"))
 	}
