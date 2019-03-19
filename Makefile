@@ -376,8 +376,11 @@ $(KEGG_OR) $(KEGG_MR) : data/scfa/scfa_composite.tsv data/metadata/zackular_meta
 CLASSIFICATION_TAGS = fit scfa fit_scfa $(MICROBIOME) $(foreach M,$(MICROBIOME),fit_$M) $(foreach M,$(MICROBIOME),scfa_$M) $(foreach M,$(MICROBIOME),fit_scfa_$M)
 CLASSIFICATION_POOLS = $(foreach C,$(CLASSIFICATION_TAGS),$(foreach D,$(DX),data/rf/$D_$C/cv_test_compare.tsv))
 
-data/rf/classification_summary.tsv : $(CLASSIFICATION_POOLS) code/rf_pool_pools.R
+data/rf/classification_data_pool.tsv : $(CLASSIFICATION_POOLS) code/rf_pool_pools.R
 	Rscript code/rf_pool_pools.R $@ $(CLASSIFICATION_POOLS)
+
+data/rf/classification_cv_test_compare.tsv data/rf/classification_w_wo_SCFA.tsv data/rf/classification_SCFA_to_random.tsv : data/rf/classification_data_pool.tsv code/rf_compare_classification_models.R
+	Rscript code/rf_compare_classification_models.R
 
 
 REGRESSION_TAGS = fit $(MICROBIOME) $(foreach M,$(MICROBIOME),fit_$M)
