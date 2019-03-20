@@ -1,5 +1,4 @@
 ---
-title: "Revisiting the Relationship between Short-Chain Fatty Acids, the Microbiota, and Colorectal Tumors"
 bibliography: references.bib
 output:
   pdf_document:
@@ -16,7 +15,7 @@ geometry: margin=1.0in
 
 \vspace{35mm}
 
-Fecal short chain fatty acids are not predictive of colorectal cancer status and cannot be predicted based on bacterial community structure
+# Fecal short chain fatty acids are not predictive of colorectal cancer status and cannot be predicted based on bacterial community structure
 
 \vspace{35mm}
 
@@ -31,19 +30,24 @@ $1$ Department of Microbiology and Immunology, University of Michigan, Ann Arbor
 
 $2$ Department of Family Medicine and Community Medicine, Penn State Hershey Medical Center, Hershey, PA
 
+\vspace{10mm}
+
+## Observation format
 
 \newpage
 \linenumbers
 
 
-## Abstract (250 words)
+## Abstract
 
-Something clever
+The gut microbiome is thought to have a role in the development of colorectal cancer by protecting against and exacerbating inflammation. Short chain fatty acids (SCFAs), including butyrate, have been shown to have anti-inflammatory properties and are produced in large quantities by colonic bacteria. We assessed whether there was an association between fecal SCFA concentrations and the presence of colonic adenomas or carcinomas in a cohort of individuals that was previously subjected to 16S rRNA gene and metagenomic shotgun sequencing. We measured the fecal concentrations of acetate, propionate, isobutyrate, and butyrate within the cohort and found that there were no meaningful differences in their concentration and disease status. When we incorporated these concentrations into Random Forest classification models trained to differentiate between people with normal colons and those with adenomas or carcinomas, we found that they did not significantly improve the ability of 16S rRNA gene or metagenomic gene sequence-based models to classify individuals. Finally, we generated Random Forest regression models trained to predict the concentration of each SCFA based on 16S rRNA gene or metagenomic gene sequence data from the same samples. These models performed poorly and were only able to explain less than 10% of the observed variation in the SCFA concentrations. These results support the broader epidemiological data that questions the value of fiber consumption for reducing the risks of colorectal cancer. Although it is likely that bacterial metabolites may serve as biomarkers to detect adenomas or carcinomas, fecal SCFA concentrations have limited value.
 
+\newpage
 
-## Importance (150 words)
+## Importance
 
-Something clever
+Considering colorectal cancer is the third leading cancer-related cause of death within the United States, there is a great need to detect colorectal tumors early without invasive colonoscopy procedures and to prevent the formation of tumors. Short chain fatty acids (SCFAs) are often used as a surrogate for measuring gut health and for being anti-carcinogenic because of their anti-inflammatory properties. We evaluated the fecal SCFA concentration of a cohort of individuals with varying colonic tumor burden who were previously analyzed to identify microbiome-based biomarkers of tumors. We were unable to find an association between SCFA concentration and tumor burden or use SCFAs to improve our microbiome-based models of classifying people based on their tumor status. Furthermore, we were unable to find an association between the fecal community structure and SCFA concentrations. These data indicate that there is not a meaningful link between the gut microbiome, SCFAs, and tumor burden.
+
 
 \newpage
 
