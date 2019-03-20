@@ -67,7 +67,8 @@ and patients with adenomas or carcinomas (P-value > 0.15). Using metagenomic seq
 Dependencies:
 * SRA toolkit v.2.8.2 (in path)
 * mothur v.1.42.0 (in path)
-* picrust v.1.53.0 (in path)
+* picrust v.1.53.0 (in picrust1 conda environment)
+* picrust v.2.1.0-b (in picrust2 conda environment)
 * R packages
 	- tidyverse v.1.2.1
 * Other

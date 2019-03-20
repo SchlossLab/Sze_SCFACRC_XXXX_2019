@@ -60,7 +60,7 @@ model_data %>%
 model_data %>%
 	filter(input == "scfa") %>%
 	group_by(class) %>%
-	summarize(test=list(tidy(wilcox.test(test_aucs, mu=0.5))),
+	summarize(test=list(tidy(wilcox.test(test_aucs, mu=0.5, alternative="great"))),
 						summary=list(tidy(summary(test_aucs)))) %>%
 	unnest() %>%
 	write_tsv("data/rf/classification_SCFA_to_random.tsv")
