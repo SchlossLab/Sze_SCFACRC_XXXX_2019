@@ -26,7 +26,8 @@ follow_up_metadata <- read_csv("data/metadata/follow_up.csv",
 cross_section <- inner_join(scfa_data, cross_section_metadata, by=c("study_id"="sample")) %>%
 	select(scfa, mmol_kg, dx) %>%
 	ggplot(aes(x=dx, y=mmol_kg, fill=dx)) +
-		geom_violin(show.legend=FALSE, draw_quantiles=0.5) +
+		# geom_violin(show.legend=FALSE, draw_quantiles=0.5) +
+		geom_boxplot(show.legend=FALSE) +
 		facet_wrap(~scfa, scales="free_y", nrow=1, labeller=labeller(.default=capitalize)) +
 		labs(x=NULL, y="mmol of SCFA/kg of feces") +
 		scale_x_discrete(labels = NULL) +
@@ -56,7 +57,8 @@ longitudinal <- inner_join(scfa_data, follow_up_metadata, by=c("study_id"="initi
 	mutate(ymax = max(abs(diff)), ymin = -1 * ymax) %>%
 	ungroup() %>%
 	ggplot(aes(x=dx, y=diff, fill=dx)) +
-		geom_violin(draw_quantiles=0.5) +
+		# geom_violin(draw_quantiles=0.5) +
+		geom_boxplot() +
 		geom_blank(aes(y = ymin)) + geom_blank(aes(y = ymax)) +
 		facet_wrap(~scfa, scales="free_y", nrow=1, labeller=labeller(.default=capitalize)) +
 		labs(x=NULL, y="Difference in SCFA concentration\nbefore and after treatment") +
