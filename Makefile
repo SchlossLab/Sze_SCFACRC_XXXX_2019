@@ -383,14 +383,10 @@ CLASSIFICATION_POOLS = $(foreach C,$(CLASSIFICATION_TAGS),$(foreach D,$(DX),data
 data/rf/classification_data_pool.tsv : $(CLASSIFICATION_POOLS) code/rf_pool_pools.R
 	Rscript code/rf_pool_pools.R $@ $(CLASSIFICATION_POOLS)
 
-data/rf/classification_cv_test_compare.tsv data/rf/classification_w_wo_SCFA.tsv data/rf/classification_SCFA_to_random.tsv : data/rf/classification_data_pool.tsv code/rf_compare_classification_models.R
-	Rscript code/rf_compare_classification_models.R
-
-
 REGRESSION_TAGS = fit $(MICROBIOME) $(foreach M,$(MICROBIOME),fit_$M)
 REGRESSION_POOLS = $(foreach C,$(REGRESSION_TAGS),$(foreach S,$(SCFA),data/rf/$S_$C/cv_test_compare.tsv))
 
-data/rf/regression_summary.tsv : $(REGRESSION_POOLS) code/rf_pool_pools.R
+data/rf/regression_data_pool.tsv : $(REGRESSION_POOLS) code/rf_pool_pools.R
 	Rscript code/rf_pool_pools.R $@ $(REGRESSION_POOLS)
 
 
@@ -401,6 +397,10 @@ data/rf/regression_summary.tsv : $(REGRESSION_POOLS) code/rf_pool_pools.R
 #	Run scripts to generate figures and tables
 #
 ################################################################################
+
+data/rf/classification_cv_test_compare.tsv data/rf/classification_w_wo_SCFA.tsv data/rf/classification_SCFA_to_random.tsv : data/rf/classification_data_pool.tsv code/rf_compare_classification_models.R
+	Rscript code/rf_compare_classification_models.R
+
 
 results/figures/scfa_abundance.pdf : code/plot_scfa_comparisons.R\
 																		data/scfa/scfa_composite.tsv\

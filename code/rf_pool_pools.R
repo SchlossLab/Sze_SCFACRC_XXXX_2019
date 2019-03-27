@@ -5,7 +5,7 @@ options(warn = 1)
 cv_test_compare_files <- function(file) {
 	print(file)
 
-	read_tsv(file, col_types=cols(col_character(), col_double(), col_double(), col_double())) %>%
+	read_tsv(file, col_types=cols(condition=col_character(), .default=col_double())) %>%
 		mutate(condition=str_replace(condition, "_", ".")) %>%
 		separate(condition, into=c("class", "input"), sep="\\.")
 

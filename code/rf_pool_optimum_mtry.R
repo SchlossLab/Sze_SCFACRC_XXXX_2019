@@ -2,7 +2,7 @@ library(tidyverse)
 
 read_optimum_mtry_file <- function(file) {
 
-	read_csv(file, col_types=cols(col_double(), col_double())) %>%
+	read_csv(file, col_types=cols(.default=col_double())) %>%
 		mutate(file=str_replace(file, "//", "/"),
 					iteration=as.numeric(str_replace(file, ".*optimum.mtry.(\\d*).csv", "\\1")),
 					condition=str_replace(file, "data/rf/(.*)/optimum.*", "\\1")
