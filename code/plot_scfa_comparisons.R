@@ -81,4 +81,4 @@ longitudinal <- inner_join(scfa_data, follow_up_metadata, by=c("study_id"="initi
 
 ### Merge the figures together
 plot_grid(cross_section, longitudinal, nrow=2, labels=c("A", "B"))
-ggsave("results/figures/scfa_abundance.pdf", width=6.875, height=6, units="in")
+ggsave("results/figures/scfa_comparisons.pdf", width=6.875, height=6, units="in")

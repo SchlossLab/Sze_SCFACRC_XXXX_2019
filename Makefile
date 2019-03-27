@@ -402,11 +402,11 @@ data/rf/regression_summary.tsv : $(REGRESSION_POOLS) code/rf_pool_pools.R
 #
 ################################################################################
 
-results/figures/scfa_abundance.pdf : code/figure_1.R\
+results/figures/scfa_abundance.pdf : code/plot_scfa_comparisons.R\
 																		data/scfa/scfa_composite.tsv\
 																		data/metadata/cross_section.csv\
 																		data/metadata/follow_up.csv
-	Rscript code/figure_1.R
+	Rscript code/plot_scfa_comparisons.R
 
 
 ################################################################################
@@ -417,7 +417,7 @@ results/figures/scfa_abundance.pdf : code/figure_1.R\
 #
 ################################################################################
 
-submission/figure_1.ps : results/figures/scfa_abundance.pdf
+submission/figure_1.ps : results/figures/scfa_comparisons.pdf
 	pdf2ps $^ $@
 
 figures : submission/figure_1.ps
