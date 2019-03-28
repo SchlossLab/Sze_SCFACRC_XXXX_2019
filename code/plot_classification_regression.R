@@ -104,4 +104,4 @@ regression_features_plot <- regression_data %>%
 
 plot_grid(classification_plot, regression_features_plot, nrow=2, labels=c("A", "B"), rel_heights=c(0.5, 1))
 
-ggsave("results/figures/scfa_modelling.pdf", width=6.875, height=6, units="in")
+ggsave("results/figures/scfa_modeling.pdf", width=6.875, height=6, units="in")

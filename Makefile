@@ -409,7 +409,7 @@ results/figures/scfa_abundance.pdf : code/plot_scfa_comparisons.R\
 	Rscript code/plot_scfa_comparisons.R
 
 
-results/figures/scfa_modelling.pdf : code/plot_classification_regression.R\
+results/figures/scfa_modeling.pdf : code/plot_classification_regression.R\
 																		data/rf/classification_data_pool.tsv\
 																		data/rf/regression_data_pool.tsv
 	Rscript code/plot_classification_regression.R
@@ -436,7 +436,7 @@ results/figures/regression_testing.pdf : code/plot_regression_fit.R\
 submission/figure_1.ps : results/figures/scfa_comparisons.pdf
 	pdf2ps $^ $@
 
-submission/figure_2.ps : results/figures/scfa_modelling.pdf
+submission/figure_2.ps : results/figures/scfa_modeling.pdf
 	pdf2ps $^ $@
 
 submission/figure_s1.ps : results/figures/classification_testing.pdf
