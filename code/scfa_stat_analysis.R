@@ -1,7 +1,11 @@
 library(tidyverse)
 library(broom)
 
-scfa <- read_tsv("data/scfa/scfa_composite.tsv",  col_type = cols(study_id = col_character()))
+total_scfa <- read_tsv("data/scfa/scfa_composite.tsv",  col_type = cols(study_id = col_character())) %>% spread(scfa, mmol_kg) %>% mutate(total = acetate + butyrate + isobutyrate + propionate) %>% gather(scfa, mmol_kg, -study_id)
+
+rel_scfa <- total_scfa %>% spread(scfa, mmol_kg) %>% mutate(rel_acetate = acetate / total, rel_butyrate = butyrate/total, rel_isobutyrate = isobutyrate/total, rel_propionate = propionate / total) %>%  select(study_id, rel_acetate, rel_butyrate, rel_isobutyrate, rel_propionate) %>% gather(scfa, mmol_kg, -study_id)
+
+scfa <- rbind(total_scfa, rel_scfa)
 
 #cross section analysis
 get_mean_dx <- function(x){

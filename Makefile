@@ -458,6 +458,14 @@ figures : submission/figure_1.ps submission/figure_2.ps\
 
 write.paper : \
 		figures\
+		data/metadata/cross_section.csv\
+		data/metadata/follow_up.csv\
+		data/process/scfa_cross_section_stats.tsv\
+		data/process/scfa_pre_post_stats.tsv\
+		data/rf/classification_SCFA_to_random.tsv\
+		data/rf/classification_w_wo_SCFA.tsv\
+		data/rf/regression_data_pool.tsv\
+		data/metagenome/metag.sample.counts\
 		$(FINAL)/manuscript.Rmd\
 		$(FINAL)/references.bib $(FINAL)/mbio.csl $(FINAL)/header.tex
 	R -e 'library(rmarkdown); render("submission/manuscript.Rmd", clean=FALSE)'
