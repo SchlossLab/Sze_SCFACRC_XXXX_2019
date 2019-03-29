@@ -150,24 +150,6 @@ data/metagenome/metag.sample.counts : data/metagenome/metag.kegg.shared code/met
 	Rscript code/metagenomics_get_ns.R
 
 
-
-
-# Targets build correctly
-# Get specific SCFA KEGG matches
-SCFA_SHARED=data/metagenome/metag.keggscfa.shared data/picrust1/crc.picrust1scfa.shared data/picrust2/crc.picrust2scfa.shared
-
-.SECONDEXPANSION:
-$(SCFA_SHARED) : $$(subst scfa,,$$@) code/scfa_genes.R
-	R -e "source('code/scfa_genes.R'); get_scfa_keggs('$<')"
-
-data/metagenome/metag.opfscfa.shared : data/metagenome/metag.opf.shared\
-																				data/metagenome/metag.ko_lookup.tsv\
-																				code/scfa_genes.R
-	R -e "source('code/scfa_genes.R'); get_scfa_keggs('data/metagenome/metag.opf.shared', 'data/metagenome/metag.ko_lookup.tsv')"
-
-
-
-
 ################################################################################
 #
 # Part 3: Compare SCFA concentrations across diagnosis groups
@@ -376,8 +358,9 @@ $(KEGG_OR) $(KEGG_MR) : data/scfa/scfa_composite.tsv data/metadata/zackular_meta
 	Rscript code/rf_pool_optimum_mtry.R $*
 
 
+MICROBIOME_SUBSET = otu genus kegg opf pc2pathways pc2ko
 # Make monster pool files for classification and RF analysis
-CLASSIFICATION_TAGS = fit scfa fit_scfa $(MICROBIOME) $(foreach M,$(MICROBIOME),fit_$M) $(foreach M,$(MICROBIOME),scfa_$M) $(foreach M,$(MICROBIOME),fit_scfa_$M)
+CLASSIFICATION_TAGS = fit scfa fit_scfa $(MICROBIOME_SUBSET) $(foreach M,$(MICROBIOME_SUBSET),scfa_$M)
 CLASSIFICATION_POOLS = $(foreach C,$(CLASSIFICATION_TAGS),$(foreach D,$(DX),data/rf/$D_$C/cv_test_compare.tsv))
 
 data/rf/classification_data_pool.tsv : $(CLASSIFICATION_POOLS) code/rf_pool_pools.R
