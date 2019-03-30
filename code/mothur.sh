@@ -35,7 +35,8 @@ done
 cut -d , -f 1,12 data/raw/16S/SRP0* | grep "SRR" | sed -E "s/(^SRR.*),([^_]*)_.*/\2\t\\1_1.fastq\t\\1_2.fastq/" > $RAWDIR/crc.files
 
 #Run mothur process
-mothur "#make.contigs(file=crc.files, inputdir=$RAWDIR, outputdir=$WORKDIR, processors=12);
+mothur "#set.seed(seed=19760620);
+	make.contigs(file=crc.files, inputdir=$RAWDIR, outputdir=$WORKDIR, processors=6);
 	screen.seqs(fasta=current, group=current, maxambig=0, maxlength=275);
 	unique.seqs(fasta=current);
 	count.seqs(name=current, group=current);
