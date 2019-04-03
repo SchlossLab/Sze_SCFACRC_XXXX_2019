@@ -1,9 +1,11 @@
 library(tidyverse)
 library(broom)
 
-total_scfa <- read_tsv("data/scfa/scfa_composite.tsv",  col_type = cols(study_id = col_character())) %>% spread(scfa, mmol_kg) %>% mutate(total = acetate + butyrate + isobutyrate + propionate) %>% gather(scfa, mmol_kg, -study_id)
+#remove isobutyrate because it was below the limit of detection
+total_scfa <- read_tsv("data/scfa/scfa_composite.tsv",  col_type = cols(study_id = col_character())) %>% filter(scfa != "isobutyrate") %>% spread(scfa, mmol_kg) %>% mutate(pooled = acetate + 2*propionate + 3*butyrate,
+	total = acetate + butyrate + propionate) %>% gather(scfa, mmol_kg, -study_id)
 
-rel_scfa <- total_scfa %>% spread(scfa, mmol_kg) %>% mutate(rel_acetate = acetate / total, rel_butyrate = butyrate/total, rel_isobutyrate = isobutyrate/total, rel_propionate = propionate / total) %>%  select(study_id, rel_acetate, rel_butyrate, rel_isobutyrate, rel_propionate) %>% gather(scfa, mmol_kg, -study_id)
+rel_scfa <- total_scfa %>% spread(scfa, mmol_kg) %>% mutate(rel_acetate = acetate / total, rel_butyrate = butyrate/total, rel_propionate = propionate / total) %>%  select(study_id, rel_acetate, rel_butyrate, rel_propionate) %>% gather(scfa, mmol_kg, -study_id)
 
 scfa <- rbind(total_scfa, rel_scfa)
 

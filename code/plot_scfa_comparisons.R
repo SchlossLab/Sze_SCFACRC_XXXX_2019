@@ -11,7 +11,8 @@ capitalize <- function(string) {
 
 ### Read in scfa data and metadata
 scfa_data <- read_tsv('data/scfa/scfa_composite.tsv') %>%
-	mutate(scfa=factor(scfa, levels=c("acetate", "propionate", "isobutyrate", "butyrate"))) %>%
+	filter(scfa != "isobutyrate") %>%
+	mutate(scfa=factor(scfa, levels=c("acetate", "propionate", "butyrate"))) %>%
 	filter(scfa != "pooled")
 
 cross_section_metadata <- read_csv("data/metadata/cross_section.csv",

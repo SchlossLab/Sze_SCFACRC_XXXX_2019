@@ -81,7 +81,7 @@ $(REFS)/97_otu_map.txt $(REFS)/gg_13_5_99.gg.fasta $(REFS)/gg_13_5_99.gg.tax  :
 # Targets build correctly
 # Process the SCFA data
 PLATES = plate1 plate2 plate3 plate4 plate5 plate6 plate7 plate8
-SCFA = acetate butyrate isobutyrate propionate
+SCFA = acetate butyrate propionate #isobutyrate
 PLATE_FILES = $(foreach A, $(SCFA), $(foreach S, $(PLATES),data/raw/scfa/$(A)/$(S)_scfa_crc_$(A).txt))
 
 data/scfa/scfa_composite.tsv : $(PLATE_FILES) data/metadata/scfa_plate_metadata.csv\
@@ -174,7 +174,7 @@ $(PROC)/scfa_cross_section_stats.tsv $(PROC)/scfa_pre_post_stats.tsv : \
 ################################################################################
 
 DX = adenoma cancer lesion
-SCFA = butyrate isobutyrate propionate acetate pooled
+SCFA = butyrate propionate acetate #pooled isobutyrate
 MICROBIOME = asv otu genus family phylum picrust1 pc2ko pc2ec pc2pathways opf kegg
 SEED = $(shell seq 0 99)
 

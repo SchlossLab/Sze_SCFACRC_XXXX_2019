@@ -56,7 +56,7 @@ classification_plot <- classification_data %>%
 regression_file_name <- "data/rf/regression_data_pool.tsv"
 
 regression_features <- c("genus", "otu", "kegg", "opf", "pc2pathways", "pc2ec")
-scfa_types <- c("acetate", "propionate", "isobutyrate", "butyrate")
+scfa_types <- c("acetate", "propionate", "butyrate")
 
 regression_data <- read_tsv(regression_file_name,
 					col_types=cols(class=col_character(),

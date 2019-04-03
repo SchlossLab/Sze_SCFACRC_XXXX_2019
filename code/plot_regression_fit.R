@@ -13,7 +13,7 @@ capitalize <- function(string) {
 regression_file_name <- "data/rf/regression_data_pool.tsv"
 
 regression_features <- c("genus", "otu", "kegg", "opf", "pc2pathways", "pc2ec")
-scfa_types <- c("acetate", "propionate", "isobutyrate", "butyrate")
+scfa_types <- c("acetate", "propionate", "butyrate")
 
 regression_data <- read_tsv(regression_file_name,
 					col_types=cols(class=col_character(),
@@ -59,4 +59,4 @@ regression_data %>%
 		panel.spacing.x=unit(1, "lines"),
 		axis.ticks.x = element_blank(),
 		strip.text = element_text(size=10)
-	) + ggsave("results/figures/regression_testing.pdf")
+	) + ggsave("results/figures/regression_testing.pdf", width=6.875, height=5)
