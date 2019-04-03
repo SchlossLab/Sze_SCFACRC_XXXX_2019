@@ -99,7 +99,7 @@
 \vspace{35mm}
 
 \hypertarget{fecal-short-chain-fatty-acids-are-not-predictive-of-colonic-tumor-status-and-cannot-be-predicted-based-on-bacterial-community-structure}{%
-\section{Fecal short chain fatty acids are not predictive of colonic
+\section{Fecal short-chain fatty acids are not predictive of colonic
 tumor status and cannot be predicted based on bacterial community
 structure}\label{fecal-short-chain-fatty-acids-are-not-predictive-of-colonic-tumor-status-and-cannot-be-predicted-based-on-bacterial-community-structure}}
 
@@ -133,7 +133,7 @@ Hershey Medical Center, Hershey, PA
 
 Colonic bacterial populations are thought to have a role in the
 development of colorectal cancer with some protecting against
-inflammation and others exacerbating inflammation. Short chain fatty
+inflammation and others exacerbating inflammation. Short-chain fatty
 acids (SCFAs), including butyrate, have been shown to have
 anti-inflammatory properties and are produced in large quantities by
 colonic bacteria which produce SCFAs by fermenting fiber. We assessed
@@ -142,7 +142,7 @@ the presence of colonic adenomas or carcinomas in a cohort of
 individuals using 16S rRNA gene and metagenomic shotgun sequence data.
 We measured the fecal concentrations of acetate, propionate, and
 butyrate within the cohort and found that there were no significant
-associations between SCFA concentration and disease status. When we
+associations between SCFA concentration and tumor status. When we
 incorporated these concentrations into random forest classification
 models trained to differentiate between people with normal colons and
 those with adenomas or carcinomas, we found that they did not
@@ -166,7 +166,7 @@ predictive power.
 Considering colorectal cancer is the third leading cancer-related cause
 of death within the United States, there is a great need to detect
 colorectal tumors early without invasive colonoscopy procedures and to
-prevent the formation of tumors. Short chain fatty acids (SCFAs) are
+prevent the formation of tumors. Short-chain fatty acids (SCFAs) are
 often used as a surrogate for measuring gut health and for being
 anti-carcinogenic because of their anti-inflammatory properties. We
 evaluated the fecal SCFA concentration of a cohort of individuals with
@@ -184,7 +184,7 @@ SCFAs, and tumor burden.
 Colorectal cancer is the third leading cancer-related cause of death
 within the United States (1). Less than 10\% of cases can be attributed
 to genetic risk factors (2). This leaves a significant role for
-environmental and behavioral factors and diet (3, 4). Colorectal cancer
+environmental, behavioral, and dietary factors (3, 4). Colorectal cancer
 is thought to be initiated by a series of mutations that accumulate as
 the mutated cells begin to proliferate leading to adenomatous lesions,
 which are succeeded by carcinomas (2). Throughout this progression,
@@ -213,8 +213,9 @@ and relative fecal acetate levels and decreased relative fecal butyrate
 concentrations in subjects with colonic lesions (13). In randomized
 controlled trials fiber supplementation has been inconsistently
 associated with protection against tumor formation and recurrence (14,
-15). These findings temper enthusiasm for treatments that aim to use
-SCFAs as biomarkers or protection against tumorigenesis.
+15). These findings temper enthusiasm for treatments that target the
+production of SCFAs or for using them as biomarkers for protection
+against tumorigenesis.
 
 \textbf{Fecal SCFA concentrations did not vary with diagnosis or
 treatment.} To quantify the associations between colorectal cancer, the
@@ -254,7 +255,7 @@ on their own (Figure 2A). When we trained the models with the SCFAs
 concentrations and OTU or genus-level relative abundances the AUROC
 values were not significantly different from the same models trained
 without the SCFA concentrations (P\textgreater{}0.21; Figure 2A). These
-data demonstrate that knowledge of the SCFA profile from a patient's
+data demonstrate that knowledge of the SCFA profile from a subject's
 fecal sample did not improve the ability to diagnose a colonic lesion.
 
 \textbf{Knowledge of microbial community structure does not predict SCFA
@@ -273,16 +274,15 @@ assembled metagenomes into operational protein families (OPFs) or KEGG
 categories and trained random forest regression models using metagenomic
 sequence data to predict the concentration of the SCFAs (Figure S2).
 Similar to the analysis using 16S rRNA gene sequence data, the
-metagenomic data was not predictive of SCFA concentration; the largest
-amount of variation that the models could explain was 5.45\%, which was
-observed when using KEGG data to predict propionate concentrations
-(Figure 2B). Because of the limited number of samples that we were able
-to generate metagenomic sequence data from, we used our 16S rRNA gene
-sequence data to impute metagenomes that were binned into metabolic
-pathways or KEGG categories using PICRUSt (Figure S2). SCFA
-concentrations could not be predicted based on the imputed metagenomic
-data. The largest amount of variation that the models could explain was
-9.67\%, which was observed when using KEGG data to predict butyrate
+metagenomic data was not predictive of SCFA concentration. The largest
+R\textsuperscript{2} was 0.055, which was observed when using KEGG data
+to predict propionate concentrations (Figure 2B). Because of the limited
+number of samples that we were able to generate metagenomic sequence
+data from, we used our 16S rRNA gene sequence data to impute metagenomes
+that were binned into metabolic pathways or KEGG categories using
+PICRUSt (Figure S2). SCFA concentrations could not be predicted based on
+the imputed metagenomic data. The largest R\textsuperscript{2} was
+0.097, which was observed when using KEGG data to predict butyrate
 concentrations (Figure 2B). The inability to model SCFA concentrations
 from microbiome data indicates that the knowledge of the abundance of
 organisms and their genes was insufficient to predict SCFA
@@ -296,16 +296,14 @@ taxonomic and genetic structure of gut microbiota was not predictive of
 SCFA concentrations. These results complement existing literature that
 suggest that fiber consumption and the production of SCFAs are unable to
 prevent the risk of developing colonic tumors. It is important to note
-that our analysis concerned fecal SCFA concentrations and microbiome
-characterization and that observations along the mucosa near the site of
-lesions may provide a stronger association. Regardless, given the
-growing literature in this area, it is unlikely that SCFAs are the
-primary mechanism that limits tumorigenesis. This may be a cautionary
-result to temper enthusiasm for SCFAs as a biomarker of gut health more
-generally. Going forward it is critical to develop additional hypotheses
-for how the microbiome and host interact to drive tumorigenesis so that
-we can better understand tumorigenesis and identify biomarkers that will
-allow early detection of lesions.
+that our analysis was based on characterizations of SCFA and microbiome
+profiles using fecal samples and that observations along the mucosa near
+the site of lesions may provide a stronger association. This may be a
+cautionary result to temper enthusiasm for SCFAs as a biomarker of gut
+health more generally. Going forward it is critical to develop
+additional hypotheses for how the microbiome and host interact to drive
+tumorigenesis so that we can better understand tumorigenesis and
+identify biomarkers that will allow early detection of lesions.
 
 \hypertarget{acknowledgements}{%
 \subsection{Acknowledgements}\label{acknowledgements}}
