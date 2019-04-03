@@ -98,14 +98,14 @@
 
 \vspace{35mm}
 
-\hypertarget{fecal-short-chain-fatty-acids-are-not-predictive-of-colorectal-cancer-status-and-cannot-be-predicted-based-on-bacterial-community-structure}{%
-\section{Fecal short chain fatty acids are not predictive of colorectal
-cancer status and cannot be predicted based on bacterial community
-structure}\label{fecal-short-chain-fatty-acids-are-not-predictive-of-colorectal-cancer-status-and-cannot-be-predicted-based-on-bacterial-community-structure}}
+\hypertarget{fecal-short-chain-fatty-acids-are-not-predictive-of-colonic-tumor-status-and-cannot-be-predicted-based-on-bacterial-community-structure}{%
+\section{Fecal short chain fatty acids are not predictive of colonic
+tumor status and cannot be predicted based on bacterial community
+structure}\label{fecal-short-chain-fatty-acids-are-not-predictive-of-colonic-tumor-status-and-cannot-be-predicted-based-on-bacterial-community-structure}}
 
 \vspace{35mm}
 
-Marc A. Sze\({^1}\), Begüm Topçuoğlu\({^1}\), Nicholas A.
+Marc A. Sze\({^1}\), Begüm D. Topçuoğlu\({^1}\), Nicholas A.
 Lesniak\({^1}\), Mack T. Ruffin IV\({^2}\), Patrick D.
 Schloss\({^1}\)\({^\dagger}\)
 
@@ -131,31 +131,32 @@ Hershey Medical Center, Hershey, PA
 \hypertarget{abstract}{%
 \subsection{Abstract}\label{abstract}}
 
-The gut microbiome is thought to have a role in the development of
-colorectal cancer by protecting against and exacerbating inflammation.
-Short chain fatty acids (SCFAs), including butyrate, have been shown to
-have anti-inflammatory properties and are produced in large quantities
-by colonic bacteria. We assessed whether there was an association
-between fecal SCFA concentrations and the presence of colonic adenomas
-or carcinomas in a cohort of individuals that was previously
-individualed to 16S rRNA gene and metagenomic shotgun sequencing. We
-measured the fecal concentrations of acetate, propionate, isobutyrate,
-and butyrate within the cohort and found that there were no meaningful
-differences in their concentration and disease status. When we
-incorporated these concentrations into Random Forest classification
+Colonic bacterial populations are thought to have a role in the
+development of colorectal cancer with some protecting against
+inflammation and others exacerbating inflammation. Short chain fatty
+acids (SCFAs), including butyrate, have been shown to have
+anti-inflammatory properties and are produced in large quantities by
+colonic bacteria which produce SCFAs by fermenting fiber. We assessed
+whether there was an association between fecal SCFA concentrations and
+the presence of colonic adenomas or carcinomas in a cohort of
+individuals using 16S rRNA gene and metagenomic shotgun sequence data.
+We measured the fecal concentrations of acetate, propionate, and
+butyrate within the cohort and found that there were no significant
+associations between SCFA concentration and disease status. When we
+incorporated these concentrations into random forest classification
 models trained to differentiate between people with normal colons and
 those with adenomas or carcinomas, we found that they did not
 significantly improve the ability of 16S rRNA gene or metagenomic gene
 sequence-based models to classify individuals. Finally, we generated
-Random Forest regression models trained to predict the concentration of
+random forest regression models trained to predict the concentration of
 each SCFA based on 16S rRNA gene or metagenomic gene sequence data from
 the same samples. These models performed poorly and were able to explain
 at most 14\% of the observed variation in the SCFA concentrations. These
 results support the broader epidemiological data that questions the
 value of fiber consumption for reducing the risks of colorectal cancer.
-Although it is likely that bacterial metabolites may serve as biomarkers
-to detect adenomas or carcinomas, fecal SCFA concentrations have limited
-value.
+Although other bacterial metabolites may serve as biomarkers to detect
+adenomas or carcinomas, fecal SCFA concentrations have limited
+predictive power.
 
 \newpage
 
@@ -183,95 +184,83 @@ SCFAs, and tumor burden.
 Colorectal cancer is the third leading cancer-related cause of death
 within the United States (1). Less than 10\% of cases can be attributed
 to genetic risk factors (2). This leaves a significant role for
-environmental, behavioral, and other factors such as smoking and diet
-(3, 4). Colorectal cancer is thought to be initiated by a series of
-mutations that accumulate as mutated cells proliferate leading to
-adenomatous lesions, which are succeeded by carcinomas (2). Throughout
-this progression, there are ample opportunities for bacterial
-populations to create mutations, induce inflammation, and accelerate
-tumorigenesis. Numerous studies in murine models have supported this
-model (5--7). Additional cross sectional studies in humans have
-identified microbiome-based biomarkers of disease (8). These studies
-suggest that in some cases, it is the loss of bacterial populations that
-produce short-chain fatty acids (SCFAs) that results in increased
-inflammation and tumorigenesis.
+environmental and behavioral factors and diet (3, 4). Colorectal cancer
+is thought to be initiated by a series of mutations that accumulate as
+the mutated cells begin to proliferate leading to adenomatous lesions,
+which are succeeded by carcinomas (2). Throughout this progression,
+there are ample opportunities for bacterial populations to have a role
+as bacteria are known to cause mutations, induce inflammation, and
+accelerate tumorigenesis (5--7). Additional cross sectional studies in
+humans have identified microbiome-based biomarkers of disease (8). These
+studies suggest that in some cases, it is the loss of bacterial
+populations that produce short-chain fatty acids (SCFAs) that results in
+increased inflammation and tumorigenesis.
 
-SCFAs have anti-inflammatory and anti-proliferative activities (9).
-Direct supplementation of SCFAs or feeding of fiber caused an overall
-reduction in tumor burdenin mouse models of colorectal cancer (10).
-These results suggest that supplementation with substrates that bacteria
-can ferment to produce SCFAs may confer beneficial effects against
-colorectal cancer. Based on similar observations, many microbiome
-studies use the concentrations of SCFAs and the presence of 16S rRNA
-gene sequences from organisms and the genes involved in producing them
-as a biomarker of a healthy microbiota (11, 12). Regardless, there is a
-lack of evidence that increasing SCFA concentrations can protect against
-colorectal cancer in humans. Case-control studies that have investigated
-a possible associations between SCFAs and colon tumor status have been
-plagued by relatively small numbers of subjects, but have reported
-increased total and relative fecal acetate levels and decreased relative
-fecal butyrate concentrations in subjects with colonic lesions (13).
-Based on these limited results, one would hypothesize increasing SCFA
-concentrations could limit tumorigenesis, in randomized controlled
-trials fiber supplementation has been inconsistently associated with
-protection against tumor formation and recurrence (14, 15). These
-findings temper enthusiasm for treatments that aim to use SCFAs as
-biomarkers or protection against tumorigenesis.
+Many microbiome studies use the concentrations of SCFAs and the presence
+of 16S rRNA gene sequences from organisms and the genes involved in
+producing them as a biomarker of a healthy microbiota (9, 10). SCFAs
+have anti-inflammatory and anti-proliferative activities (11). Direct
+supplementation of SCFAs or feeding of fiber caused an overall reduction
+in tumor burden in mouse models of colorectal cancer (12). These results
+suggest that supplementation with fiber, which many colonic bacteria
+ferment to produce SCFAs may confer beneficial effects against
+colorectal cancer. Regardless, there is a lack of evidence that
+increasing SCFA concentrations can protect against colorectal cancer in
+humans. Case-control studies that have investigated possible
+associations between SCFAs and colon tumor status have been plagued by
+relatively small numbers of subjects, but have reported increased total
+and relative fecal acetate levels and decreased relative fecal butyrate
+concentrations in subjects with colonic lesions (13). In randomized
+controlled trials fiber supplementation has been inconsistently
+associated with protection against tumor formation and recurrence (14,
+15). These findings temper enthusiasm for treatments that aim to use
+SCFAs as biomarkers or protection against tumorigenesis.
 
-\textbf{SCFA concentrations do not meaningfully vary with diagnosis or
+\textbf{Fecal SCFA concentrations did not vary with diagnosis or
 treatment.} To quantify the associations between colorectal cancer, the
 microbiome, and SCFAs, we quantified the concentration of acetate,
-propionate, isobutyrate, and butyrate in feces of previously
-characterized individuals with normal colons (N=172) and those with
-colonic adenomas (N=198) or carcinomas (N=120) (16). The only SCFA that
-had a significantly different concentration across the diagnoses was
-isobutyrate (P=0.0091; Figure 1A). Interestingly, the median
-concentration of isobutyrate was 3.30 mmol/kg of feces in people with
-normal colons and it was 3.00 and 3.84 mmol/kg of feces in people with
-colonic adenomas or carcinomas, respectively. The difference in
-isobutyrate concentration between people with adenomas and carcinomas
-was significantly different (P=0.0065); however, the differences between
-people with normal colons and those with adenomas or carcinomas was not
-significant (P=0.19 and P=0.11). Among the individuals with adenomas and
-carcinomas, a subset (N\textsubscript{adenoma}=41,
+propionate, and butyrate in feces of previously characterized
+individuals with normal colons (N=172) and those with colonic adenomas
+(N=198) or carcinomas (N=120) (16). We were unable to detect a
+significant difference in any SCFA concentration across the diagnoses
+groups (all P\textgreater{}0.15; Figure 1A). Among the individuals with
+adenomas and carcinomas, a subset (N\textsubscript{adenoma}=41,
 N\textsubscript{carcinoma}=26) were treated and sampled a year later
-(17). The only SCFA that changed following treatment was isobutyrate,
-which decreased by 0.99 mmol/kg of feces (P=0.002; Figure 1B). For both
-the pre-treatment cross-sectional data and the pre/post treatment data,
-we also failed to detect any significant differences in the relative
-concentrations of any SCFAs other than isobutyrate (0.17). Finally, we
-pooled the SCFA concentrations on a total and per molecule of carbon
-basis and again failed to observe any significant differences
-(P\textgreater{}0.15). The low concentration of isobutyrate relative to
-the other SCFAs, inconsistent concentrations, and unexpected decrease in
-concentration with treatment makes it difficult to ascribe much
-biological relevance to the isobutyrate observations.
+(17). None of the SCFAs exhibited a significant change with treatment
+(all P\textgreater{}0.058; Figure 1B). For both the pre-treatment
+cross-sectional data and the pre/post treatment data, we also failed to
+detect any significant differences in the relative concentrations of any
+SCFAs (P\textgreater{}0.16). Finally, we pooled the SCFA concentrations
+on a total and per molecule of carbon basis and again failed to observe
+any significant differences (P\textgreater{}0.077). These results
+demonstrated that there were no significant associations between fecal
+SCFA concentration and diagnosis or treatment.
 
 \textbf{Combining SCFA and microbiome data does not improve the ability
 to diagnose individual as having adenomas or carcinomas.} We previously
 found that binning 16S rRNA gene sequence data into operational
 taxonomic units (OTUs) based on 97\% similarity or into genera enabled
-us to classify individuals as having adenomas or carcinomas using Random
-Forest machine learning models (8, 16). We repeated that analysis but
+us to classify individuals as having adenomas or carcinomas using random
+forest machine learning models (8, 16). We repeated that analysis but
 added the concentration of the SCFAs as possible features to train the
 models (Figure S1). Models trained using SCFAs to classify individuals
 as having adenomas or carcinomas rather than normal colons had median
 areas under the receiver operator characteristic curve (AUROC) that were
 significantly greater than 0.5 (P\textsubscript{adenoma}\textless{}0.001
-and P\textsubscript{carcinoma}\textless{}0.001); however, the AUROC
+and P\textsubscript{carcinoma}\textless{}0.001). However, the AUROC
 values to detect the presence of adenomas or carcinomas were only 0.54
-and 0.55, respectively (Figure 2A). When we trained the models with the
-SCFAs concentrations and OTU or genus-level relative abundances the
-AUROC values were not significantly different from the same models
-trained without the SCFA concentrations (P\textgreater{}0.21; Figure
-2A). These data demonstrate that knowledge of the SCFA profile from a
-patient's fecal sample did not improve the ability to diagnose a colonic
-lesion.
+and 0.55, respectively, indicating that SCFAs had poor predictive power
+on their own (Figure 2A). When we trained the models with the SCFAs
+concentrations and OTU or genus-level relative abundances the AUROC
+values were not significantly different from the same models trained
+without the SCFA concentrations (P\textgreater{}0.21; Figure 2A). These
+data demonstrate that knowledge of the SCFA profile from a patient's
+fecal sample did not improve the ability to diagnose a colonic lesion.
 
 \textbf{Knowledge of microbial community structure does not predict SCFA
 concentrations.} We next asked whether the fecal community structure was
 predictive of fecal SCFA concentrations, regardless of a person's
-diagnosis. We trained Random Forest regression models using 16S rRNA
+diagnosis. We trained random forest regression models using 16S rRNA
 gene sequence data binned into OTUs and genera to predict the
 concentration of the SCFAs (Figure S2). The largest R\textsuperscript{2}
 between the observed SCFA concentrations and the modeled concentrations
@@ -281,28 +270,29 @@ metagenomic sequencing data generated from a subset of our cohort
 (N\textsubscript{normal}=27, N\textsubscript{adenoma}=25, and
 N\textsubscript{cancer}=26) (18). We binned genes extracted from the
 assembled metagenomes into operational protein families (OPFs) or KEGG
-categories and trained Random Forest regression models using metagenomic
-to predict the concentration of the SCFAs (Figure S2). Similar to the
-analysis using 16S rRNA gene sequence data, the metagenomic data was not
-predictive of SCFA concentration; the largest amount of variation that
-the models could explain was 0.055, which was observed when using KEGG
-data to predict propionate concentrations (Figure 2B). Because of the
-limited number of samples that we were able to generate metagenomic
-sequence data from, we used our 16S rRNA gene sequence data to impute
-metagenomes that were binned into metabolic pathways or KEGG categories
-using PICRUSt (Figure S2). SCFA concentrations could not be predicted
-based on the imputed metagenomic data. The largest amount of variation
-that the models could explain was 0.097, which was observed when using
-KEGG data to predict butyrate concentrations (Figure 2B). The inability
-to model SCFA concentrations from microbiome data indicates that the
-knowledge of the abundance of organisms and their genes was insufficient
-to predict SCFA concentrations.
+categories and trained random forest regression models using metagenomic
+sequence data to predict the concentration of the SCFAs (Figure S2).
+Similar to the analysis using 16S rRNA gene sequence data, the
+metagenomic data was not predictive of SCFA concentration; the largest
+amount of variation that the models could explain was 5.45\%, which was
+observed when using KEGG data to predict propionate concentrations
+(Figure 2B). Because of the limited number of samples that we were able
+to generate metagenomic sequence data from, we used our 16S rRNA gene
+sequence data to impute metagenomes that were binned into metabolic
+pathways or KEGG categories using PICRUSt (Figure S2). SCFA
+concentrations could not be predicted based on the imputed metagenomic
+data. The largest amount of variation that the models could explain was
+9.67\%, which was observed when using KEGG data to predict butyrate
+concentrations (Figure 2B). The inability to model SCFA concentrations
+from microbiome data indicates that the knowledge of the abundance of
+organisms and their genes was insufficient to predict SCFA
+concentrations.
 
 \textbf{Conclusion.} Our data indicate that fecal SCFA concentrations
 are not associated with the presence of adenomas or carcinomas and that
 they provide weak predictive power to improve the ability to diagnose
 someone with one of these lesions. Furthermore, knowledge of the
-taxonomic and genetic structure of gut microbiota was not predictive
+taxonomic and genetic structure of gut microbiota was not predictive of
 SCFA concentrations. These results complement existing literature that
 suggest that fiber consumption and the production of SCFAs are unable to
 prevent the risk of developing colonic tumors. It is important to note
@@ -356,15 +346,17 @@ fecal samples in 1 mL of PBS. Second, instead of using the average
 weight of fecal sample aliquots to normalize SCFA concentrations, we
 used the actual weight of the fecal samples. These methodological
 changes did not affect the range of concentrations of these SCFAs
-between the two studies.
+between the two studies. The concentrations of isobutyrate were
+consistently at or below the limit of detection and were not included in
+our analysis.
 
 \textbf{16S rRNA gene sequence data analysis.} Sequence data from Baxter
 et al.~(16) and Sze et al.~(17) were obtained from the Sequence Read
-Archive (studies SRP062005 and SRP096978) and reprocessed using using
-mothur v.1.42 (20). The original studies generated sequence data from V4
-region of the 16S rRNA gene using paired 250 nt reads on an Illumina
-MiSeq sequencer. The resulting sequence data were assembled into contigs
-and screened to remove low quality contigs and chimeras. The curated
+Archive (studies SRP062005 and SRP096978) and reprocessed using mothur
+v.1.42 (20). The original studies generated sequence data from V4 region
+of the 16S rRNA gene using paired 250 nt reads on an Illumina MiSeq
+sequencer. The resulting sequence data were assembled into contigs and
+screened to remove low quality contigs and chimeras. The curated
 sequences were then clustered into OTUs at a 97\% similarity threshold
 and assigned to the closest possible genus with an 80\% confidence
 threshold trained on the reference collection from the Ribosomal
@@ -377,7 +369,7 @@ the samples described by Baxter et al.~(16) were used to generate
 metagenomic sequence data (N\textsubscript{normal}=27,
 N\textsubscript{adenoma}=25, and N\textsubscript{cancer}=26). These data
 were generated by Hannigan et al.~(18) and deposited into the Sequence
-Read Archive (study SRP108915). Fecal DNA was individualed to shotgun
+Read Archive (study SRP108915). Fecal DNA was subjected to shotgun
 sequencing on an Illumina HiSeq using 125 bp paired end reads. The
 archived sequences were already quality filtered and aligned to the
 human genome to remove contaminating sequence data. We downloaded the
@@ -390,7 +382,7 @@ identical to each other using mmseq2 (25). We also used mmseq2 to map
 the ORFs to the KEGG database and clustered the ORFs according to which
 category the ORFs mapped.
 
-\textbf{Random Forest models.} The classification models were built to
+\textbf{random forest models.} The classification models were built to
 predict lesion type from microbiome information with or without SCFA
 concentrations. The regression models were built to predict the SCFA
 concentrations of acetate, butyrate, and propionate from microbiome
@@ -429,7 +421,7 @@ model generated using only the SCFAs, we compared the distribution of
 the data to the expected median of 0.5 using the Wilcoxon rank sum test
 to test whether the model performed better than would be achieved by
 randomly assigning the data to each diagnosis. When we compared the
-Random Forest models generated without and with SCFA data included, we
+random forest models generated without and with SCFA data included, we
 used Wilcoxon rank sum tests to determine whether the models with the
 SCFA data included did better.
 
@@ -497,24 +489,8 @@ rRNA gene surveys to identify reproducible biomarkers in individuals
 with colorectal tumors.
 doi:\href{https://doi.org/10.1101/285486}{10.1101/285486}.
 
-\leavevmode\hypertarget{ref-OKeefe2016}{}%
-9. \textbf{O'Keefe SJD}. 2016. Diet, microorganisms and their
-metabolites and colon cancer. Nature Reviews Gastroenterology \&
-Hepatology \textbf{13}:691--706.
-doi:\href{https://doi.org/10.1038/nrgastro.2016.165}{10.1038/nrgastro.2016.165}.
-
-\leavevmode\hypertarget{ref-Bishehsari2018}{}%
-10. \textbf{Bishehsari F}, \textbf{Engen P}, \textbf{Preite N},
-\textbf{Tuncil Y}, \textbf{Naqib A}, \textbf{Shaikh M}, \textbf{Rossi
-M}, \textbf{Wilber S}, \textbf{Green S}, \textbf{Hamaker B},
-\textbf{Khazaie K}, \textbf{Voigt R}, \textbf{Forsyth C},
-\textbf{Keshavarzian A}. 2018. Dietary fiber treatment corrects the
-composition of gut microbiota, promotes SCFA production, and suppresses
-colon carcinogenesis. Genes \textbf{9}:102.
-doi:\href{https://doi.org/10.3390/genes9020102}{10.3390/genes9020102}.
-
 \leavevmode\hypertarget{ref-Sanna2019}{}%
-11. \textbf{Sanna S}, \textbf{Zuydam NR van}, \textbf{Mahajan A},
+9. \textbf{Sanna S}, \textbf{Zuydam NR van}, \textbf{Mahajan A},
 \textbf{Kurilshikov A}, \textbf{Vila AV}, \textbf{Võsa U},
 \textbf{Mujagic Z}, \textbf{Masclee AAM}, \textbf{Jonkers DMAE},
 \textbf{Oosting M}, \textbf{Joosten LAB}, \textbf{Netea MG},
@@ -525,7 +501,7 @@ diseases. Nature Genetics.
 doi:\href{https://doi.org/10.1038/s41588-019-0350-x}{10.1038/s41588-019-0350-x}.
 
 \leavevmode\hypertarget{ref-Meisel2016}{}%
-12. \textbf{Meisel M}, \textbf{Mayassi T}, \textbf{Fehlner-Peach H},
+10. \textbf{Meisel M}, \textbf{Mayassi T}, \textbf{Fehlner-Peach H},
 \textbf{Koval JC}, \textbf{O'Brien SL}, \textbf{Hinterleitner R},
 \textbf{Lesko K}, \textbf{Kim S}, \textbf{Bouziat R}, \textbf{Chen L},
 \textbf{Weber CR}, \textbf{Mazmanian SK}, \textbf{Jabri B},
@@ -533,6 +509,22 @@ doi:\href{https://doi.org/10.1038/s41588-019-0350-x}{10.1038/s41588-019-0350-x}.
 dysbiosis with butyrate deficiency associated with increased
 susceptibility to colitis. The ISME Journal \textbf{11}:15--30.
 doi:\href{https://doi.org/10.1038/ismej.2016.114}{10.1038/ismej.2016.114}.
+
+\leavevmode\hypertarget{ref-OKeefe2016}{}%
+11. \textbf{O'Keefe SJD}. 2016. Diet, microorganisms and their
+metabolites and colon cancer. Nature Reviews Gastroenterology \&
+Hepatology \textbf{13}:691--706.
+doi:\href{https://doi.org/10.1038/nrgastro.2016.165}{10.1038/nrgastro.2016.165}.
+
+\leavevmode\hypertarget{ref-Bishehsari2018}{}%
+12. \textbf{Bishehsari F}, \textbf{Engen P}, \textbf{Preite N},
+\textbf{Tuncil Y}, \textbf{Naqib A}, \textbf{Shaikh M}, \textbf{Rossi
+M}, \textbf{Wilber S}, \textbf{Green S}, \textbf{Hamaker B},
+\textbf{Khazaie K}, \textbf{Voigt R}, \textbf{Forsyth C},
+\textbf{Keshavarzian A}. 2018. Dietary fiber treatment corrects the
+composition of gut microbiota, promotes SCFA production, and suppresses
+colon carcinogenesis. Genes \textbf{9}:102.
+doi:\href{https://doi.org/10.3390/genes9020102}{10.3390/genes9020102}.
 
 \leavevmode\hypertarget{ref-Weaver1988}{}%
 13. \textbf{Weaver GA}, \textbf{Krause JA}, \textbf{Miller TL},
@@ -654,14 +646,14 @@ diagnosing the presence of adenomas, carcinomas, or all lesions and
 cannot be reliably predicted from 16S rRNA gene or metagenomic sequence
 data.} (A) The median AUROC for diagnosing individuals as having
 adenomas or carcinomas using SCFAs was slightly better than than chance
-(depicted by horizontal line at 0.50), but did improve performance of
-the models generated using 16S rRNA gene sequence data. (B) Regression
-models that were trained using 16S rRNA gene sequence, metagenomic, and
-PICRUSt data to predict the concentrations of SCFAs performed poorly
-(all median R\textsuperscript{2} values \textless{} 0.14). Regression
-models generated using 16S rRNA gene sequence and PICRUSt data included
-data from 490 samples and those generated using metagenomic data
-included data from 78 samples.
+(depicted by horizontal line at 0.50), but did not improve performance
+of the models generated using 16S rRNA gene sequence data. (B)
+Regression models that were trained using 16S rRNA gene sequence,
+metagenomic, and PICRUSt data to predict the concentrations of SCFAs
+performed poorly (all median R\textsuperscript{2} values \textless{}
+0.14). Regression models generated using 16S rRNA gene sequence and
+PICRUSt data included data from 490 samples and those generated using
+metagenomic data included data from 78 samples.
 
 \newpage
 
@@ -669,11 +661,11 @@ included data from 78 samples.
 
 \textbf{Figure S1. Comparison of training and testing results for
 classification models shows that the models are robust and are not
-overfit.} Random Forest classification models were generated to
+overfit.} random forest classification models were generated to
 differentiate between individuals with normal colons and those with
 adenomas or carcinomas using 16S rRNA gene sequence data that were
-clustered into genera or OTUs with and without including the four SCFAs
-as additional features. Random Forest classification models were
+clustered into genera or OTUs with and without including the three SCFAs
+as additional features. random forest classification models were
 generated by partitioning the samples into a training set with 80\% of
 the data and a testing set with the remaining samples for 100
 randomizations.
@@ -684,7 +676,7 @@ randomizations.
 
 \textbf{Figure S2. Comparison of training and testing results for
 regression models shows that the models are robust and are not overfit.}
-Random Forest regression models were generated to predict the
+random forest regression models were generated to predict the
 concentration of each SCFA using each individuals' microbiome data
 generated using 16S rRNA gene sequence and metagenomic sequence data.
 These regression models were generated by partitioning the samples into
