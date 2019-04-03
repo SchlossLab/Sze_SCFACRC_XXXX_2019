@@ -43,7 +43,7 @@ classification_plot <- classification_data %>%
 			labels = c("Without SCFAs", "With SCFAs"),
 			values = brewer.pal("PRGn", n=3)[-2]
 		) +
-		labs(x="Microbiome data included", y="AUCROC for\ndiagnosis classification") +
+		labs(x="Microbiome data included", y="AUROC for classification") +
 		theme_classic() +
 		theme(
 			strip.background = element_blank(),
@@ -82,7 +82,7 @@ regression_data <- read_tsv(regression_file_name,
 regression_features_plot <- regression_data %>%
 	ggplot(aes(x=microbiome, y=test_Rsquared, fill=data_type)) +
 	geom_boxplot() +
-	facet_wrap(~class, nrow=2, labeller=labeller(.default=capitalize)) +
+	facet_wrap(~class, nrow=1, labeller=labeller(.default=capitalize)) +
 	scale_x_discrete(
 		breaks = c("genus", "otu", "kegg", "opf", "pc2ec", "pc2pathways"),
 		labels = c("Genus", "OTU", "KEGG", "OPF", "KEGG", "Paths")
@@ -93,15 +93,17 @@ regression_features_plot <- regression_data %>%
 		labels = c("16S rRNA gene", "Metagenomic", "PICRUSt"),
 		values = brewer.pal("RdYlBu", n=3)
 	) +
-	labs(x="Microbiome data included", y=bquote(R^{2}~'for regression of SCFA concentrations')) +
+	labs(x="Microbiome data included", y=bquote(R^{2}~"for regression")) +
 	theme_classic() +
 	theme(
 		strip.background = element_blank(),
 		panel.spacing.x=unit(1, "lines"),
 		axis.ticks.x = element_blank(),
-		strip.text = element_text(size=10)
+		strip.text = element_text(size=10),
+		axis.text.x = element_text(angle = 90, hjust = 1,  vjust = 0.5)
 	)
 
-plot_grid(classification_plot, regression_features_plot, nrow=2, labels=c("A", "B"), rel_heights=c(0.5, 1))
+plot_grid(classification_plot, regression_features_plot, nrow=2, labels=c("A", "B"), rel_heights=c(1, 1))
 
-ggsave("results/figures/scfa_modeling.pdf", width=6.875, height=6, units="in")
+ggsave("results/figures/scfa_modeling.pdf", width=6.875, height=5.5, units="in")
+#	labs(x="Microbiome data included", y=bquote(atop(R^{2}~'for regression', 'of SCFA concentrations'))) +

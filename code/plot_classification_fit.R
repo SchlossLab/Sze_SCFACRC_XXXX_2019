@@ -35,7 +35,7 @@ classification_data %>%
 	ggplot(aes(x=microbiome, fill=test, y=auc)) +
 		geom_hline(yintercept=0.5, col="#888888") +
 		geom_boxplot(position=position_dodge2(preserve = "single"))+
-		facet_grid(scfa~class, labeller=labeller(.default=capitalize)) +
+		facet_grid(class~scfa, labeller=labeller(.default=capitalize)) +
 		coord_cartesian(ylim=c(0.35,1.0)) +
 		scale_x_discrete(
 			breaks = c("scfa", "genus", "otu"),
@@ -47,7 +47,7 @@ classification_data %>%
 			labels = c("Cross validation", "Held out data"),
 			values = brewer.pal("RdBu", n=3)[-2]
 		) +
-		labs(x="Microbiome data included", y="AUCROC for diagnosis classification") +
+		labs(x="Microbiome data included", y="AUROC for diagnosis classification") +
 		theme_classic() +
 		theme(
 			strip.background = element_blank(),
