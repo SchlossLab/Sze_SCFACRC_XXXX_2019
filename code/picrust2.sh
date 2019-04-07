@@ -1,5 +1,8 @@
 THREADS=6
 
+module load python-anaconda3/latest
+module load R/3.5.1
+
 WORKDIR=data/picrust2
 rm -rf $WORKDIR
 mkdir -p $WORKDIR
@@ -14,7 +17,7 @@ mothur "#make.biom(shared=data/asv/crc.asv.shared, outputdir=$WORKDIR)"
 
 mv $WORKDIR/crc.asv.ASV.biom $BIOM
 
-
+conda activate
 conda activate picrust2
 
 # Comments on whether this is an acceptable biom format

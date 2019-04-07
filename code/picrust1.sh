@@ -1,8 +1,7 @@
 #!bash
 
-# module load python-anaconda2/latest
-
-# module load R/3.5.1
+module load python-anaconda2/latest
+module load R/3.5.1
 
 #Set local variables
 REF=data/references
