@@ -78,7 +78,6 @@ $(REFS)/97_otu_map.txt $(REFS)/gg_13_5_99.gg.fasta $(REFS)/gg_13_5_99.gg.tax  :
 #
 ################################################################################
 
-# Targets build correctly
 # Process the SCFA data
 PLATES = plate1 plate2 plate3 plate4 plate5 plate6 plate7 plate8
 SCFA = acetate butyrate propionate #isobutyrate
@@ -90,7 +89,6 @@ data/scfa/scfa_composite.tsv : $(PLATE_FILES) data/metadata/scfa_plate_metadata.
 	Rscript code/scfa_combine_plates.R
 
 
-# Targets build correctly
 # Download files from SRA, run mothur pipeline to generate files for ASV, phylotype, and OTU-based
 # analyses as well as for picrust
 $(MOTHUR)/crc.otu.shared $(MOTHUR)/crc.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.opti_mcc.0.03.cons_gg.taxonomy $(MOTHUR)/crc.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.opti_mcc.0.03.cons_rdp.taxonomy $(MOTHUR)/crc.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.fasta $(MOTHUR)/crc.trim.contigs.good.unique.good.filter.unique.precluster.denovo.uchime.pick.pick.pick.count_table $(MOTHUR)/crc.trim.contigs.good.unique.good.filter.unique.precluster.pick.pds.wang.pick.pick.taxonomy :	code/mothur.sh\
@@ -102,7 +100,6 @@ $(MOTHUR)/crc.otu.shared $(MOTHUR)/crc.trim.contigs.good.unique.good.filter.uniq
 	bash code/mothur.sh
 
 
-# Targets build correctly
 # Pool OTUs into phylotypes
 data/phylotype/crc.%.shared data/phylotype/crc.%.taxonomy :\
 		$(MOTHUR)/crc.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.opti_mcc.0.03.cons_rdp.taxonomy\
@@ -110,7 +107,6 @@ data/phylotype/crc.%.shared data/phylotype/crc.%.taxonomy :\
 	Rscript code/phylotype.R $*
 
 
-# Targets build correctly
 # Output crc.asv.shared and crc.asv.taxonomy, and crc.asv.fasta file based on screened preclustered
 #	sequences in mothur pipeline
 data/asv/crc.asv.% : $(MOTHUR)/crc.trim.contigs.good.unique.good.filter.unique.precluster.denovo.uchime.pick.pick.pick.count_table\
@@ -137,7 +133,6 @@ data/picrust2/crc.%.shared : data/asv/crc.asv.shared\
 	bash code/picrust2.sh
 
 
-# Targets build correctly
 # Create the metag.opf.shared and metag.kegg.shared shared file along wiht the ko/opf look up file
 MGSHARED = data/metagenome/metag.opf.shared data/metagenome/metag.kegg.shared
 $(MGSHARED) data/metagenome/metag.ko_lookup.tsv : $(REFS)/genes.pep.format.fasta\
@@ -163,7 +158,6 @@ $(PROC)/scfa_cross_section_stats.tsv $(PROC)/scfa_pre_post_stats.tsv : \
 										data/metadata/follow_up.csv\
 										code/scfa_stat_analysis.R
 	Rscript code/scfa_stat_analysis.R
-
 
 
 ################################################################################
