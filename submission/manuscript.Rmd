@@ -82,7 +82,7 @@ Considering colorectal cancer is the third leading cancer-related cause of death
 
 Colorectal cancer is the third leading cancer-related cause of death within the United States [@Siegel2016]. Less than 10% of cases can be attributed to genetic risk factors [@Fearon1990]. This leaves a significant role for environmental, behavioral, and dietary factors [@FlissIsakov2017; @Lee2015]. Colorectal cancer is thought to be initiated by a series of mutations that accumulate as the mutated cells begin to proliferate leading to adenomatous lesions, which are succeeded by carcinomas [@Fearon1990]. Throughout this progression, there are ample opportunities for bacterial populations to have a role as bacteria are known to cause mutations, induce inflammation, and accelerate tumorigenesis [@Zackular2013; @DeStefanoShields2016; @Tomkovich2017]. Additional cross sectional studies in humans have identified microbiome-based biomarkers of disease [@Sze2018]. These studies suggest that in some cases, it is the loss of bacterial populations that produce short-chain fatty acids (SCFAs) that results in increased inflammation and tumorigenesis.
 
-Many microbiome studies use the concentrations of SCFAs and the presence of 16S rRNA gene sequences from organisms and the genes involved in producing them as a biomarker of a healthy microbiota [@Sanna2019; @Meisel2016]. SCFAs have anti-inflammatory and anti-proliferative activities [@OKeefe2016]. Direct supplementation of SCFAs or feeding of fiber caused an overall reduction in tumor burden in mouse models of colorectal cancer [@Bishehsari2018]. These results suggest that supplementation with fiber, which many colonic bacteria ferment to produce SCFAs may confer beneficial effects against colorectal cancer. Regardless, there is a lack of evidence that increasing SCFA concentrations can protect against colorectal cancer in humans. Case-control studies that have investigated possible associations between SCFAs and colon tumor status have been plagued by relatively small numbers of subjects, but have reported increased total and relative fecal acetate levels and decreased relative fecal butyrate concentrations in subjects with colonic lesions [@Weaver1988]. In randomized controlled trials fiber supplementation has been inconsistently associated with protection against tumor formation and recurrence [@Yao2017; @Gianfredi2018]. These findings temper enthusiasm for treatments that target the production of SCFAs or for using them as biomarkers for protection against tumorigenesis.
+Many microbiome studies use the concentrations of SCFAs and the presence of 16S rRNA gene sequences from organisms and the genes involved in producing them as a biomarker of a healthy microbiota [@Sanna2019; @Meisel2016]. SCFAs have anti-inflammatory and anti-proliferative activities [@OKeefe2016]. Direct supplementation of SCFAs or feeding of fiber caused an overall reduction in tumor burden in mouse models of colorectal cancer [@Bishehsari2018]. These results suggest that supplementation with fiber, which many colonic bacteria ferment to produce SCFAs may confer beneficial effects against colorectal cancer. Regardless, there is a lack of evidence that increasing SCFA concentrations can protect against colorectal cancer in humans. Case-control studies that have investigated possible associations between SCFAs and colon tumor status have been plagued by relatively small numbers of subjects, but have reported increased total and relative fecal acetate levels and decreased relative fecal butyrate concentrations in subjects with colonic lesions [@Weaver1988]. In randomized controlled trials fiber supplementation has been inconsistently associated with protection against tumor formation and recurrence [@Yao2017; @Gianfredi2018]. Such studies are plagued by difficulties insuring subjects took the proper dose and using subjects with prior polyp history who may be beyond a point of benefiting from fiber supplementation. Together, these findings temper enthusiasm for treatments that target the production of SCFAs or for using them as biomarkers for protection against tumorigenesis.
 
 
 ```{r, concentration}
@@ -133,7 +133,7 @@ min_p_compare_tax <- w_wo_compare %>%
 
 ```{r, regression}
 
-regression_features <- c("genus", "otu", "kegg", "opf", "pc2pathways", "pc2ec")
+regression_features <- c("genus", "otu", "kegg", "opf", "pc2pathways", "pc2ko")
 scfa_types <- c("acetate", "propionate", "butyrate")
 
 regression <- read_tsv("../data/rf/regression_data_pool.tsv",
@@ -151,7 +151,7 @@ regression <- read_tsv("../data/rf/regression_data_pool.tsv",
 							mutate(data_type = case_when(
 					       microbiome %in% c("genus", "otu")  ~ "16S",
 								 microbiome %in% c("kegg", "opf")  ~ "metagenomics",
-								 microbiome %in% c("pc2ec", "pc2pathways")  ~ "picrust"
+								 microbiome %in% c("pc2ko", "pc2pathways")  ~ "picrust"
 							 )) %>%
 							group_by(class, microbiome, data_type) %>%
 							summarize(median_Rsquared = median(test_Rsquared)) %>%
@@ -163,7 +163,7 @@ top_metagenomics <- regression %>% filter(data_type == "metagenomics") %>% arran
 
 top_picrust <- regression %>% filter(data_type == "picrust") %>% arrange(desc(median_Rsquared)) %>% ungroup() %>% slice(1)
 
-convert <- c(genus = "genus", otu = "OTU", kegg = "KEGG", opf = "OPF", pc2ec = "KEGG", pc2pathways = "pathway")
+convert <- c(genus = "genus", otu = "OTU", kegg = "KEGG", opf = "OPF", pc2ko = "KEGG", pc2pathways = "pathway")
 
 
 n_s <- read_tsv("../data/metagenome/metag.sample.counts")

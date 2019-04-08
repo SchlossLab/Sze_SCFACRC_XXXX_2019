@@ -55,7 +55,7 @@ classification_plot <- classification_data %>%
 
 regression_file_name <- "data/rf/regression_data_pool.tsv"
 
-regression_features <- c("genus", "otu", "kegg", "opf", "pc2pathways", "pc2ec")
+regression_features <- c("genus", "otu", "kegg", "opf", "pc2pathways", "pc2ko")
 scfa_types <- c("acetate", "propionate", "butyrate")
 
 regression_data <- read_tsv(regression_file_name,
@@ -75,7 +75,7 @@ regression_data <- read_tsv(regression_file_name,
 					data_type = case_when(
 			       microbiome %in% c("genus", "otu")  ~ "16S",
 						 microbiome %in% c("kegg", "opf")  ~ "metagenome",
-						 microbiome %in% c("pc2ec", "pc2pathways")  ~ "picrust"
+						 microbiome %in% c("pc2ko", "pc2pathways")  ~ "picrust"
 					 )
 				)
 
@@ -84,7 +84,7 @@ regression_features_plot <- regression_data %>%
 	geom_boxplot() +
 	facet_wrap(~class, nrow=1, labeller=labeller(.default=capitalize)) +
 	scale_x_discrete(
-		breaks = c("genus", "otu", "kegg", "opf", "pc2ec", "pc2pathways"),
+		breaks = c("genus", "otu", "kegg", "opf", "pc2ko", "pc2pathways"),
 		labels = c("Genus", "OTU", "KEGG", "OPF", "KEGG", "Paths")
 	) +
 	scale_fill_manual(

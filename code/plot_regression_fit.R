@@ -12,7 +12,7 @@ capitalize <- function(string) {
 
 regression_file_name <- "data/rf/regression_data_pool.tsv"
 
-regression_features <- c("genus", "otu", "kegg", "opf", "pc2pathways", "pc2ec")
+regression_features <- c("genus", "otu", "kegg", "opf", "pc2pathways", "pc2ko")
 scfa_types <- c("acetate", "propionate", "butyrate")
 
 regression_data <- read_tsv(regression_file_name,
@@ -32,7 +32,7 @@ regression_data <- read_tsv(regression_file_name,
 					data_type = case_when(
 			       microbiome %in% c("genus", "otu")  ~ "16S rRNA gene",
 						 microbiome %in% c("kegg", "opf")  ~ "Metagenomics",
-						 microbiome %in% c("pc2ec", "pc2pathways")  ~ "PICRUSt"
+						 microbiome %in% c("pc2ko", "pc2pathways")  ~ "PICRUSt"
 					 )
 				) %>%
 	gather(test, auc, train_Rsquared, test_Rsquared) %>%
@@ -43,7 +43,7 @@ regression_data %>%
 	geom_boxplot() +
 	facet_grid(class~data_type, labeller=labeller(.default=capitalize), scale="free_x") +
 	scale_x_discrete(
-		breaks = c("genus", "otu", "kegg", "opf", "pc2ec", "pc2pathways"),
+		breaks = c("genus", "otu", "kegg", "opf", "pc2ko", "pc2pathways"),
 		labels = c("Genus", "OTU", "KEGG", "OPF", "KEGG", "Paths")
 	) +
 	scale_fill_manual(
