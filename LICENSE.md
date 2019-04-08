@@ -1,6 +1,6 @@
 The MIT License (MIT)
 
-Copyright (c) 2019 Marc A Sze and Patrick D. Schloss
+Copyright (c) 2019 Marc A Sze, Begum D. Topcuoglu, Nicholas A. Lesniak, Mack T. Ruffin IV and Patrick D. Schloss
 
 
 
