@@ -167,7 +167,7 @@ $(PROC)/scfa_cross_section_stats.tsv $(PROC)/scfa_pre_post_stats.tsv : \
 #
 ################################################################################
 
-DX = adenoma cancer lesion
+DX = adenoma cancer #lesion
 SCFA = butyrate propionate acetate #pooled isobutyrate
 MICROBIOME = asv otu genus family phylum picrust1 pc2ko pc2ec pc2pathways opf kegg
 SEED = $(shell seq 0 99)
@@ -175,84 +175,84 @@ SEED = $(shell seq 0 99)
 CLASS_O_RF = $(foreach T,$(1),$(foreach D,$(DX),$(foreach S,$(SEED),data/rf/$D_$T/optimum_mtry.$S.csv)))
 
 
-ANALYTE_OC=$(call CLASS_O_RF,fit scfa fit_scfa)
+ANALYTE_OC=$(call CLASS_O_RF,scfa)
 ANALYTE_MC=$(subst optimum,all,$(ANALYTE_OC))
 
 $(ANALYTE_OC) $(ANALYTE_MC) : data/scfa/scfa_composite.tsv data/metadata/cross_section.csv code/rf_classification.R
 	Rscript code/rf_classification.R $(subst .,,$(suffix $(basename $@))) $(dir $@)
 
 
-ASV_OC=$(call CLASS_O_RF,asv fit_asv scfa_asv fit_scfa_asv)
+ASV_OC=$(call CLASS_O_RF,asv scfa_asv)
 ASV_MC=$(subst optimum,all,$(ASV_OC))
 
 $(ASV_OC) $(ASV_MC) : data/scfa/scfa_composite.tsv data/metadata/cross_section.csv data/asv/crc.asv.shared code/rf_classification.R
 	Rscript code/rf_classification.R $(subst .,,$(suffix $(basename $@))) $(dir $@)
 
 
-OTU_OC=$(call CLASS_O_RF,otu fit_otu scfa_otu fit_scfa_otu)
+OTU_OC=$(call CLASS_O_RF,otu scfa_otu)
 OTU_MC=$(subst optimum,all,$(OTU_OC))
 
 $(OTU_OC) $(OTU_MC) : data/scfa/scfa_composite.tsv data/metadata/cross_section.csv data/mothur/crc.otu.shared code/rf_classification.R
 	Rscript code/rf_classification.R $(subst .,,$(suffix $(basename $@))) $(dir $@)
 
 
-GENUS_OC=$(call CLASS_O_RF,genus fit_genus scfa_genus fit_scfa_genus)
+GENUS_OC=$(call CLASS_O_RF,genus scfa_genus)
 GENUS_MC=$(subst optimum,all,$(GENUS_OC))
 
 $(GENUS_OC) $(GENUS_MC) : data/scfa/scfa_composite.tsv data/metadata/cross_section.csv data/phylotype/crc.genus.shared code/rf_classification.R
 	Rscript code/rf_classification.R $(subst .,,$(suffix $(basename $@))) $(dir $@)
 
 
-FAMILY_OC=$(call CLASS_O_RF,family fit_family scfa_family fit_scfa_family)
+FAMILY_OC=$(call CLASS_O_RF,family scfa_family)
 FAMILY_MC=$(subst optimum,all,$(FAMILY_OC))
 
 $(FAMILY_OC) $(FAMILY_MC) : data/scfa/scfa_composite.tsv data/metadata/cross_section.csv data/phylotype/crc.family.shared code/rf_classification.R
 	Rscript code/rf_classification.R $(subst .,,$(suffix $(basename $@))) $(dir $@)
 
 
-PHYLUM_OC=$(call CLASS_O_RF,phylum fit_phylum scfa_phylum fit_scfa_phylum)
+PHYLUM_OC=$(call CLASS_O_RF,phylum scfa_phylum)
 PHYLUM_MC=$(subst optimum,all,$(PHYLUM_OC))
 
 $(PHYLUM_OC) $(PHYLUM_MC) : data/scfa/scfa_composite.tsv data/metadata/cross_section.csv data/phylotype/crc.phylum.shared code/rf_classification.R
 	Rscript code/rf_classification.R $(subst .,,$(suffix $(basename $@))) $(dir $@)
 
 
-PICRUST1_OC=$(call CLASS_O_RF,picrust1 fit_picrust1 scfa_picrust1 fit_scfa_picrust1)
+PICRUST1_OC=$(call CLASS_O_RF,picrust1 scfa_picrust1)
 PICRUST1_MC=$(subst optimum,all,$(PICRUST1_OC))
 
 $(PICRUST1_OC) $(PICRUST1_MC) : data/scfa/scfa_composite.tsv data/metadata/cross_section.csv data/picrust1/crc.picrust1.shared code/rf_classification.R
 	Rscript code/rf_classification.R $(subst .,,$(suffix $(basename $@))) $(dir $@)
 
 
-PC2KO_OC=$(call CLASS_O_RF,pc2ko fit_pc2ko scfa_pc2ko fit_scfa_pc2ko)
+PC2KO_OC=$(call CLASS_O_RF,pc2ko scfa_pc2ko)
 PC2KO_MC=$(subst optimum,all,$(PC2KO_OC))
 
 $(PC2KO_OC) $(PC2KO_MC) : data/scfa/scfa_composite.tsv data/metadata/cross_section.csv data/picrust2/crc.ko.shared code/rf_classification.R
 	Rscript code/rf_classification.R $(subst .,,$(suffix $(basename $@))) $(dir $@)
 
 
-PC2EC_OC=$(call CLASS_O_RF,pc2ec fit_pc2ec scfa_pc2ec fit_scfa_pc2ec)
+PC2EC_OC=$(call CLASS_O_RF,pc2ec scfa_pc2ec)
 PC2EC_MC=$(subst optimum,all,$(PC2EC_OC))
 
 $(PC2EC_OC) $(PC2EC_MC) : data/scfa/scfa_composite.tsv data/metadata/cross_section.csv data/picrust2/crc.ec.shared code/rf_classification.R
 	Rscript code/rf_classification.R $(subst .,,$(suffix $(basename $@))) $(dir $@)
 
 
-PC2PATHWAYS_OC=$(call CLASS_O_RF,pc2pathways fit_pc2pathways scfa_pc2pathways fit_scfa_pc2pathways)
+PC2PATHWAYS_OC=$(call CLASS_O_RF,pc2pathways scfa_pc2pathways)
 PC2PATHWAYS_MC=$(subst optimum,all,$(PC2PATHWAYS_OC))
 
 $(PC2PATHWAYS_OC) $(PC2PATHWAYS_MC) : data/scfa/scfa_composite.tsv data/metadata/cross_section.csv data/picrust2/crc.pathways.shared code/rf_classification.R
 	Rscript code/rf_classification.R $(subst .,,$(suffix $(basename $@))) $(dir $@)
 
 
-OPF_OC=$(call CLASS_O_RF,opf fit_opf scfa_opf fit_scfa_opf)
+OPF_OC=$(call CLASS_O_RF,opf scfa_opf)
 OPF_MC=$(subst optimum,all,$(OPF_OC))
 
 $(OPF_OC) $(OPF_MC) : data/scfa/scfa_composite.tsv data/metadata/zackular_metadata.tsv data/metagenome/metag.opf.shared code/rf_classification.R
 	Rscript code/rf_classification.R $(subst .,,$(suffix $(basename $@))) $(dir $@)
 
 
-KEGG_OC=$(call CLASS_O_RF,kegg fit_kegg scfa_kegg fit_scfa_kegg)
+KEGG_OC=$(call CLASS_O_RF,kegg scfa_kegg)
 KEGG_MC=$(subst optimum,all,$(KEGG_OC))
 
 $(KEGG_OC) $(KEGG_MC) : data/scfa/scfa_composite.tsv data/metadata/zackular_metadata.tsv data/metagenome/metag.kegg.shared code/rf_classification.R
@@ -262,84 +262,77 @@ $(KEGG_OC) $(KEGG_MC) : data/scfa/scfa_composite.tsv data/metadata/zackular_meta
 
 REG_O_RF = $(foreach T,$(1),$(foreach D,$(SCFA),$(foreach S,$(SEED),data/rf/$D_$T/optimum_mtry.$S.csv)))
 
-ANALYTE_OR=$(call REG_O_RF,fit)
-ANALYTE_MR=$(subst optimum,all,$(ANALYTE_OR))
-
-$(ANALYTE_OR) $(ANALYTE_MR) : data/scfa/scfa_composite.tsv data/metadata/cross_section.csv code/rf_regression.R
-	Rscript code/rf_regression.R $(subst .,,$(suffix $(basename $@))) $(dir $@)
-
-
-ASV_OR=$(call REG_O_RF,asv fit_asv)
+ASV_OR=$(call REG_O_RF,asv)
 ASV_MR=$(subst optimum,all,$(ASV_OR))
 
 $(ASV_OR) $(ASV_MR) : data/scfa/scfa_composite.tsv data/metadata/cross_section.csv data/asv/crc.asv.shared code/rf_regression.R
 	Rscript code/rf_regression.R $(subst .,,$(suffix $(basename $@))) $(dir $@)
 
 
-OTU_OR=$(call REG_O_RF,otu fit_otu)
+OTU_OR=$(call REG_O_RF,otu)
 OTU_MR=$(subst optimum,all,$(OTU_OR))
 
 $(OTU_OR) $(OTU_MR) : data/scfa/scfa_composite.tsv data/metadata/cross_section.csv data/mothur/crc.otu.shared code/rf_regression.R
 	Rscript code/rf_regression.R $(subst .,,$(suffix $(basename $@))) $(dir $@)
 
 
-GENUS_OR=$(call REG_O_RF,genus fit_genus)
+GENUS_OR=$(call REG_O_RF,genus)
 GENUS_MR=$(subst optimum,all,$(GENUS_OR))
 
 $(GENUS_OR) $(GENUS_MR) : data/scfa/scfa_composite.tsv data/metadata/cross_section.csv data/phylotype/crc.genus.shared code/rf_regression.R
 	Rscript code/rf_regression.R $(subst .,,$(suffix $(basename $@))) $(dir $@)
 
 
-FAMILY_OR=$(call REG_O_RF,family fit_family)
+FAMILY_OR=$(call REG_O_RF,family)
 FAMILY_MR=$(subst optimum,all,$(FAMILY_OR))
 
 $(FAMILY_OR) $(FAMILY_MR) : data/scfa/scfa_composite.tsv data/metadata/cross_section.csv data/phylotype/crc.family.shared code/rf_regression.R
 	Rscript code/rf_regression.R $(subst .,,$(suffix $(basename $@))) $(dir $@)
 
 
-PHYLUM_OR=$(call REG_O_RF,phylum fit_phylum)
+PHYLUM_OR=$(call REG_O_RF,phylum)
 PHYLUM_MR=$(subst optimum,all,$(PHYLUM_OR))
 
 $(PHYLUM_OR) $(PHYLUM_MR) : data/scfa/scfa_composite.tsv data/metadata/cross_section.csv data/phylotype/crc.phylum.shared code/rf_regression.R
 	Rscript code/rf_regression.R $(subst .,,$(suffix $(basename $@))) $(dir $@)
 
 
-PICRUST1_OR=$(call REG_O_RF,picrust1 fit_picrust1)
+PICRUST1_OR=$(call REG_O_RF,picrust1)
 PICRUST1_MR=$(subst optimum,all,$(PICRUST1_OR))
 
 $(PICRUST1_OR) $(PICRUST1_MR) : data/scfa/scfa_composite.tsv data/metadata/cross_section.csv data/picrust1/crc.picrust1.shared code/rf_regression.R
 	Rscript code/rf_regression.R $(subst .,,$(suffix $(basename $@))) $(dir $@)
 
 
-PC2KO_OR=$(call REG_O_RF,pc2ko fit_pc2ko)
+PC2KO_OR=$(call REG_O_RF,pc2ko)
 PC2KO_MR=$(subst optimum,all,$(PC2KO_OR))
 
 $(PC2KO_OR) $(PC2KO_MR) : data/scfa/scfa_composite.tsv data/metadata/cross_section.csv data/picrust2/crc.ko.shared code/rf_regression.R
 	Rscript code/rf_regression.R $(subst .,,$(suffix $(basename $@))) $(dir $@)
 
 
-PC2EC_OR=$(call REG_O_RF,pc2ec fit_pc2ec)
+PC2EC_OR=$(call REG_O_RF,pc2ec)
 PC2EC_MR=$(subst optimum,all,$(PC2EC_OR))
 
 $(PC2EC_OR) $(PC2EC_MR) : data/scfa/scfa_composite.tsv data/metadata/cross_section.csv data/picrust2/crc.ec.shared code/rf_regression.R
 	Rscript code/rf_regression.R $(subst .,,$(suffix $(basename $@))) $(dir $@)
 
 
-PC2PATHWAYS_OR=$(call REG_O_RF,pc2pathways fit_pc2pathways)
+PC2PATHWAYS_OR=$(call REG_O_RF,pc2pathways)
 PC2PATHWAYS_MR=$(subst optimum,all,$(PC2PATHWAYS_OR))
 
 $(PC2PATHWAYS_OR) $(PC2PATHWAYS_MR) : data/scfa/scfa_composite.tsv data/metadata/cross_section.csv data/picrust2/crc.pathways.shared code/rf_regression.R
 	Rscript code/rf_regression.R $(subst .,,$(suffix $(basename $@))) $(dir $@)
 
 
-OPF_OR=$(call REG_O_RF,opf fit_opf)
+OPF_OR=$(call REG_O_RF,opf)
 OPF_MR=$(subst optimum,all,$(OPF_OR))
 
 $(OPF_OR) $(OPF_MR) : data/scfa/scfa_composite.tsv data/metadata/zackular_metadata.tsv data/metagenome/metag.opf.shared code/rf_regression.R
 	Rscript code/rf_regression.R $(subst .,,$(suffix $(basename $@))) $(dir $@)
 
 
-KEGG_OR=$(call REG_O_RF,kegg fit_kegg)
+KEGG_OR=$(call REG_O_RF,kegg)
 KEGG_MR=$(subst optimum,all,$(KEGG_OR))
 
 $(KEGG_OR) $(KEGG_MR) : data/scfa/scfa_composite.tsv data/metadata/zackular_metadata.tsv data/metagenome/metag.kegg.shared code/rf_regression.R
@@ -354,13 +347,13 @@ $(KEGG_OR) $(KEGG_MR) : data/scfa/scfa_composite.tsv data/metadata/zackular_meta
 
 MICROBIOME_SUBSET = otu genus kegg opf pc2pathways pc2ko
 # Make monster pool files for classification and RF analysis
-CLASSIFICATION_TAGS = fit scfa fit_scfa $(MICROBIOME_SUBSET) $(foreach M,$(MICROBIOME_SUBSET),scfa_$M)
+CLASSIFICATION_TAGS = scfa $(MICROBIOME_SUBSET) $(foreach M,$(MICROBIOME_SUBSET),scfa_$M)
 CLASSIFICATION_POOLS = $(foreach C,$(CLASSIFICATION_TAGS),$(foreach D,$(DX),data/rf/$D_$C/cv_test_compare.tsv))
 
 data/rf/classification_data_pool.tsv : $(CLASSIFICATION_POOLS) code/rf_pool_pools.R
 	Rscript code/rf_pool_pools.R $@ $(CLASSIFICATION_POOLS)
 
-REGRESSION_TAGS = fit $(MICROBIOME) $(foreach M,$(MICROBIOME),fit_$M)
+REGRESSION_TAGS = $(MICROBIOME_SUBSET)
 REGRESSION_POOLS = $(foreach C,$(REGRESSION_TAGS),$(foreach S,$(SCFA),data/rf/$S_$C/cv_test_compare.tsv))
 
 data/rf/regression_data_pool.tsv : $(REGRESSION_POOLS) code/rf_pool_pools.R
@@ -431,9 +424,7 @@ figures : submission/figure_1.ps submission/figure_2.ps\
 					submission/figure_s1.png submission/figure_s2.png
 
 
-
-
-write.paper : \
+submission/manuscript.pdf submission/manuscript.md submission/manuscript.tex : \
 		figures\
 		data/metadata/cross_section.csv\
 		data/metadata/follow_up.csv\
@@ -448,3 +439,18 @@ write.paper : \
 	R -e 'library(rmarkdown); render("submission/manuscript.Rmd", clean=FALSE)'
 	mv submission/manuscript.knit.md submission/manuscript.md
 	rm submission/manuscript.utf8.md
+
+
+# module load perl-modules latexdiff/1.2.0
+submission/track_changes.pdf: submission/manuscript.tex
+	git cat-file -p 56654178478c1d217:submission/manuscript.tex > submission/manuscript_old.tex
+	latexdiff submission/manuscript_old.tex submission/manuscript.tex > submission/marked_up.tex
+	pdflatex -output-directory=submission submission/marked_up.tex
+	rm submission/marked_up.aux
+	rm submission/marked_up.log
+	rm submission/marked_up.out
+	rm submission/marked_up.tex
+	rm submission/manuscript_old.tex
+
+submission/response_to_reviewers.pdf : submission/response_to_reviewers.md submission/header.tex
+	pandoc $< -o $@ --include-in-header=submission/header.tex
