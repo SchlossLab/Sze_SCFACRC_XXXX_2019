@@ -24,7 +24,7 @@ Marc A. Sze${^1}$, Begüm D. Topçuoğlu${^1}$, Nicholas A. Lesniak${^1}$, Mack 
 
 \vspace{40mm}
 
-$\dagger$ To whom correspondence should be addressed: pschloss@umich.edu
+$\dagger$ To whom correspondence should be addressed: \href{mailto:pschloss@umich.edu}{pschloss@umich.edu}
 
 $1$ Department of Microbiology and Immunology, University of Michigan, Ann Arbor, MI 48109
 
