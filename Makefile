@@ -425,7 +425,8 @@ figures : submission/figure_1.ps submission/figure_2.ps\
 
 
 submission/manuscript.pdf submission/manuscript.md submission/manuscript.tex : \
-		figures\
+		submission/figure_1.ps submission/figure_2.ps submission/figure_s1.ps\
+		submission/figure_s2.ps\
 		data/metadata/cross_section.csv\
 		data/metadata/follow_up.csv\
 		data/process/scfa_cross_section_stats.tsv\
