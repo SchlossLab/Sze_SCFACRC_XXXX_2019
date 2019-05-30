@@ -372,7 +372,7 @@ data/rf/classification_cv_test_compare.tsv data/rf/classification_w_wo_SCFA.tsv 
 	Rscript code/rf_compare_classification_models.R
 
 
-results/figures/scfa_abundance.pdf : code/plot_scfa_comparisons.R\
+results/figures/scfa_comparisons.pdf : code/plot_scfa_comparisons.R\
 																		data/scfa/scfa_composite.tsv\
 																		data/metadata/cross_section.csv\
 																		data/metadata/follow_up.csv
@@ -443,8 +443,8 @@ submission/manuscript.pdf submission/manuscript.md submission/manuscript.tex : \
 
 
 # module load perl-modules latexdiff/1.2.0
-submission/track_changes.pdf: submission/manuscript.tex
-	git cat-file -p 56654178478c1d217:submission/manuscript.tex > submission/manuscript_old.tex
+submission/marked_up.pdf : submission/manuscript.tex
+	git cat-file -p d2a784e63f58566232ff:submission/manuscript.tex > submission/manuscript_old.tex
 	latexdiff submission/manuscript_old.tex submission/manuscript.tex > submission/marked_up.tex
 	pdflatex -output-directory=submission submission/marked_up.tex
 	rm submission/marked_up.aux
@@ -454,4 +454,4 @@ submission/track_changes.pdf: submission/manuscript.tex
 	rm submission/manuscript_old.tex
 
 submission/response_to_reviewers.pdf : submission/response_to_reviewers.md submission/header.tex
-	pandoc $< -o $@ --include-in-header=submission/header.tex
+	pandoc -s --include-in-header=submission/header.tex -V geometry:margin=1in -o $@ $<

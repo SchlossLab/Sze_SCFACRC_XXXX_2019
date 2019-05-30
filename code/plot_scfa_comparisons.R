@@ -62,7 +62,7 @@ longitudinal <- inner_join(scfa_data, follow_up_metadata, by=c("study_id"="initi
 		geom_boxplot() +
 		geom_blank(aes(y = ymin)) + geom_blank(aes(y = ymax)) +
 		facet_wrap(~scfa, scales="free_y", nrow=1, labeller=labeller(.default=capitalize)) +
-		labs(x=NULL, y="Difference in SCFA concentration\nbefore and after treatment") +
+		labs(x=NULL, y="Difference in SCFA concentration\nbefore and after treatment\n(mmol of SCFA/kg of feces)") +
 		scale_x_discrete(labels = NULL) +
 		scale_fill_manual(
 			breaks=c("normal", "adenoma", "cancer"),
